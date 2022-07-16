@@ -6,12 +6,23 @@ use Joomla\CMS\Factory;
 $app = Factory::getApplication();
 $wa  = $this->getWebAssetManager();
 
-$this->setTitle("Erro " . $this->error->getCode() . " - " . $this->error->getMessage());
-
 $wa->registerAndUseStyle('font-rawline', 'media/templates/site/govbr-ds/css/rawline.css');
 $wa->registerAndUseStyle('dsgov-core-css', 'media/templates/site/govbr-ds/css/core.css');
 $wa->registerAndUseStyle('fontawesome-all', 'media/templates/site/govbr-ds/css/all.min.css');
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
+
+$error_code = $this->error->getCode();
+$this->setTitle("Erro " . $error_code . " - " . htmlspecialchars($this->error->getMessage(), ENT_QUOTES, 'UTF-8'));
+$error_img = "https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/images/logo-positive.png";
+switch ($error_code)
+{
+    case 403:
+        $error_img = "/media/templates/site/govbr-ds/img/error403.png";
+        break;
+    case 404:
+        $error_img = "/media/templates/site/govbr-ds/img/error404.png";
+        break;
+}
 
 $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
 ?>
@@ -277,9 +288,9 @@ $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
                                 <div class="template-erro">
                                     <div class="row">
                                         <div class="col-sm-4 d-flex align-items-center justify-content-center">
-                                            <div class="mt-4 mt-sm-0"><img src="https://cdngovbr-ds.estaleiro.serpro.gov.br/design-system/images/logo-positive.png" alt="imagem de erro"/></div>
+                                            <div class="mt-4 mt-sm-0"><img src="<?php echo $error_img ?>" alt="imagem de erro"/></div>
                                         </div>
-                                        <div class="col text-center text-sm-left">
+                                        <div class="col align-self-center text-center text-sm-left">
                                             <div class="text-support-03">
                                                 <p class="text-up-06 text-semi-bold my-3">
                                                     Estamos constrangidos em te ver por aqui
@@ -296,6 +307,35 @@ $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
                                             </p>
                                         </div>
                                     </div>
+                                    <?php if ($this->debug) : ?>
+                                            <div class="row">
+                                            <p>
+                                				<?php echo $this->error->getCode(); ?> - <?php echo htmlspecialchars($this->error->getMessage(), ENT_QUOTES, 'UTF-8'); ?>
+					                            <br><?php echo htmlspecialchars($this->error->getFile(), ENT_QUOTES, 'UTF-8');?>:<?php echo $this->error->getLine(); ?>
+                                			</p>
+                                            </div>
+                                            <div class="row">
+                                                <?php echo $this->renderBacktrace(); ?>
+                                                <?php // Check if there are more Exceptions and render their data as well ?>
+                                                <?php if ($this->error->getPrevious()) : ?>
+                                                    <?php $loop = true; ?>
+                                                    <?php // Reference $this->_error here and in the loop as setError() assigns errors to this property and we need this for the backtrace to work correctly ?>
+                                                    <?php // Make the first assignment to setError() outside the loop so the loop does not skip Exceptions ?>
+                                                    <?php $this->setError($this->_error->getPrevious()); ?>
+                                                    <?php while ($loop === true) : ?>
+                                                        <p><strong><?php echo Text::_('JERROR_LAYOUT_PREVIOUS_ERROR'); ?></strong></p>
+                                                        <p>
+                                                            <?php echo htmlspecialchars($this->_error->getMessage(), ENT_QUOTES, 'UTF-8'); ?>
+                                                            <br><?php echo htmlspecialchars($this->_error->getFile(), ENT_QUOTES, 'UTF-8');?>:<?php echo $this->_error->getLine(); ?>
+                                                        </p>
+                                                        <?php echo $this->renderBacktrace(); ?>
+                                                        <?php $loop = $this->setError($this->_error->getPrevious()); ?>
+                                                    <?php endwhile; ?>
+                                                    <?php // Reset the main error object to the base error ?>
+                                                    <?php $this->setError($this->error); ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     <div class="my-3">
                                         <p>Aproveite para fazer uma nova busca</p>
                                         <div class="br-input input-button mt-n1 input-highlight">
