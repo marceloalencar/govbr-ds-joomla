@@ -347,11 +347,11 @@ $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
                                     </div>
                                     <div class="row my-5 text-center justify-content-lg-center">
                                         <div class="col-lg-auto">
-                                            <button class="br-button crumb" type="button"><i class="fas fa-chevron-left" aria-hidden="true"></i><span>Ir para Página Anterior</span>
+                                            <button class="br-button crumb" type="button" onclick="history.back()"><i class="fas fa-chevron-left" aria-hidden="true"></i><span>Ir para Página Anterior</span>
                                             </button>
                                         </div>
                                         <div class="col-lg-auto mt-1 mt-lg-0">
-                                            <button class="br-button crumb" type="button"><i class="fas fa-home" aria-hidden="true"></i><span>Ir para Página Principal</span>
+                                            <button class="br-button crumb" type="button" onclick="location.href = '/'"><i class="fas fa-home" aria-hidden="true"></i><span>Ir para Página Principal</span>
                                             </button>
                                         </div>
                                         <div class="col-lg-auto mt-1 mt-lg-0">
