@@ -36,8 +36,23 @@
 					<option value="0">Não</option>
 					<option value="1">Sim</option>
 				</field>
-				<field name="texto_licenca" type="textarea" label="Texto final a respeito da licença de uso" rows="1" cols="5"
-					description="Apresentado no rodapé de todas as páginas. Manter vazio para deixar a mensagem padrão."
+				<field name="imagem_logo" type="media" label="Logo"
+					description="É recomendada que a largura tenha, no máximo, 4x a dimensão da altura (ênfase) escolhida."
+					default="" />
+				<field name="texto_titulo" type="textarea" label="Título" rows="1" cols="5"
+					description="Título que identifica o site, sistema ou aplicativo."
+					default="Template básico"
+					filter="string" />
+				<field name="texto_subtitulo" type="textarea" label="Subtítulo" rows="1" cols="5"
+					description="Reforça a identificação de uma categoria associada ao título da página, ou descrição do mesmo."
+					default="Subtítulo do Header"
+					filter="string" />
+				<field name="texto_assinatura" type="textarea" label="Assinatura" rows="1" cols="5"
+					description="Identifica uma subcategoria ou descrição relacionada à marca."
+					default="Assinatura"
+					filter="string" />
+				<field name="texto_licenca" type="textarea" label="Informações legais" rows="1" cols="5"
+					description="Apresentado no rodapé de todas as páginas."
 					default="Desenvolvido com o CMS de c&amp;oacute;digo aberto &lt;strong&gt;&lt;a aria-label=&quot;Desenvolvido por Comunidade Joomla&quot; href=&quot;https://www.joomla.org&quot;&gt;Joomla&lt;/a&gt;&lt;/strong&gt;."
 					filter="raw" />
 			</fieldset>
