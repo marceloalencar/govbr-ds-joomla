@@ -9,6 +9,7 @@ $wa  = $this->getWebAssetManager();
 $wa->registerAndUseStyle('font-rawline', 'media/templates/site/govbr-ds/css/rawline.css');
 $wa->registerAndUseStyle('dsgov-core-css', 'media/templates/site/govbr-ds/css/core.css');
 $wa->registerAndUseStyle('fontawesome-all', 'media/templates/site/govbr-ds/css/all.min.css');
+$wa->registerAndUseStyle('dsgov-custom', 'media/templates/site/govbr-ds/css/custom.css');
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
 
 $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';

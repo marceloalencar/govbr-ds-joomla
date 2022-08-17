@@ -9,6 +9,7 @@ $wa  = $this->getWebAssetManager();
 $wa->registerAndUseStyle('font-rawline', 'media/templates/site/govbr-ds/css/rawline.css');
 $wa->registerAndUseStyle('dsgov-core-css', 'media/templates/site/govbr-ds/css/core.css');
 $wa->registerAndUseStyle('fontawesome-all', 'media/templates/site/govbr-ds/css/all.min.css');
+$wa->registerAndUseStyle('dsgov-custom', 'media/templates/site/govbr-ds/css/custom.css');
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
 
 $error_code = $this->error->getCode();
@@ -86,10 +87,12 @@ $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
                                     </div>
                                 </div>
                             </div>
-                            <div class="header-search-trigger">
-                                <button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search" data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i>
-                                </button>
-                            </div>
+							<?php if ($this->countModules("search")) : ?>
+								<div class="header-search-trigger">
+									<button class="br-button circle" type="button" aria-label="Abrir Busca" data-toggle="search" data-target=".header-search"><i class="fas fa-search" aria-hidden="true"></i>
+									</button>
+								</div>
+							<?php endif; ?>
                         </div>
                     </div>
                     <div class="header-bottom">
@@ -103,16 +106,7 @@ $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
                                 <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
                             </div>
                         </div>
-                        <div class="header-search" id="main-searchbox">
-                            <div class="br-input has-icon">
-                                <label for="searchbox">Texto da pesquisa</label>
-                                <input id="searchbox" type="text" placeholder="O que você procura?"/>
-                                <button class="br-button circle small" type="button" aria-label="Pesquisar"><i class="fas fa-search" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            <button class="br-button circle search-close ml-1" type="button" aria-label="Fechar Busca" data-dismiss="search"><i class="fas fa-times" aria-hidden="true"></i>
-                            </button>
-                        </div>
+                        <jdoc:include type="modules" name="search" style="none" />
                     </div>
                 </div>
             </header>
