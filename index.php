@@ -13,6 +13,8 @@ $wa->registerAndUseStyle('dsgov-custom', 'media/templates/site/govbr-ds/css/cust
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
 
 $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
+$cor_footer = $this->params->get('cor_footer') ? 'br-footer inverted pt-3' : 'br-footer pt-3';
+$logo_footer = $this->params->get('cor_footer') ? '/media/templates/site/govbr-ds/img/logo.svg' : '/media/templates/site/govbr-ds/img/logo_footer.svg';
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $this->language; ?>" dir="<?php echo $this->direction; ?>">
@@ -210,8 +212,85 @@ $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
                     </div>
                 </div>
             </main>
-
-            <footer class="br-footer pt-3" id="footer">
+            <footer class="<?php echo $cor_footer ?>" id="footer">
+				<div class="<?php echo $largura ?>">
+					<div class="logo"><img src="<?php echo $this->params->get('imagem_logo_footer', $logo_footer); ?>" alt="Imagem"/></div>
+					<div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
+						<div class="col-2"><a class="br-item header" href="javascript:void(0)">
+							<div class="content text-down-01 text-bold text-uppercase">Categoria 1</div>
+							<div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+							<div class="br-list"><span class="br-divider d-md-none"></span><a class="br-item" href="javascript:void(0)">
+								<div class="content">Ad deserunt nostrud</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Nulla occaecat eiusmod</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Nulla occaecat eiusmod</div></a><span class="br-divider d-md-none"></span>
+							</div>
+						</div>
+						<div class="col-2"><a class="br-item header" href="javascript:void(0)">
+							<div class="content text-down-01 text-bold text-uppercase">Categoria 2</div>
+							<div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+							<div class="br-list"><span class="br-divider d-md-none"></span><a class="br-item" href="javascript:void(0)">
+								<div class="content">Ex qui laborum consectetur aute commodo</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Duis incididunt consectetur</div></a><span class="br-divider d-md-none"></span>
+							</div>
+						</div>
+						<div class="col-2"><a class="br-item header" href="javascript:void(0)">
+							<div class="content text-down-01 text-bold text-uppercase">Categoria 3</div>
+							<div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+							<div class="br-list"><span class="br-divider d-md-none"></span><a class="br-item" href="javascript:void(0)">
+								<div class="content">Duis incididunt consectetur</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Adipisicing culpa et ad consequat</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Nulla occaecat eiusmod</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Duis incididunt consectetur</div></a><span class="br-divider d-md-none"></span>
+							</div>
+						</div>
+						<div class="col-2"><a class="br-item header" href="javascript:void(0)">
+							<div class="content text-down-01 text-bold text-uppercase">Categoria 4</div>
+							<div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+							<div class="br-list"><span class="br-divider d-md-none"></span><a class="br-item" href="javascript:void(0)">
+								<div class="content">Duis incididunt consectetur</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Qui esse</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Duis incididunt consectetur</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Duis incididunt consectetur</div></a><span class="br-divider d-md-none"></span>
+							</div>
+						</div>
+						<div class="col-2"><a class="br-item header" href="javascript:void(0)">
+							<div class="content text-down-01 text-bold text-uppercase">Categoria 5</div>
+							<div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+							<div class="br-list"><span class="br-divider d-md-none"></span><a class="br-item" href="javascript:void(0)">
+								<div class="content">Ad deserunt nostrud</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Adipisicing culpa et ad consequat</div></a><span class="br-divider d-md-none"></span>
+							</div>
+						</div>
+						<div class="col-2"><a class="br-item header" href="javascript:void(0)">
+							<div class="content text-down-01 text-bold text-uppercase">Categoria 6</div>
+							<div class="support"><i class="fas fa-angle-down" aria-hidden="true"></i></div></a>
+							<div class="br-list"><span class="br-divider d-md-none"></span><a class="br-item" href="javascript:void(0)">
+								<div class="content">Adipisicing culpa et ad consequat</div></a><a class="br-item" href="javascript:void(0)">
+								<div class="content">Qui esse</div></a><span class="br-divider d-md-none"></span>
+							</div>
+						</div>
+					</div>
+					<div class="d-none d-sm-block">
+						<div class="row align-items-end justify-content-between py-5">
+							<div class="col social-network">
+								<p class="text-up-01 text-extra-bold text-uppercase">Redes Sociais</p>
+									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+							</div>
+							<div class="col assigns text-right">
+								<?php if ($this->params->get('imagem_footer_acesso', '1')) : ?>
+									<a href="https://www.acessoainformacao.gov.br/"><img class="ml-4" src="/media/templates/site/govbr-ds/img/acesso_footer.svg" alt="Acesso a Informação"/></a>
+								<?php endif; ?>
+								<?php if ($this->params->get('imagem_footer_brasil', '1')) : ?>
+									<a href="https://www.gov.br/"><img class="ml-4" src="<?php echo $this->params->get('imagem_footer_brasil_src', '/media/templates/site/govbr-ds/img/brasil_footer.svg')?>" alt="Imagem"/></a>
+								<?php endif; ?>
+							</div>
+						</div>
+					</div>
+				</div>
+				<span class="br-divider my-3"></span>
                 <div class="<?php echo $largura ?>">
                     <div class="info">
                         <div class="text-down-01 text-medium pb-3">

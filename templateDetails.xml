@@ -36,7 +36,15 @@
 					<option value="0">Não</option>
 					<option value="1">Sim</option>
 				</field>
+				<field name="cor_footer" type="radio" layout="joomla.form.field.radio.switcher" default="0"
+				label="Rodapé claro">
+					<option value="0">Não</option>
+					<option value="1">Sim</option>
+				</field>
 				<field name="imagem_logo" type="media" label="Logo"
+					description="É recomendada que a largura tenha, no máximo, 4x a dimensão da altura (ênfase) escolhida."
+					default="" />
+				<field name="imagem_logo_footer" type="media" label="Logo (Rodapé)"
 					description="É recomendada que a largura tenha, no máximo, 4x a dimensão da altura (ênfase) escolhida."
 					default="" />
 				<field name="texto_titulo" type="textarea" label="Título" rows="1" cols="5"
@@ -55,6 +63,19 @@
 					description="Apresentado no rodapé de todas as páginas."
 					default="Desenvolvido com o CMS de c&amp;oacute;digo aberto &lt;strong&gt;&lt;a aria-label=&quot;Desenvolvido por Comunidade Joomla&quot; href=&quot;https://www.joomla.org&quot;&gt;Joomla&lt;/a&gt;&lt;/strong&gt;."
 					filter="raw" />
+				<field name="imagem_footer_brasil" type="radio" layout="joomla.form.field.radio.switcher" default="1"
+				label="Exibir logo Brasil" description="Marca do Governo Federal, exibida no rodapé da página.">
+					<option value="0">Não</option>
+					<option value="1">Sim</option>
+				</field>
+				<field name="imagem_footer_brasil_src" type="media" label="Logo Brasil"
+					showon="imagem_footer_brasil:1"
+					default="" />
+				<field name="imagem_footer_acesso" type="radio" layout="joomla.form.field.radio.switcher" default="1"
+				label="Exibir logo Acesso à Informação">
+					<option value="0">Não</option>
+					<option value="1">Sim</option>
+				</field>
 			</fieldset>
 		</fields>
 	</config>

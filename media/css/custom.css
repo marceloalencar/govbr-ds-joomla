@@ -17,3 +17,18 @@ form[role=search] {
   background-image: none;
 }
 
+.br-footer .assigns a:not(:disabled):hover {
+  background-image: none;
+}
+
+.br-footer .assigns a:not(:disabled):active {
+  background-image: none;
+}
+
+.br-footer .assigns img:not(:disabled):hover {
+  background-image: linear-gradient(rgba(var(--interactive-rgb), var(--hover)), rgba(var(--interactive-rgb), var(--hover)));
+}
+
+.br-footer .assigns img:not(:disabled):active {
+  background-image: linear-gradient(rgba(var(--interactive-rgb), var(--pressed)), rgba(var(--interactive-rgb), var(--pressed)));
+}
