@@ -8,3 +8,12 @@ form[role=search] {
   display: flex;
   flex: 100%;
 }
+
+.br-breadcrumb .crumb-list .crumb.home a:not(:disabled):hover {
+  background-image: none;
+}
+
+.br-breadcrumb .crumb-list .crumb.home a:not(:disabled):active {
+  background-image: none;
+}
+
