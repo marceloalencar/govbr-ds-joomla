@@ -108,6 +108,7 @@ form[role=search] {
     color: white !important;
 }
 
-.contrast a.br-item {
+.contrast a.br-item,
+.contrast a.menu-item{
     background-color: transparent;
 }
