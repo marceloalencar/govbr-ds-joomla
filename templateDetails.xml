@@ -22,7 +22,7 @@
 		<folder>webfonts</folder>
 	</media>
 	<positions>
-        <position>top</position>
+        <position>menuacesso</position>
 		<position>search</position>
 		<position>breadcrumbs</position>
 		<position>footer</position>

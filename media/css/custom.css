@@ -107,3 +107,7 @@ form[role=search] {
     border: 1px solid white !important;
     color: white !important;
 }
+
+.contrast a.br-item {
+    background-color: transparent;
+}
