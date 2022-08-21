@@ -2,6 +2,7 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
 
 $app = Factory::getApplication();
 $wa  = $this->getWebAssetManager();
@@ -12,9 +13,17 @@ $wa->registerAndUseStyle('fontawesome-all', 'media/templates/site/govbr-ds/css/a
 $wa->registerAndUseStyle('dsgov-custom', 'media/templates/site/govbr-ds/css/custom.css');
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
 
+$this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/apple-touch-icon.png', '', [], false, 1), 'apple-touch-icon', 'rel', ['sizes' => '180x180']);
+$this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/favicon-32x32.png', '', [], false, 1), 'icon', 'rel', ['type' => 'image/png', 'sizes' => '32x32']);
+$this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/favicon-16x16.png', '', [], false, 1), 'icon', 'rel', ['type' => 'image/png', 'sizes' => '16x16']);
+$this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/manifest.json', '', [], false, 1), 'manifest', 'rel', []);
+$this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/safari-pinned-tab.svg', '', [], false, 1), 'mask-icon', 'rel', ['color' => '#00a300']);
+$this->setMetaData('msapplication-config', 'media/templates/site/govbr-ds/favicons/browserconfig.xml');
+$this->setMetaData('theme-color', '#00a300');
+
 $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
 $cor_footer = $this->params->get('cor_footer') ? 'br-footer inverted pt-3' : 'br-footer pt-3';
-$logo_footer = $this->params->get('cor_footer') ? '/media/templates/site/govbr-ds/img/logo.svg' : '/media/templates/site/govbr-ds/img/logo_footer.svg';
+$logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds/img/logo.svg' : 'media/templates/site/govbr-ds/img/logo_footer.svg';
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $this->language; ?>" dir="<?php echo $this->direction; ?>">
@@ -35,7 +44,7 @@ $logo_footer = $this->params->get('cor_footer') ? '/media/templates/site/govbr-d
                 <div class="<?php echo $largura ?>">
                     <div class="header-top">
                         <div class="header-logo">
-                            <img src="<?php echo $this->params->get('imagem_logo', '/media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo"/>
+                            <img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo"/>
                             <span class="br-divider vertical mx-half mx-sm-1"></span>
                             <div class="header-sign"><?php echo $this->params->get('texto_assinatura', 'Assinatura'); ?></div>
                         </div>
@@ -107,7 +116,7 @@ $logo_footer = $this->params->get('cor_footer') ? '/media/templates/site/govbr-d
                             <div class="menu-container">
                                 <div class="menu-panel">
                                     <div class="menu-header">
-                                        <div class="menu-title"><img src="<?php echo $this->params->get('imagem_logo', '/media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="Imagem ilustrativa"/><span><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></span></div>
+                                        <div class="menu-title"><img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="Imagem ilustrativa"/><span><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></span></div>
                                         <div class="menu-close">
                                             <button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i>
                                             </button>
@@ -274,17 +283,17 @@ $logo_footer = $this->params->get('cor_footer') ? '/media/templates/site/govbr-d
 						<div class="row align-items-end justify-content-between py-5">
 							<div class="col social-network">
 								<p class="text-up-01 text-extra-bold text-uppercase">Redes Sociais</p>
-									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
-									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
-									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
-									<a class="mr-3" href="javascript:void(0);"><img src="/media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+									<a class="mr-3" href="javascript:void(0);"><img src="media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+									<a class="mr-3" href="javascript:void(0);"><img src="media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+									<a class="mr-3" href="javascript:void(0);"><img src="media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
+									<a class="mr-3" href="javascript:void(0);"><img src="media/templates/site/govbr-ds/img/img-round.png" alt="Image"/></a>
 							</div>
 							<div class="col assigns text-right">
 								<?php if ($this->params->get('imagem_footer_acesso', '1')) : ?>
-									<a href="https://www.acessoainformacao.gov.br/"><img class="ml-4" src="/media/templates/site/govbr-ds/img/acesso_footer.svg" alt="Acesso a Informação"/></a>
+									<a href="https://www.acessoainformacao.gov.br/"><img class="ml-4" src="media/templates/site/govbr-ds/img/acesso_footer.svg" alt="Acesso a Informação"/></a>
 								<?php endif; ?>
 								<?php if ($this->params->get('imagem_footer_brasil', '1')) : ?>
-									<a href="https://www.gov.br/"><img class="ml-4" src="<?php echo $this->params->get('imagem_footer_brasil_src', '/media/templates/site/govbr-ds/img/brasil_footer.svg')?>" alt="Imagem"/></a>
+									<a href="https://www.gov.br/"><img class="ml-4" src="<?php echo $this->params->get('imagem_footer_brasil_src', 'media/templates/site/govbr-ds/img/brasil_footer.svg')?>" alt="Imagem"/></a>
 								<?php endif; ?>
 							</div>
 						</div>

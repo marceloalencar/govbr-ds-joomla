@@ -15,11 +15,11 @@
 	</files>
 	<media destination="templates/site/govbr-ds" folder="media">
 		<folder>css</folder>
+		<folder>favicons</folder>
 		<folder>font</folder>
 		<folder>img</folder>
 		<folder>js</folder>
 		<folder>webfonts</folder>
-		<filename>favicon.ico</filename>
 	</media>
 	<positions>
         <position>top</position>
