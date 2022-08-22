@@ -37,6 +37,7 @@ switch ($error_code)
 }
 
 $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
+$tipomenu = $this->params->get('tipomenu') ? 'br-menu push' : 'br-menu';
 $cor_footer = $this->params->get('cor_footer') ? 'br-footer inverted pt-3' : 'br-footer pt-3';
 $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds/img/logo.svg' : 'media/templates/site/govbr-ds/img/logo_footer.svg';
 ?>
@@ -105,7 +106,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
             <main class="d-flex flex-fill mb-5" id="main">
                 <div class="<?php echo $largura ?> d-flex">
                     <div class="row">
-                        <div class="br-menu" id="main-navigation">
+                        <div class="<?php echo $tipomenu?>" id="main-navigation">
                             <div class="menu-container">
                                 <div class="menu-panel">
                                     <div class="menu-header">
