@@ -21,6 +21,7 @@
 	</media>
 	<positions>
         <position>menuacesso</position>
+        <position>menumapa</position>
 		<position>search</position>
 		<position>breadcrumbs</position>
 		<position>footer</position>
