@@ -33,6 +33,41 @@ form[role=search] {
   background-image: linear-gradient(rgba(var(--interactive-rgb), var(--pressed)), rgba(var(--interactive-rgb), var(--pressed)));
 }
 
+div.com-content-article [itemprop='headline'] {
+    font-size: 36px;
+    line-height: 40px;
+    font-weight: 600;
+    color: #0c326f;
+    padding-bottom: 10px;
+    margin: 0
+}
+
+div.com-content-article [itemprop='description'] {
+    font-weight: 400;
+    font-size: 18px;
+    color: #555;
+    line-height: normal;
+    margin-bottom: 16px;
+    margin: 0;
+    padding-bottom: 8px
+}
+
+@media only screen and (max-width: 575px) {
+    div.com-content-article [itemprop='headline'] {
+        font-size: 24px
+    }
+}
+
+div.com-content-article div[itemprop='articleBody']::first-letter {
+    color: #1351b4;
+    font-size: 3rem;
+    display: block;
+    font-weight: 700;
+    float: left;
+    line-height: 3rem;
+    margin-right: 20px
+}
+
 /* Modo Alto Contraste */
 
 .contrast,
