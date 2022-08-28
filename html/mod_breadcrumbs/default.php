@@ -123,3 +123,6 @@ use Joomla\CMS\WebAsset\WebAssetManager;
     }
     ?>
 </div>
+<?php if ($itemsCounter) : ?>
+<div class="br-divider pl-sm-3"></div>
+<?php endif; ?>
