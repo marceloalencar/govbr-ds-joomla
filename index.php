@@ -51,7 +51,18 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <div class="header-sign"><?php echo $this->params->get('texto_assinatura', 'Assinatura'); ?></div>
                         </div>
                         <div class="header-actions">
-                            <jdoc:include type="modules" name="menuacesso" style="acessorapido" />
+                            <?php if ($this->countModules('menuacesso')) : ?>
+                                <div class="header-links dropdown">
+                                    <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Acesso Rápido"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button>
+                                    <div class="br-list">
+                                        <div class="header">
+                                            <div class="title">Acesso Rápido</div>
+                                        </div>
+                                        <jdoc:include type="modules" name="menuacesso" style="none" />
+                                    </div>
+                                </div>
+                                <span class="br-divider vertical mx-half mx-sm-1"></span>
+                            <?php endif; ?>
                             <div class="header-functions dropdown">
                                 <button class="br-button circle small" type="button" data-toggle="dropdown" aria-label="Abrir Funcionalidades do Sistema"><i class="fas fa-th" aria-hidden="true"></i>
                                 </button>
