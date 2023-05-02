@@ -9,6 +9,13 @@ form[role=search] {
   flex: 100%;
 }
 
+.br-breadcrumb .crumb-list .crumb span {
+    font-size: var(--font-size-scale-down-01);
+    font-weight: var(--font-weight-medium);
+    padding: 0 0 0 var(--spacing-scale-base);
+    padding: 0 6px;
+}
+
 .br-breadcrumb .crumb-list .crumb.home a:not(:disabled):hover {
   background-image: none;
 }

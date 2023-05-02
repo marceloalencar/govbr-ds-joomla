@@ -204,7 +204,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                         </div>
                         <div class="col mb-5">
                             <jdoc:include type="modules" name="breadcrumbs" />
-                            <div class="main-content pl-sm-3 mt-4" id="main-content">
+                            <div class="main-content pl-sm-3" id="main-content">
                                 <jdoc:include type="message" />
                                 <jdoc:include type="component" />
                             </div>
