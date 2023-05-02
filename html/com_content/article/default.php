@@ -87,7 +87,6 @@ $isExpired         = !is_null($this->item->publish_down) && $this->item->publish
 	<?php if (isset ($this->item->toc)) :
 		echo $this->item->toc;
 	endif; ?>
-	<div class="br-divider"></div>
 	<div itemprop="articleBody" class="com-content-article__body">
 		<?php echo $this->item->text; ?>
 	</div>

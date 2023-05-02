@@ -33,6 +33,10 @@ form[role=search] {
   background-image: linear-gradient(rgba(var(--interactive-rgb), var(--pressed)), rgba(var(--interactive-rgb), var(--pressed)));
 }
 
+div.com-content-article div.page-header {
+    padding-top: 22px;
+}
+
 div.com-content-article [itemprop='headline'] {
     font-size: 36px;
     line-height: 40px;
@@ -66,6 +70,24 @@ div.com-content-article div[itemprop='articleBody']::first-letter {
     float: left;
     line-height: 3rem;
     margin-right: 20px
+}
+
+div.com-content-article figure {
+    text-align: center;
+    margin-bottom: 16px
+}
+
+div.com-content-article figure figcaption {
+    color: #555;
+    font-size: 0.88rem;
+    font-weight: normal;
+    max-width: 960px;
+    margin: 5px auto
+}
+
+div.com-content-article figure img {
+    height: auto;
+    max-width: 100%
 }
 
 /* Modo Alto Contraste */
