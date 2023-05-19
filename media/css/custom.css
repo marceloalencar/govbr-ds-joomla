@@ -62,14 +62,8 @@ div.com-content-article [itemprop='description'] {
     }
 }
 
-div.com-content-article div[itemprop='articleBody']::first-letter {
-    color: #1351b4;
-    font-size: 3rem;
-    display: block;
-    font-weight: 700;
-    float: left;
-    line-height: 3rem;
-    margin-right: 20px
+div.com-content-article div[itemprop='articleBody'] {
+    padding-top: 32px;
 }
 
 div.com-content-article figure {
@@ -88,6 +82,18 @@ div.com-content-article figure figcaption {
 div.com-content-article figure img {
     height: auto;
     max-width: 100%
+}
+
+div.tags span {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+}
+
+div.tags span a.tags-link {
+    padding: 0 8px;
+    margin: 0 0 25px;
 }
 
 /* Modo Alto Contraste */
