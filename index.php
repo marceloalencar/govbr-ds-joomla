@@ -202,7 +202,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                 <div class="menu-scrim" data-dismiss="menu" tabindex="0"></div>
                             </div>
                         </div>
-                        <div class="col mb-5">
+                        <div class="col">
                             <jdoc:include type="modules" name="breadcrumbs" />
                             <div class="main-content pl-sm-3" id="main-content">
                                 <jdoc:include type="message" />
