@@ -38,7 +38,9 @@ $isExpired         = !is_null($this->item->publish_down) && $this->item->publish
 		</<?php echo $htag; ?>>
 	</div>
 	<div itemprop="description">
+	<?php if (!empty($this->item->fulltext)) : ?>
 		<?php echo HTMLHelper::_('content.prepare', $this->item->introtext); ?>
+	<?php endif; ?>
 	</div>
 	<div class="br-divider"></div>
 	<?php endif; ?>
@@ -71,7 +73,11 @@ $isExpired         = !is_null($this->item->publish_down) && $this->item->publish
 	<?php if ($params->get('access-view')) : ?>
 	<?php echo LayoutHelper::render('joomla.content.full_image', $this->item); ?>
 	<div class="com-content-article__body pt-4 pb-4">
-		<?php echo $this->item->text; ?>
+		<?php if (empty($this->item->fulltext)) : ?>
+			<?php echo HTMLHelper::_('content.prepare', $this->item->text); ?>
+		<?php else : ?>
+			<?php echo HTMLHelper::_('content.prepare', $this->item->fulltext); ?>
+		<?php endif; ?>
 	</div>
 
 	<?php if ($params->get('show_tags', 1) && !empty($this->item->tags->itemTags)) : ?>
