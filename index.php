@@ -101,7 +101,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
             </header>
 
             <main class="d-flex flex-fill mb-5" id="main">
-                <div class="<?php echo $largura ?> d-flex">
+                <div class="<?php echo $largura ?>">
                     <div class="row">
                         <div class="<?php echo $tipomenu?>" id="main-navigation">
                             <div class="menu-container">
@@ -215,7 +215,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
             <footer class="<?php echo $cor_footer ?>" id="footer">
 				<div class="<?php echo $largura ?>">
 					<div class="logo"><img src="<?php echo $this->params->get('imagem_logo_footer', $logo_footer); ?>" alt="Imagem"/></div>
-                    <?php if ($this->countModules('menuacesso')) : ?>
+                    <?php if ($this->countModules('menumapa')) : ?>
                         <div class="br-list horizontal" data-toggle="data-toggle" data-sub="data-sub">
                             <jdoc:include type="modules" name="menumapa" style="none" />
                         </div>
