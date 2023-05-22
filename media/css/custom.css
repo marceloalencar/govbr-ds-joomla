@@ -71,7 +71,8 @@ div.com-content-article div[itemprop='articleBody'] {
 
 div.com-content-article figure {
     text-align: center;
-    margin-bottom: 16px
+    margin-bottom: 16px;
+    margin-top: 32px;
 }
 
 div.com-content-article figure figcaption {
