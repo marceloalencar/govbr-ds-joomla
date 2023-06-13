@@ -59,18 +59,22 @@ if ($displayData['active']) {
 
 ?>
 <?php if ($displayData['active']) : ?>
-    <li class="page">
-        <a aria-label="<?php echo $aria; ?>" <?php echo $link; ?> class="page-link">
-            <?php echo $display; ?>
-        </a>
+    <li>
+        <?php if (($item->text === Text::_('JPREVIOUS')) || ($item->text === Text::_('JNEXT'))) : ?>
+            <a class="br-button circle" aria-label="<?php echo $aria; ?>" <?php echo $link; ?>><?php echo $display; ?></a>
+        <?php else : ?>
+            <a class="page" aria-label="<?php echo $aria; ?>" <?php echo $link; ?>>
+                <?php echo $display; ?>
+            </a>
+        <?php endif; ?>
     </li>
 <?php elseif (isset($item->active) && $item->active) : ?>
     <?php $aria = Text::sprintf('JLIB_HTML_PAGE_CURRENT', strtolower($item->text)); ?>
-    <li class="page <?php echo $class; ?>">
-        <a aria-current="true" aria-label="<?php echo $aria; ?>" href="#" class="page-link"><?php echo $display; ?></a>
+    <li>
+        <a class="page <?php echo $class; ?>" aria-current="true" aria-label="<?php echo $aria; ?>" href="javascript:void(0)"><?php echo $display; ?></a>
     </li>
 <?php else : ?>
-    <li class="page <?php echo $class; ?>">
-        <span class="page-link" aria-hidden="true"><?php echo $display; ?></span>
+    <li>
+        <a class="br-button circle <?php echo $class; ?>" aria-label="<?php echo $aria; ?>" href="javascript:void(0)"><?php echo $display; ?></a>
     </li>
 <?php endif; ?>
