@@ -36,11 +36,12 @@ $isExpired         = !is_null($this->item->publish_down) && $this->item->publish
 		<<?php echo $htag; ?> itemprop="headline">
 			<?php echo $this->escape($this->item->title); ?>
 		</<?php echo $htag; ?>>
-	<div itemprop="description">
-	<?php if (!empty($this->item->fulltext)) : ?>
-		<?php echo HTMLHelper::_('content.prepare', $this->item->introtext); ?>
-	<?php endif; ?>
-	</div>
+		<?php if (!empty($this->item->fulltext)) : ?>
+			<div itemprop="description">
+				<?php echo HTMLHelper::_('content.prepare', $this->item->introtext); ?>
+			</div>
+		<?php endif; ?>
+	<div class="pt-4"></div>
 	<div class="br-divider"></div>
 	<?php endif; ?>
 	<?php endif; ?>
@@ -72,7 +73,7 @@ $isExpired         = !is_null($this->item->publish_down) && $this->item->publish
 	<?php endif; ?>
 	<?php if ($params->get('access-view')) : ?>
 	<?php echo LayoutHelper::render('joomla.content.full_image', $this->item); ?>
-	<div class="com-content-article__body pt-4 pb-4">
+	<div class="com-content-article__body pt-5 pb-4">
 		<?php if (empty($this->item->fulltext)) : ?>
 			<?php echo HTMLHelper::_('content.prepare', $this->item->text); ?>
 		<?php else : ?>
