@@ -73,7 +73,7 @@ $isExpired         = !is_null($this->item->publish_down) && $this->item->publish
 	<?php endif; ?>
 	<?php if ($params->get('access-view')) : ?>
 	<?php echo LayoutHelper::render('joomla.content.full_image', $this->item); ?>
-	<div class="com-content-article__body pt-4 pb-4">
+	<div class="com-content-article__body pt-5 pb-4">
 		<?php if (empty($this->item->fulltext)) : ?>
 			<?php echo HTMLHelper::_('content.prepare', $this->item->text); ?>
 		<?php else : ?>

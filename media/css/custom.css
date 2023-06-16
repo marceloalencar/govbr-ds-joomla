@@ -131,6 +131,14 @@ div.com-content-category-blog__item {
     padding-bottom: 16px;
 }
 
+div.com-content-category-blog__item img.itemImage {
+    float: right;
+    margin: 0 1em 0.5em 1em;
+    width: 128px;
+    height: 85px;
+    object-fit: contain;
+}
+
 div.com-content-category-blog__item .info {
     font-weight: 400;
     font-size: 16px;
