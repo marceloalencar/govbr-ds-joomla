@@ -35,7 +35,7 @@ $htag    = $this->params->get('show_page_heading') ? 'h2' : 'h1';
 
 ?>
 <div class="com-content-category-blog blog" itemscope itemtype="https://schema.org/Blog">
-    <div class="br-divider"></div>
+    <div class="br-divider pb-4"></div>
 
     <?php $showHeader = $this->params->get('show_page_heading') || $this->params->get('show_category_title'); ?>
 	<?php if ($showHeader) : ?>

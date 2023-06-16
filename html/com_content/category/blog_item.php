@@ -32,10 +32,11 @@ $currentDate   = Factory::getDate()->format('Y-m-d H:i:s');
 $isUnpublished = ($this->item->state == ContentComponent::CONDITION_UNPUBLISHED || $this->item->publish_up > $currentDate)
     || ($this->item->publish_down < $currentDate && $this->item->publish_down !== null);
 
-$layoutAttr = [
-    'src' => $images->image_intro,
-    'alt' => empty($images->image_intro_alt) && empty($images->image_intro_alt_empty) ? false : $images->image_intro_alt,
-];
+if (!empty($images->image_intro)) {
+    $layoutAttr = [
+        'src' => $images->image_intro,
+        'alt' => empty($images->image_intro_alt) && empty($images->image_intro_alt_empty) ? false : $images->image_intro_alt,
+    ];
 ?>
 
 <div class="tileImage">
@@ -44,6 +45,10 @@ $layoutAttr = [
         <!-- <img src="" alt="" class="tileImage" width="128" height="85"> -->
     </a>
 </div>
+
+<?php
+}
+?>
 
 <div class="item-content">
     <?php if ($isUnpublished) : ?>

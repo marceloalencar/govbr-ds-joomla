@@ -58,10 +58,14 @@ div.com-content-category-blog h2[itemprop='name'] {
     font-size: 24px;
     line-height: 26px;
     font-weight: 600;
-    color: #0c326f;
     margin-top: 0px;
     margin-bottom: 12px;
     padding: 0;
+}
+
+
+div.com-content-category-blog h2[itemprop='name'] a {
+    color: #0c326f;
 }
 
 div.com-content-category-blog h2 a {
