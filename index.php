@@ -91,8 +91,10 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                 </button>
                             </div>
                             <div class="header-info">
-                                <div class="header-title"><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></div>
-                                <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
+                                <a href="<?php echo JURI::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
+                                    <div class="header-title"><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></div>
+                                    <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
+                                </a>
                             </div>
                         </div>
                         <jdoc:include type="modules" name="search" style="none" />
