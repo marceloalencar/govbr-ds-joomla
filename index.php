@@ -47,8 +47,10 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                     <div class="header-top">
                         <div class="header-logo">
                             <img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo"/>
-                            <span class="br-divider vertical mx-half mx-sm-1"></span>
-                            <div class="header-sign"><?php echo $this->params->get('texto_assinatura', 'Assinatura'); ?></div>
+                            <?php if (!empty($this->params->get('texto_assinatura', ''))) : ?>
+                                <span class="br-divider vertical mx-half mx-sm-1"></span>
+                                <div class="header-sign"><?php echo $this->params->get('texto_assinatura', ''); ?></div>
+                            <?php endif; ?>
                         </div>
                         <div class="header-actions">
                             <?php if ($this->countModules('menuacesso')) : ?>
@@ -93,7 +95,9 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <div class="header-info">
                                 <a href="<?php echo JURI::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
                                     <div class="header-title"><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></div>
+                                    <?php if (!empty($this->params->get('texto_subtitulo', ''))) : ?>
                                     <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
+                                    <?php endif; ?>
                                 </a>
                             </div>
                         </div>
