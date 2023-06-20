@@ -152,6 +152,10 @@ div.com-content-category-blog div.tags {
     margin-bottom: 12px;
 }
 
+div.social-network i {
+    --icon-size: var(--icon-size-2x);
+}
+
 div.tags span {
     font-weight: 600;
     font-size: 16px;
