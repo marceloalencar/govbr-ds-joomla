@@ -210,9 +210,11 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                             </div>
                                         </div>
                                         <?php endif; ?>
+                                        <?php if (!empty($this->params->get('texto_menuinfo', ''))) : ?>
                                         <div class="menu-info">
-                                            <div class="text-center text-down-01">Todo o conteúdo deste site está publicado sob a licença <strong>Creative Commons Atribuição-SemDerivações 3.0</strong></div>
+                                            <div class="text-center text-down-01"><?php echo $this->params->get('texto_menuinfo', 'Desenvolvido com o CMS de c&oacute;digo aberto <strong><a aria-label="Desenvolvido por Comunidade Joomla" href="https://www.joomla.org">Joomla</a></strong>.'); ?></div>
                                         </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="menu-scrim" data-dismiss="menu" tabindex="0"></div>

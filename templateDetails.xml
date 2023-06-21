@@ -41,9 +41,9 @@
 					<option value="1">Sim</option>
 				</field>
 				<field name="cor_footer" type="radio" layout="joomla.form.field.radio.switcher" default="0"
-					label="Rodapé claro">
-					<option value="0">Não</option>
-					<option value="1">Sim</option>
+					label="Cor do rodapé">
+					<option value="0">Escuro</option>
+					<option value="1">Claro</option>
 				</field>
 				<field name="imagem_logo" type="media" label="Logo"
 					description="É recomendada que a largura tenha, no máximo, 4x a dimensão da altura (ênfase) escolhida."
@@ -51,15 +51,15 @@
 				<field name="imagem_logo_footer" type="media" label="Logo (Rodapé)"
 					description="É recomendada que a largura tenha, no máximo, 4x a dimensão da altura (ênfase) escolhida."
 					default="" />
-				<field name="texto_titulo" type="text" label="Título" rows="1" cols="5"
+				<field name="texto_titulo" type="text" label="Título"
 					description="Título que identifica o site, sistema ou aplicativo."
 					default="Template básico"
 					filter="string" />
-				<field name="texto_subtitulo" type="text" label="Subtítulo" rows="1" cols="5"
+				<field name="texto_subtitulo" type="text" label="Subtítulo"
 					description="Reforça a identificação de uma categoria associada ao título da página, ou descrição do mesmo."
 					default=""
 					filter="string" />
-				<field name="texto_assinatura" type="text" label="Assinatura" rows="1" cols="5"
+				<field name="texto_assinatura" type="text" label="Assinatura"
 					description="Identifica uma subcategoria ou descrição relacionada à marca."
 					default=""
 					filter="string" />
@@ -84,6 +84,10 @@
 					description="Endereço da página no YouTube"
 					showon="redes_sociais:1"
 					default="" />
+				<field name="texto_menuinfo" type="textarea" label="Informações legais (Rodapé do menu)" rows="1" cols="5"
+					description="Apresentado no rodapé do menu."
+					default=""
+					filter="raw" />
 				<field name="imagem_footer_brasil" type="radio" layout="joomla.form.field.radio.switcher" default="1"
 					label="Exibir logo Brasil" description="Marca do Governo Federal, exibida no rodapé da página.">
 					<option value="0">Não</option>
