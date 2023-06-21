@@ -21,10 +21,10 @@
 	</media>
 	<positions>
         <position>menuacesso</position>
-        <position>menumapa</position>
 		<position>search</position>
+		<position>menu-links</position>
 		<position>breadcrumbs</position>
-		<position>footer</position>
+        <position>menumapa</position>
 		<position>debug</position>
 	</positions>
 	<config>
