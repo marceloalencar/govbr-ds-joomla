@@ -24,7 +24,11 @@
 		<position>search</position>
 		<position>menu-logos</position>
 		<position>menu-links</position>
+		<position>main-top</position>
 		<position>breadcrumbs</position>
+		<position>content-top</position>
+		<position>content-bottom</position>
+		<position>main-bottom</position>
         <position>menumapa</position>
 		<position>debug</position>
 	</positions>

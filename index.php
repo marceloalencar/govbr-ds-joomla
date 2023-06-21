@@ -3,6 +3,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
 
 $app = Factory::getApplication();
 $wa  = $this->getWebAssetManager();
@@ -93,7 +94,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                 </button>
                             </div>
                             <div class="header-info">
-                                <a href="<?php echo JURI::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
+                                <a href="<?php echo Uri::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
                                     <div class="header-title"><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></div>
                                     <?php if (!empty($this->params->get('texto_subtitulo', ''))) : ?>
                                     <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
@@ -108,6 +109,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
 
             <main class="d-flex flex-fill mb-5" id="main">
                 <div class="<?php echo $largura ?>">
+                    <jdoc:include type="modules" name="main-top" />
                     <div class="row">
                         <div class="<?php echo $tipomenu?>" id="main-navigation">
                             <div class="menu-container">
@@ -232,12 +234,16 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <jdoc:include type="modules" name="breadcrumbs" />
                             <div class="main-content pl-sm-3" id="main-content">
                                 <jdoc:include type="message" />
+                                <jdoc:include type="modules" name="content-top" />
                                 <jdoc:include type="component" />
+                                <jdoc:include type="modules" name="content-bottom" />
                             </div>
                         </div>
                     </div>
+                    <jdoc:include type="modules" name="main-bottom" />
                 </div>
             </main>
+            
             <footer class="<?php echo $cor_footer ?>" id="footer">
 				<div class="<?php echo $largura ?>">
 					<div class="logo"><img src="<?php echo $this->params->get('imagem_logo_footer', $logo_footer); ?>" alt="Imagem"/></div>

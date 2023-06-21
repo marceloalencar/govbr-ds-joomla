@@ -63,7 +63,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <img src="<?php echo $this->params->get('imagem_logo', Uri::root() . 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo"/>
                             <?php if (!empty($this->params->get('texto_assinatura', ''))) : ?>
                                 <span class="br-divider vertical mx-half mx-sm-1"></span>
-                                <div class="header-sign"><?php echo $this->params->get('texto_assinatura', 'Assinatura'); ?></div>
+                                <div class="header-sign"><?php echo $this->params->get('texto_assinatura', ''); ?></div>
                             <?php endif; ?>
                         </div>
                         <div class="header-actions">
@@ -107,7 +107,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                 </button>
                             </div>
                             <div class="header-info">
-                                <a href="<?php echo JURI::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
+                                <a href="<?php echo Uri::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
                                     <div class="header-title"><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></div>
                                     <?php if (!empty($this->params->get('texto_subtitulo', ''))) : ?>
                                     <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
@@ -121,7 +121,8 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
             </header>
 
             <main class="d-flex flex-fill mb-5" id="main">
-                <div class="<?php echo $largura ?> d-flex">
+                <div class="<?php echo $largura ?>">
+                    <jdoc:include type="modules" name="main-top" />
                     <div class="row">
                         <div class="<?php echo $tipomenu?>" id="main-navigation">
                             <div class="menu-container">
@@ -245,6 +246,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                         <div class="col">
                             <jdoc:include type="modules" name="breadcrumbs" />
                             <div class="main-content pl-sm-3" id="main-content">
+                                <jdoc:include type="modules" name="content-top" />
                                 <div class="template-erro">
                                     <div class="row">
                                         <div class="col-sm-4 d-flex align-items-center justify-content-center">
@@ -320,9 +322,11 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                         </div>
                                     </div>
                                 </div>
+                                <jdoc:include type="modules" name="content-bottom" />
                             </div>
                         </div>
                     </div>
+                    <jdoc:include type="modules" name="main-bottom" />
                 </div>
             </main>
 
