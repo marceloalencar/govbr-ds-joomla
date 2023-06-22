@@ -12,32 +12,16 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/@popperjs/core/lib/popper.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/@popperjs/core/lib/popper.js + 56 modules ***!
-  \****************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "applyStyles": () => (/* reexport */ modifiers_applyStyles),
-  "arrow": () => (/* reexport */ modifiers_arrow),
-  "computeStyles": () => (/* reexport */ modifiers_computeStyles),
-  "createPopper": () => (/* binding */ popper_createPopper),
-  "createPopperLite": () => (/* reexport */ popper_lite_createPopper),
-  "defaultModifiers": () => (/* binding */ popper_defaultModifiers),
-  "detectOverflow": () => (/* reexport */ detectOverflow),
-  "eventListeners": () => (/* reexport */ eventListeners),
-  "flip": () => (/* reexport */ modifiers_flip),
-  "hide": () => (/* reexport */ modifiers_hide),
-  "offset": () => (/* reexport */ modifiers_offset),
-  "popperGenerator": () => (/* reexport */ popperGenerator),
-  "popperOffsets": () => (/* reexport */ modifiers_popperOffsets),
-  "preventOverflow": () => (/* reexport */ modifiers_preventOverflow)
+  fi: () => (/* binding */ popper_createPopper)
 });
+
+// UNUSED EXPORTS: applyStyles, arrow, computeStyles, createPopperLite, defaultModifiers, detectOverflow, eventListeners, flip, hide, offset, popperGenerator, popperOffsets, preventOverflow
 
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getWindow.js
 function getWindow(node) {
@@ -80,41 +64,63 @@ function isShadowRoot(node) {
 var math_max = Math.max;
 var math_min = Math.min;
 var round = Math.round;
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/userAgent.js
+function getUAString() {
+  var uaData = navigator.userAgentData;
+
+  if (uaData != null && uaData.brands && Array.isArray(uaData.brands)) {
+    return uaData.brands.map(function (item) {
+      return item.brand + "/" + item.version;
+    }).join(' ');
+  }
+
+  return navigator.userAgent;
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/isLayoutViewport.js
+
+function isLayoutViewport() {
+  return !/^((?!chrome|android).)*safari/i.test(getUAString());
+}
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js
 
 
-function getBoundingClientRect(element, includeScale) {
+
+
+function getBoundingClientRect(element, includeScale, isFixedStrategy) {
   if (includeScale === void 0) {
     includeScale = false;
   }
 
-  var rect = element.getBoundingClientRect();
+  if (isFixedStrategy === void 0) {
+    isFixedStrategy = false;
+  }
+
+  var clientRect = element.getBoundingClientRect();
   var scaleX = 1;
   var scaleY = 1;
 
-  if (isHTMLElement(element) && includeScale) {
-    var offsetHeight = element.offsetHeight;
-    var offsetWidth = element.offsetWidth; // Do not attempt to divide by 0, otherwise we get `Infinity` as scale
-    // Fallback to 1 in case both values are `0`
-
-    if (offsetWidth > 0) {
-      scaleX = round(rect.width) / offsetWidth || 1;
-    }
-
-    if (offsetHeight > 0) {
-      scaleY = round(rect.height) / offsetHeight || 1;
-    }
+  if (includeScale && isHTMLElement(element)) {
+    scaleX = element.offsetWidth > 0 ? round(clientRect.width) / element.offsetWidth || 1 : 1;
+    scaleY = element.offsetHeight > 0 ? round(clientRect.height) / element.offsetHeight || 1 : 1;
   }
 
+  var _ref = isElement(element) ? getWindow(element) : window,
+      visualViewport = _ref.visualViewport;
+
+  var addVisualOffsets = !isLayoutViewport() && isFixedStrategy;
+  var x = (clientRect.left + (addVisualOffsets && visualViewport ? visualViewport.offsetLeft : 0)) / scaleX;
+  var y = (clientRect.top + (addVisualOffsets && visualViewport ? visualViewport.offsetTop : 0)) / scaleY;
+  var width = clientRect.width / scaleX;
+  var height = clientRect.height / scaleY;
   return {
-    width: rect.width / scaleX,
-    height: rect.height / scaleY,
-    top: rect.top / scaleY,
-    right: rect.right / scaleX,
-    bottom: rect.bottom / scaleY,
-    left: rect.left / scaleX,
-    x: rect.left / scaleX,
-    y: rect.top / scaleY
+    width: width,
+    height: height,
+    top: y,
+    right: x + width,
+    bottom: y + height,
+    left: x,
+    x: x,
+    y: y
   };
 }
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getWindowScroll.js
@@ -215,7 +221,7 @@ function getCompositeRect(elementOrVirtualElement, offsetParent, isFixed) {
   var isOffsetParentAnElement = isHTMLElement(offsetParent);
   var offsetParentIsScaled = isHTMLElement(offsetParent) && isElementScaled(offsetParent);
   var documentElement = getDocumentElement(offsetParent);
-  var rect = getBoundingClientRect(elementOrVirtualElement, offsetParentIsScaled);
+  var rect = getBoundingClientRect(elementOrVirtualElement, offsetParentIsScaled, isFixed);
   var scroll = {
     scrollLeft: 0,
     scrollTop: 0
@@ -350,6 +356,7 @@ function isTableElement(element) {
 
 
 
+
 function getTrueOffsetParent(element) {
   if (!isHTMLElement(element) || // https://github.com/popperjs/popper-core/issues/837
   getComputedStyle(element).position === 'fixed') {
@@ -362,8 +369,8 @@ function getTrueOffsetParent(element) {
 
 
 function getContainingBlock(element) {
-  var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
-  var isIE = navigator.userAgent.indexOf('Trident') !== -1;
+  var isFirefox = /firefox/i.test(getUAString());
+  var isIE = /Trident/i.test(getUAString());
 
   if (isIE && isHTMLElement(element)) {
     // In IE 9, 10 and 11 fixed elements containing block is always established by the viewport
@@ -504,115 +511,6 @@ function debounce(fn) {
     return pending;
   };
 }
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/format.js
-function format(str) {
-  for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  return [].concat(args).reduce(function (p, c) {
-    return p.replace(/%s/, c);
-  }, str);
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/validateModifiers.js
-
-
-var INVALID_MODIFIER_ERROR = 'Popper: modifier "%s" provided an invalid %s property, expected %s but got %s';
-var MISSING_DEPENDENCY_ERROR = 'Popper: modifier "%s" requires "%s", but "%s" modifier is not available';
-var VALID_PROPERTIES = ['name', 'enabled', 'phase', 'fn', 'effect', 'requires', 'options'];
-function validateModifiers(modifiers) {
-  modifiers.forEach(function (modifier) {
-    [].concat(Object.keys(modifier), VALID_PROPERTIES) // IE11-compatible replacement for `new Set(iterable)`
-    .filter(function (value, index, self) {
-      return self.indexOf(value) === index;
-    }).forEach(function (key) {
-      switch (key) {
-        case 'name':
-          if (typeof modifier.name !== 'string') {
-            console.error(format(INVALID_MODIFIER_ERROR, String(modifier.name), '"name"', '"string"', "\"" + String(modifier.name) + "\""));
-          }
-
-          break;
-
-        case 'enabled':
-          if (typeof modifier.enabled !== 'boolean') {
-            console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"enabled"', '"boolean"', "\"" + String(modifier.enabled) + "\""));
-          }
-
-          break;
-
-        case 'phase':
-          if (modifierPhases.indexOf(modifier.phase) < 0) {
-            console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"phase"', "either " + modifierPhases.join(', '), "\"" + String(modifier.phase) + "\""));
-          }
-
-          break;
-
-        case 'fn':
-          if (typeof modifier.fn !== 'function') {
-            console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"fn"', '"function"', "\"" + String(modifier.fn) + "\""));
-          }
-
-          break;
-
-        case 'effect':
-          if (modifier.effect != null && typeof modifier.effect !== 'function') {
-            console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"effect"', '"function"', "\"" + String(modifier.fn) + "\""));
-          }
-
-          break;
-
-        case 'requires':
-          if (modifier.requires != null && !Array.isArray(modifier.requires)) {
-            console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"requires"', '"array"', "\"" + String(modifier.requires) + "\""));
-          }
-
-          break;
-
-        case 'requiresIfExists':
-          if (!Array.isArray(modifier.requiresIfExists)) {
-            console.error(format(INVALID_MODIFIER_ERROR, modifier.name, '"requiresIfExists"', '"array"', "\"" + String(modifier.requiresIfExists) + "\""));
-          }
-
-          break;
-
-        case 'options':
-        case 'data':
-          break;
-
-        default:
-          console.error("PopperJS: an invalid property has been provided to the \"" + modifier.name + "\" modifier, valid properties are " + VALID_PROPERTIES.map(function (s) {
-            return "\"" + s + "\"";
-          }).join(', ') + "; but \"" + key + "\" was provided.");
-      }
-
-      modifier.requires && modifier.requires.forEach(function (requirement) {
-        if (modifiers.find(function (mod) {
-          return mod.name === requirement;
-        }) == null) {
-          console.error(format(MISSING_DEPENDENCY_ERROR, String(modifier.name), requirement, requirement));
-        }
-      });
-    });
-  });
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/uniqueBy.js
-function uniqueBy(arr, fn) {
-  var identifiers = new Set();
-  return arr.filter(function (item) {
-    var identifier = fn(item);
-
-    if (!identifiers.has(identifier)) {
-      identifiers.add(identifier);
-      return true;
-    }
-  });
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getBasePlacement.js
-
-function getBasePlacement(placement) {
-  return placement.split('-')[0];
-}
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/mergeByName.js
 function mergeByName(modifiers) {
   var merged = modifiers.reduce(function (merged, current) {
@@ -628,180 +526,260 @@ function mergeByName(modifiers) {
     return merged[key];
   });
 }
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getViewportRect.js
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/createPopper.js
 
 
 
-function getViewportRect(element) {
-  var win = getWindow(element);
-  var html = getDocumentElement(element);
-  var visualViewport = win.visualViewport;
-  var width = html.clientWidth;
-  var height = html.clientHeight;
-  var x = 0;
-  var y = 0; // NB: This isn't supported on iOS <= 12. If the keyboard is open, the popper
-  // can be obscured underneath it.
-  // Also, `html.clientHeight` adds the bottom bar height in Safari iOS, even
-  // if it isn't open, so if this isn't available, the popper will be detected
-  // to overflow the bottom of the screen too early.
 
-  if (visualViewport) {
-    width = visualViewport.width;
-    height = visualViewport.height; // Uses Layout Viewport (like Chrome; Safari does not currently)
-    // In Chrome, it returns a value very close to 0 (+/-) but contains rounding
-    // errors due to floating point numbers, so we need to check precision.
-    // Safari returns a number <= 0, usually < -1 when pinch-zoomed
-    // Feature detection fails in mobile emulation mode in Chrome.
-    // Math.abs(win.innerWidth / visualViewport.scale - visualViewport.width) <
-    // 0.001
-    // Fallback here: "Not Safari" userAgent
 
-    if (!/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
-      x = visualViewport.offsetLeft;
-      y = visualViewport.offsetTop;
+
+
+
+
+var DEFAULT_OPTIONS = {
+  placement: 'bottom',
+  modifiers: [],
+  strategy: 'absolute'
+};
+
+function areValidElements() {
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return !args.some(function (element) {
+    return !(element && typeof element.getBoundingClientRect === 'function');
+  });
+}
+
+function popperGenerator(generatorOptions) {
+  if (generatorOptions === void 0) {
+    generatorOptions = {};
+  }
+
+  var _generatorOptions = generatorOptions,
+      _generatorOptions$def = _generatorOptions.defaultModifiers,
+      defaultModifiers = _generatorOptions$def === void 0 ? [] : _generatorOptions$def,
+      _generatorOptions$def2 = _generatorOptions.defaultOptions,
+      defaultOptions = _generatorOptions$def2 === void 0 ? DEFAULT_OPTIONS : _generatorOptions$def2;
+  return function createPopper(reference, popper, options) {
+    if (options === void 0) {
+      options = defaultOptions;
     }
-  }
 
-  return {
-    width: width,
-    height: height,
-    x: x + getWindowScrollBarX(element),
-    y: y
+    var state = {
+      placement: 'bottom',
+      orderedModifiers: [],
+      options: Object.assign({}, DEFAULT_OPTIONS, defaultOptions),
+      modifiersData: {},
+      elements: {
+        reference: reference,
+        popper: popper
+      },
+      attributes: {},
+      styles: {}
+    };
+    var effectCleanupFns = [];
+    var isDestroyed = false;
+    var instance = {
+      state: state,
+      setOptions: function setOptions(setOptionsAction) {
+        var options = typeof setOptionsAction === 'function' ? setOptionsAction(state.options) : setOptionsAction;
+        cleanupModifierEffects();
+        state.options = Object.assign({}, defaultOptions, state.options, options);
+        state.scrollParents = {
+          reference: isElement(reference) ? listScrollParents(reference) : reference.contextElement ? listScrollParents(reference.contextElement) : [],
+          popper: listScrollParents(popper)
+        }; // Orders the modifiers based on their dependencies and `phase`
+        // properties
+
+        var orderedModifiers = orderModifiers(mergeByName([].concat(defaultModifiers, state.options.modifiers))); // Strip out disabled modifiers
+
+        state.orderedModifiers = orderedModifiers.filter(function (m) {
+          return m.enabled;
+        });
+        runModifierEffects();
+        return instance.update();
+      },
+      // Sync update – it will always be executed, even if not necessary. This
+      // is useful for low frequency updates where sync behavior simplifies the
+      // logic.
+      // For high frequency updates (e.g. `resize` and `scroll` events), always
+      // prefer the async Popper#update method
+      forceUpdate: function forceUpdate() {
+        if (isDestroyed) {
+          return;
+        }
+
+        var _state$elements = state.elements,
+            reference = _state$elements.reference,
+            popper = _state$elements.popper; // Don't proceed if `reference` or `popper` are not valid elements
+        // anymore
+
+        if (!areValidElements(reference, popper)) {
+          return;
+        } // Store the reference and popper rects to be read by modifiers
+
+
+        state.rects = {
+          reference: getCompositeRect(reference, getOffsetParent(popper), state.options.strategy === 'fixed'),
+          popper: getLayoutRect(popper)
+        }; // Modifiers have the ability to reset the current update cycle. The
+        // most common use case for this is the `flip` modifier changing the
+        // placement, which then needs to re-run all the modifiers, because the
+        // logic was previously ran for the previous placement and is therefore
+        // stale/incorrect
+
+        state.reset = false;
+        state.placement = state.options.placement; // On each update cycle, the `modifiersData` property for each modifier
+        // is filled with the initial data specified by the modifier. This means
+        // it doesn't persist and is fresh on each update.
+        // To ensure persistent data, use `${name}#persistent`
+
+        state.orderedModifiers.forEach(function (modifier) {
+          return state.modifiersData[modifier.name] = Object.assign({}, modifier.data);
+        });
+
+        for (var index = 0; index < state.orderedModifiers.length; index++) {
+          if (state.reset === true) {
+            state.reset = false;
+            index = -1;
+            continue;
+          }
+
+          var _state$orderedModifie = state.orderedModifiers[index],
+              fn = _state$orderedModifie.fn,
+              _state$orderedModifie2 = _state$orderedModifie.options,
+              _options = _state$orderedModifie2 === void 0 ? {} : _state$orderedModifie2,
+              name = _state$orderedModifie.name;
+
+          if (typeof fn === 'function') {
+            state = fn({
+              state: state,
+              options: _options,
+              name: name,
+              instance: instance
+            }) || state;
+          }
+        }
+      },
+      // Async and optimistically optimized update – it will not be executed if
+      // not necessary (debounced to run at most once-per-tick)
+      update: debounce(function () {
+        return new Promise(function (resolve) {
+          instance.forceUpdate();
+          resolve(state);
+        });
+      }),
+      destroy: function destroy() {
+        cleanupModifierEffects();
+        isDestroyed = true;
+      }
+    };
+
+    if (!areValidElements(reference, popper)) {
+      return instance;
+    }
+
+    instance.setOptions(options).then(function (state) {
+      if (!isDestroyed && options.onFirstUpdate) {
+        options.onFirstUpdate(state);
+      }
+    }); // Modifiers have the ability to execute arbitrary code before the first
+    // update cycle runs. They will be executed in the same order as the update
+    // cycle. This is useful when a modifier adds some persistent data that
+    // other modifiers need to use, but the modifier is run after the dependent
+    // one.
+
+    function runModifierEffects() {
+      state.orderedModifiers.forEach(function (_ref) {
+        var name = _ref.name,
+            _ref$options = _ref.options,
+            options = _ref$options === void 0 ? {} : _ref$options,
+            effect = _ref.effect;
+
+        if (typeof effect === 'function') {
+          var cleanupFn = effect({
+            state: state,
+            name: name,
+            instance: instance,
+            options: options
+          });
+
+          var noopFn = function noopFn() {};
+
+          effectCleanupFns.push(cleanupFn || noopFn);
+        }
+      });
+    }
+
+    function cleanupModifierEffects() {
+      effectCleanupFns.forEach(function (fn) {
+        return fn();
+      });
+      effectCleanupFns = [];
+    }
+
+    return instance;
   };
 }
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getDocumentRect.js
+var createPopper = /*#__PURE__*/(/* unused pure expression or super */ null && (popperGenerator())); // eslint-disable-next-line import/no-unused-modules
 
 
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/eventListeners.js
+ // eslint-disable-next-line import/no-unused-modules
 
+var passive = {
+  passive: true
+};
 
- // Gets the entire size of the scrollable document area, even extending outside
-// of the `<html>` and `<body>` rect bounds if horizontally scrollable
+function effect(_ref) {
+  var state = _ref.state,
+      instance = _ref.instance,
+      options = _ref.options;
+  var _options$scroll = options.scroll,
+      scroll = _options$scroll === void 0 ? true : _options$scroll,
+      _options$resize = options.resize,
+      resize = _options$resize === void 0 ? true : _options$resize;
+  var window = getWindow(state.elements.popper);
+  var scrollParents = [].concat(state.scrollParents.reference, state.scrollParents.popper);
 
-function getDocumentRect(element) {
-  var _element$ownerDocumen;
-
-  var html = getDocumentElement(element);
-  var winScroll = getWindowScroll(element);
-  var body = (_element$ownerDocumen = element.ownerDocument) == null ? void 0 : _element$ownerDocumen.body;
-  var width = math_max(html.scrollWidth, html.clientWidth, body ? body.scrollWidth : 0, body ? body.clientWidth : 0);
-  var height = math_max(html.scrollHeight, html.clientHeight, body ? body.scrollHeight : 0, body ? body.clientHeight : 0);
-  var x = -winScroll.scrollLeft + getWindowScrollBarX(element);
-  var y = -winScroll.scrollTop;
-
-  if (getComputedStyle(body || html).direction === 'rtl') {
-    x += math_max(html.clientWidth, body ? body.clientWidth : 0) - width;
+  if (scroll) {
+    scrollParents.forEach(function (scrollParent) {
+      scrollParent.addEventListener('scroll', instance.update, passive);
+    });
   }
 
-  return {
-    width: width,
-    height: height,
-    x: x,
-    y: y
+  if (resize) {
+    window.addEventListener('resize', instance.update, passive);
+  }
+
+  return function () {
+    if (scroll) {
+      scrollParents.forEach(function (scrollParent) {
+        scrollParent.removeEventListener('scroll', instance.update, passive);
+      });
+    }
+
+    if (resize) {
+      window.removeEventListener('resize', instance.update, passive);
+    }
   };
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/contains.js
-
-function contains(parent, child) {
-  var rootNode = child.getRootNode && child.getRootNode(); // First, attempt with faster native method
-
-  if (parent.contains(child)) {
-    return true;
-  } // then fallback to custom implementation with Shadow DOM support
-  else if (rootNode && isShadowRoot(rootNode)) {
-      var next = child;
-
-      do {
-        if (next && parent.isSameNode(next)) {
-          return true;
-        } // $FlowFixMe[prop-missing]: need a better way to handle this...
+} // eslint-disable-next-line import/no-unused-modules
 
 
-        next = next.parentNode || next.host;
-      } while (next);
-    } // Give up, the result is false
+/* harmony default export */ const eventListeners = ({
+  name: 'eventListeners',
+  enabled: true,
+  phase: 'write',
+  fn: function fn() {},
+  effect: effect,
+  data: {}
+});
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getBasePlacement.js
 
-
-  return false;
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/rectToClientRect.js
-function rectToClientRect(rect) {
-  return Object.assign({}, rect, {
-    left: rect.x,
-    top: rect.y,
-    right: rect.x + rect.width,
-    bottom: rect.y + rect.height
-  });
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getClippingRect.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getInnerBoundingClientRect(element) {
-  var rect = getBoundingClientRect(element);
-  rect.top = rect.top + element.clientTop;
-  rect.left = rect.left + element.clientLeft;
-  rect.bottom = rect.top + element.clientHeight;
-  rect.right = rect.left + element.clientWidth;
-  rect.width = element.clientWidth;
-  rect.height = element.clientHeight;
-  rect.x = rect.left;
-  rect.y = rect.top;
-  return rect;
-}
-
-function getClientRectFromMixedType(element, clippingParent) {
-  return clippingParent === viewport ? rectToClientRect(getViewportRect(element)) : isElement(clippingParent) ? getInnerBoundingClientRect(clippingParent) : rectToClientRect(getDocumentRect(getDocumentElement(element)));
-} // A "clipping parent" is an overflowable container with the characteristic of
-// clipping (or hiding) overflowing elements with a position different from
-// `initial`
-
-
-function getClippingParents(element) {
-  var clippingParents = listScrollParents(getParentNode(element));
-  var canEscapeClipping = ['absolute', 'fixed'].indexOf(getComputedStyle(element).position) >= 0;
-  var clipperElement = canEscapeClipping && isHTMLElement(element) ? getOffsetParent(element) : element;
-
-  if (!isElement(clipperElement)) {
-    return [];
-  } // $FlowFixMe[incompatible-return]: https://github.com/facebook/flow/issues/1414
-
-
-  return clippingParents.filter(function (clippingParent) {
-    return isElement(clippingParent) && contains(clippingParent, clipperElement) && getNodeName(clippingParent) !== 'body';
-  });
-} // Gets the maximum area that the element is visible in due to any number of
-// clipping parents
-
-
-function getClippingRect(element, boundary, rootBoundary) {
-  var mainClippingParents = boundary === 'clippingParents' ? getClippingParents(element) : [].concat(boundary);
-  var clippingParents = [].concat(mainClippingParents, [rootBoundary]);
-  var firstClippingParent = clippingParents[0];
-  var clippingRect = clippingParents.reduce(function (accRect, clippingParent) {
-    var rect = getClientRectFromMixedType(element, clippingParent);
-    accRect.top = math_max(rect.top, accRect.top);
-    accRect.right = math_min(rect.right, accRect.right);
-    accRect.bottom = math_min(rect.bottom, accRect.bottom);
-    accRect.left = math_max(rect.left, accRect.left);
-    return accRect;
-  }, getClientRectFromMixedType(element, firstClippingParent));
-  clippingRect.width = clippingRect.right - clippingRect.left;
-  clippingRect.height = clippingRect.bottom - clippingRect.top;
-  clippingRect.x = clippingRect.left;
-  clippingRect.y = clippingRect.top;
-  return clippingRect;
+function getBasePlacement(placement) {
+  return placement.split('-')[0];
 }
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getVariation.js
 function getVariation(placement) {
@@ -882,401 +860,6 @@ function computeOffsets(_ref) {
 
   return offsets;
 }
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getFreshSideObject.js
-function getFreshSideObject() {
-  return {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0
-  };
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/mergePaddingObject.js
-
-function mergePaddingObject(paddingObject) {
-  return Object.assign({}, getFreshSideObject(), paddingObject);
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/expandToHashMap.js
-function expandToHashMap(value, keys) {
-  return keys.reduce(function (hashMap, key) {
-    hashMap[key] = value;
-    return hashMap;
-  }, {});
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/detectOverflow.js
-
-
-
-
-
-
-
-
- // eslint-disable-next-line import/no-unused-modules
-
-function detectOverflow(state, options) {
-  if (options === void 0) {
-    options = {};
-  }
-
-  var _options = options,
-      _options$placement = _options.placement,
-      placement = _options$placement === void 0 ? state.placement : _options$placement,
-      _options$boundary = _options.boundary,
-      boundary = _options$boundary === void 0 ? clippingParents : _options$boundary,
-      _options$rootBoundary = _options.rootBoundary,
-      rootBoundary = _options$rootBoundary === void 0 ? viewport : _options$rootBoundary,
-      _options$elementConte = _options.elementContext,
-      elementContext = _options$elementConte === void 0 ? popper : _options$elementConte,
-      _options$altBoundary = _options.altBoundary,
-      altBoundary = _options$altBoundary === void 0 ? false : _options$altBoundary,
-      _options$padding = _options.padding,
-      padding = _options$padding === void 0 ? 0 : _options$padding;
-  var paddingObject = mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
-  var altContext = elementContext === popper ? reference : popper;
-  var popperRect = state.rects.popper;
-  var element = state.elements[altBoundary ? altContext : elementContext];
-  var clippingClientRect = getClippingRect(isElement(element) ? element : element.contextElement || getDocumentElement(state.elements.popper), boundary, rootBoundary);
-  var referenceClientRect = getBoundingClientRect(state.elements.reference);
-  var popperOffsets = computeOffsets({
-    reference: referenceClientRect,
-    element: popperRect,
-    strategy: 'absolute',
-    placement: placement
-  });
-  var popperClientRect = rectToClientRect(Object.assign({}, popperRect, popperOffsets));
-  var elementClientRect = elementContext === popper ? popperClientRect : referenceClientRect; // positive = overflowing the clipping rect
-  // 0 or negative = within the clipping rect
-
-  var overflowOffsets = {
-    top: clippingClientRect.top - elementClientRect.top + paddingObject.top,
-    bottom: elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom,
-    left: clippingClientRect.left - elementClientRect.left + paddingObject.left,
-    right: elementClientRect.right - clippingClientRect.right + paddingObject.right
-  };
-  var offsetData = state.modifiersData.offset; // Offsets can be applied only to the popper element
-
-  if (elementContext === popper && offsetData) {
-    var offset = offsetData[placement];
-    Object.keys(overflowOffsets).forEach(function (key) {
-      var multiply = [right, bottom].indexOf(key) >= 0 ? 1 : -1;
-      var axis = [enums_top, bottom].indexOf(key) >= 0 ? 'y' : 'x';
-      overflowOffsets[key] += offset[axis] * multiply;
-    });
-  }
-
-  return overflowOffsets;
-}
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/createPopper.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var INVALID_ELEMENT_ERROR = 'Popper: Invalid reference or popper argument provided. They must be either a DOM element or virtual element.';
-var INFINITE_LOOP_ERROR = 'Popper: An infinite loop in the modifiers cycle has been detected! The cycle has been interrupted to prevent a browser crash.';
-var DEFAULT_OPTIONS = {
-  placement: 'bottom',
-  modifiers: [],
-  strategy: 'absolute'
-};
-
-function areValidElements() {
-  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  return !args.some(function (element) {
-    return !(element && typeof element.getBoundingClientRect === 'function');
-  });
-}
-
-function popperGenerator(generatorOptions) {
-  if (generatorOptions === void 0) {
-    generatorOptions = {};
-  }
-
-  var _generatorOptions = generatorOptions,
-      _generatorOptions$def = _generatorOptions.defaultModifiers,
-      defaultModifiers = _generatorOptions$def === void 0 ? [] : _generatorOptions$def,
-      _generatorOptions$def2 = _generatorOptions.defaultOptions,
-      defaultOptions = _generatorOptions$def2 === void 0 ? DEFAULT_OPTIONS : _generatorOptions$def2;
-  return function createPopper(reference, popper, options) {
-    if (options === void 0) {
-      options = defaultOptions;
-    }
-
-    var state = {
-      placement: 'bottom',
-      orderedModifiers: [],
-      options: Object.assign({}, DEFAULT_OPTIONS, defaultOptions),
-      modifiersData: {},
-      elements: {
-        reference: reference,
-        popper: popper
-      },
-      attributes: {},
-      styles: {}
-    };
-    var effectCleanupFns = [];
-    var isDestroyed = false;
-    var instance = {
-      state: state,
-      setOptions: function setOptions(setOptionsAction) {
-        var options = typeof setOptionsAction === 'function' ? setOptionsAction(state.options) : setOptionsAction;
-        cleanupModifierEffects();
-        state.options = Object.assign({}, defaultOptions, state.options, options);
-        state.scrollParents = {
-          reference: isElement(reference) ? listScrollParents(reference) : reference.contextElement ? listScrollParents(reference.contextElement) : [],
-          popper: listScrollParents(popper)
-        }; // Orders the modifiers based on their dependencies and `phase`
-        // properties
-
-        var orderedModifiers = orderModifiers(mergeByName([].concat(defaultModifiers, state.options.modifiers))); // Strip out disabled modifiers
-
-        state.orderedModifiers = orderedModifiers.filter(function (m) {
-          return m.enabled;
-        }); // Validate the provided modifiers so that the consumer will get warned
-        // if one of the modifiers is invalid for any reason
-
-        if (true) {
-          var modifiers = uniqueBy([].concat(orderedModifiers, state.options.modifiers), function (_ref) {
-            var name = _ref.name;
-            return name;
-          });
-          validateModifiers(modifiers);
-
-          if (getBasePlacement(state.options.placement) === auto) {
-            var flipModifier = state.orderedModifiers.find(function (_ref2) {
-              var name = _ref2.name;
-              return name === 'flip';
-            });
-
-            if (!flipModifier) {
-              console.error(['Popper: "auto" placements require the "flip" modifier be', 'present and enabled to work.'].join(' '));
-            }
-          }
-
-          var _getComputedStyle = getComputedStyle(popper),
-              marginTop = _getComputedStyle.marginTop,
-              marginRight = _getComputedStyle.marginRight,
-              marginBottom = _getComputedStyle.marginBottom,
-              marginLeft = _getComputedStyle.marginLeft; // We no longer take into account `margins` on the popper, and it can
-          // cause bugs with positioning, so we'll warn the consumer
-
-
-          if ([marginTop, marginRight, marginBottom, marginLeft].some(function (margin) {
-            return parseFloat(margin);
-          })) {
-            console.warn(['Popper: CSS "margin" styles cannot be used to apply padding', 'between the popper and its reference element or boundary.', 'To replicate margin, use the `offset` modifier, as well as', 'the `padding` option in the `preventOverflow` and `flip`', 'modifiers.'].join(' '));
-          }
-        }
-
-        runModifierEffects();
-        return instance.update();
-      },
-      // Sync update – it will always be executed, even if not necessary. This
-      // is useful for low frequency updates where sync behavior simplifies the
-      // logic.
-      // For high frequency updates (e.g. `resize` and `scroll` events), always
-      // prefer the async Popper#update method
-      forceUpdate: function forceUpdate() {
-        if (isDestroyed) {
-          return;
-        }
-
-        var _state$elements = state.elements,
-            reference = _state$elements.reference,
-            popper = _state$elements.popper; // Don't proceed if `reference` or `popper` are not valid elements
-        // anymore
-
-        if (!areValidElements(reference, popper)) {
-          if (true) {
-            console.error(INVALID_ELEMENT_ERROR);
-          }
-
-          return;
-        } // Store the reference and popper rects to be read by modifiers
-
-
-        state.rects = {
-          reference: getCompositeRect(reference, getOffsetParent(popper), state.options.strategy === 'fixed'),
-          popper: getLayoutRect(popper)
-        }; // Modifiers have the ability to reset the current update cycle. The
-        // most common use case for this is the `flip` modifier changing the
-        // placement, which then needs to re-run all the modifiers, because the
-        // logic was previously ran for the previous placement and is therefore
-        // stale/incorrect
-
-        state.reset = false;
-        state.placement = state.options.placement; // On each update cycle, the `modifiersData` property for each modifier
-        // is filled with the initial data specified by the modifier. This means
-        // it doesn't persist and is fresh on each update.
-        // To ensure persistent data, use `${name}#persistent`
-
-        state.orderedModifiers.forEach(function (modifier) {
-          return state.modifiersData[modifier.name] = Object.assign({}, modifier.data);
-        });
-        var __debug_loops__ = 0;
-
-        for (var index = 0; index < state.orderedModifiers.length; index++) {
-          if (true) {
-            __debug_loops__ += 1;
-
-            if (__debug_loops__ > 100) {
-              console.error(INFINITE_LOOP_ERROR);
-              break;
-            }
-          }
-
-          if (state.reset === true) {
-            state.reset = false;
-            index = -1;
-            continue;
-          }
-
-          var _state$orderedModifie = state.orderedModifiers[index],
-              fn = _state$orderedModifie.fn,
-              _state$orderedModifie2 = _state$orderedModifie.options,
-              _options = _state$orderedModifie2 === void 0 ? {} : _state$orderedModifie2,
-              name = _state$orderedModifie.name;
-
-          if (typeof fn === 'function') {
-            state = fn({
-              state: state,
-              options: _options,
-              name: name,
-              instance: instance
-            }) || state;
-          }
-        }
-      },
-      // Async and optimistically optimized update – it will not be executed if
-      // not necessary (debounced to run at most once-per-tick)
-      update: debounce(function () {
-        return new Promise(function (resolve) {
-          instance.forceUpdate();
-          resolve(state);
-        });
-      }),
-      destroy: function destroy() {
-        cleanupModifierEffects();
-        isDestroyed = true;
-      }
-    };
-
-    if (!areValidElements(reference, popper)) {
-      if (true) {
-        console.error(INVALID_ELEMENT_ERROR);
-      }
-
-      return instance;
-    }
-
-    instance.setOptions(options).then(function (state) {
-      if (!isDestroyed && options.onFirstUpdate) {
-        options.onFirstUpdate(state);
-      }
-    }); // Modifiers have the ability to execute arbitrary code before the first
-    // update cycle runs. They will be executed in the same order as the update
-    // cycle. This is useful when a modifier adds some persistent data that
-    // other modifiers need to use, but the modifier is run after the dependent
-    // one.
-
-    function runModifierEffects() {
-      state.orderedModifiers.forEach(function (_ref3) {
-        var name = _ref3.name,
-            _ref3$options = _ref3.options,
-            options = _ref3$options === void 0 ? {} : _ref3$options,
-            effect = _ref3.effect;
-
-        if (typeof effect === 'function') {
-          var cleanupFn = effect({
-            state: state,
-            name: name,
-            instance: instance,
-            options: options
-          });
-
-          var noopFn = function noopFn() {};
-
-          effectCleanupFns.push(cleanupFn || noopFn);
-        }
-      });
-    }
-
-    function cleanupModifierEffects() {
-      effectCleanupFns.forEach(function (fn) {
-        return fn();
-      });
-      effectCleanupFns = [];
-    }
-
-    return instance;
-  };
-}
-var createPopper = /*#__PURE__*/popperGenerator(); // eslint-disable-next-line import/no-unused-modules
-
-
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/eventListeners.js
- // eslint-disable-next-line import/no-unused-modules
-
-var passive = {
-  passive: true
-};
-
-function effect(_ref) {
-  var state = _ref.state,
-      instance = _ref.instance,
-      options = _ref.options;
-  var _options$scroll = options.scroll,
-      scroll = _options$scroll === void 0 ? true : _options$scroll,
-      _options$resize = options.resize,
-      resize = _options$resize === void 0 ? true : _options$resize;
-  var window = getWindow(state.elements.popper);
-  var scrollParents = [].concat(state.scrollParents.reference, state.scrollParents.popper);
-
-  if (scroll) {
-    scrollParents.forEach(function (scrollParent) {
-      scrollParent.addEventListener('scroll', instance.update, passive);
-    });
-  }
-
-  if (resize) {
-    window.addEventListener('resize', instance.update, passive);
-  }
-
-  return function () {
-    if (scroll) {
-      scrollParents.forEach(function (scrollParent) {
-        scrollParent.removeEventListener('scroll', instance.update, passive);
-      });
-    }
-
-    if (resize) {
-      window.removeEventListener('resize', instance.update, passive);
-    }
-  };
-} // eslint-disable-next-line import/no-unused-modules
-
-
-/* harmony default export */ const eventListeners = ({
-  name: 'eventListeners',
-  enabled: true,
-  phase: 'write',
-  fn: function fn() {},
-  effect: effect,
-  data: {}
-});
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/popperOffsets.js
 
 
@@ -1322,10 +905,9 @@ var unsetSides = {
 // Zooming can change the DPR, but it seems to report a value that will
 // cleanly divide the values into the appropriate subpixels.
 
-function roundOffsetsByDPR(_ref) {
+function roundOffsetsByDPR(_ref, win) {
   var x = _ref.x,
       y = _ref.y;
-  var win = window;
   var dpr = win.devicePixelRatio || 1;
   return {
     x: round(x * dpr) / dpr || 0,
@@ -1408,7 +990,7 @@ function mapToStyles(_ref2) {
   var _ref4 = roundOffsets === true ? roundOffsetsByDPR({
     x: x,
     y: y
-  }) : {
+  }, getWindow(popper)) : {
     x: x,
     y: y
   };
@@ -1434,17 +1016,6 @@ function computeStyles(_ref5) {
       adaptive = _options$adaptive === void 0 ? true : _options$adaptive,
       _options$roundOffsets = options.roundOffsets,
       roundOffsets = _options$roundOffsets === void 0 ? true : _options$roundOffsets;
-
-  if (true) {
-    var transitionProperty = getComputedStyle(state.elements.popper).transitionProperty || '';
-
-    if (adaptive && ['transform', 'top', 'right', 'bottom', 'left'].some(function (property) {
-      return transitionProperty.indexOf(property) >= 0;
-    })) {
-      console.warn(['Popper: Detected CSS transitions on at least one of the following', 'CSS properties: "transform", "top", "right", "bottom", "left".', '\n\n', 'Disable the "computeStyles" modifier\'s `adaptive` option to allow', 'for smooth transitions, or remove these properties from the CSS', 'transition declaration on the popper element if only transitioning', 'opacity or background-color for example.', '\n\n', 'We recommend using the popper element as a wrapper around an inner', 'element that can have any CSS property transitioned for animations.'].join(' '));
-    }
-  }
-
   var commonStyles = {
     placement: getBasePlacement(state.placement),
     variation: getVariation(state.placement),
@@ -1647,6 +1218,259 @@ function getOppositeVariationPlacement(placement) {
     return getOppositeVariationPlacement_hash[matched];
   });
 }
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getViewportRect.js
+
+
+
+
+function getViewportRect(element, strategy) {
+  var win = getWindow(element);
+  var html = getDocumentElement(element);
+  var visualViewport = win.visualViewport;
+  var width = html.clientWidth;
+  var height = html.clientHeight;
+  var x = 0;
+  var y = 0;
+
+  if (visualViewport) {
+    width = visualViewport.width;
+    height = visualViewport.height;
+    var layoutViewport = isLayoutViewport();
+
+    if (layoutViewport || !layoutViewport && strategy === 'fixed') {
+      x = visualViewport.offsetLeft;
+      y = visualViewport.offsetTop;
+    }
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x + getWindowScrollBarX(element),
+    y: y
+  };
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getDocumentRect.js
+
+
+
+
+ // Gets the entire size of the scrollable document area, even extending outside
+// of the `<html>` and `<body>` rect bounds if horizontally scrollable
+
+function getDocumentRect(element) {
+  var _element$ownerDocumen;
+
+  var html = getDocumentElement(element);
+  var winScroll = getWindowScroll(element);
+  var body = (_element$ownerDocumen = element.ownerDocument) == null ? void 0 : _element$ownerDocumen.body;
+  var width = math_max(html.scrollWidth, html.clientWidth, body ? body.scrollWidth : 0, body ? body.clientWidth : 0);
+  var height = math_max(html.scrollHeight, html.clientHeight, body ? body.scrollHeight : 0, body ? body.clientHeight : 0);
+  var x = -winScroll.scrollLeft + getWindowScrollBarX(element);
+  var y = -winScroll.scrollTop;
+
+  if (getComputedStyle(body || html).direction === 'rtl') {
+    x += math_max(html.clientWidth, body ? body.clientWidth : 0) - width;
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x,
+    y: y
+  };
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/contains.js
+
+function contains(parent, child) {
+  var rootNode = child.getRootNode && child.getRootNode(); // First, attempt with faster native method
+
+  if (parent.contains(child)) {
+    return true;
+  } // then fallback to custom implementation with Shadow DOM support
+  else if (rootNode && isShadowRoot(rootNode)) {
+      var next = child;
+
+      do {
+        if (next && parent.isSameNode(next)) {
+          return true;
+        } // $FlowFixMe[prop-missing]: need a better way to handle this...
+
+
+        next = next.parentNode || next.host;
+      } while (next);
+    } // Give up, the result is false
+
+
+  return false;
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/rectToClientRect.js
+function rectToClientRect(rect) {
+  return Object.assign({}, rect, {
+    left: rect.x,
+    top: rect.y,
+    right: rect.x + rect.width,
+    bottom: rect.y + rect.height
+  });
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getClippingRect.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getInnerBoundingClientRect(element, strategy) {
+  var rect = getBoundingClientRect(element, false, strategy === 'fixed');
+  rect.top = rect.top + element.clientTop;
+  rect.left = rect.left + element.clientLeft;
+  rect.bottom = rect.top + element.clientHeight;
+  rect.right = rect.left + element.clientWidth;
+  rect.width = element.clientWidth;
+  rect.height = element.clientHeight;
+  rect.x = rect.left;
+  rect.y = rect.top;
+  return rect;
+}
+
+function getClientRectFromMixedType(element, clippingParent, strategy) {
+  return clippingParent === viewport ? rectToClientRect(getViewportRect(element, strategy)) : isElement(clippingParent) ? getInnerBoundingClientRect(clippingParent, strategy) : rectToClientRect(getDocumentRect(getDocumentElement(element)));
+} // A "clipping parent" is an overflowable container with the characteristic of
+// clipping (or hiding) overflowing elements with a position different from
+// `initial`
+
+
+function getClippingParents(element) {
+  var clippingParents = listScrollParents(getParentNode(element));
+  var canEscapeClipping = ['absolute', 'fixed'].indexOf(getComputedStyle(element).position) >= 0;
+  var clipperElement = canEscapeClipping && isHTMLElement(element) ? getOffsetParent(element) : element;
+
+  if (!isElement(clipperElement)) {
+    return [];
+  } // $FlowFixMe[incompatible-return]: https://github.com/facebook/flow/issues/1414
+
+
+  return clippingParents.filter(function (clippingParent) {
+    return isElement(clippingParent) && contains(clippingParent, clipperElement) && getNodeName(clippingParent) !== 'body';
+  });
+} // Gets the maximum area that the element is visible in due to any number of
+// clipping parents
+
+
+function getClippingRect(element, boundary, rootBoundary, strategy) {
+  var mainClippingParents = boundary === 'clippingParents' ? getClippingParents(element) : [].concat(boundary);
+  var clippingParents = [].concat(mainClippingParents, [rootBoundary]);
+  var firstClippingParent = clippingParents[0];
+  var clippingRect = clippingParents.reduce(function (accRect, clippingParent) {
+    var rect = getClientRectFromMixedType(element, clippingParent, strategy);
+    accRect.top = math_max(rect.top, accRect.top);
+    accRect.right = math_min(rect.right, accRect.right);
+    accRect.bottom = math_min(rect.bottom, accRect.bottom);
+    accRect.left = math_max(rect.left, accRect.left);
+    return accRect;
+  }, getClientRectFromMixedType(element, firstClippingParent, strategy));
+  clippingRect.width = clippingRect.right - clippingRect.left;
+  clippingRect.height = clippingRect.bottom - clippingRect.top;
+  clippingRect.x = clippingRect.left;
+  clippingRect.y = clippingRect.top;
+  return clippingRect;
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getFreshSideObject.js
+function getFreshSideObject() {
+  return {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  };
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/mergePaddingObject.js
+
+function mergePaddingObject(paddingObject) {
+  return Object.assign({}, getFreshSideObject(), paddingObject);
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/expandToHashMap.js
+function expandToHashMap(value, keys) {
+  return keys.reduce(function (hashMap, key) {
+    hashMap[key] = value;
+    return hashMap;
+  }, {});
+}
+;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/detectOverflow.js
+
+
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+function detectOverflow(state, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      _options$placement = _options.placement,
+      placement = _options$placement === void 0 ? state.placement : _options$placement,
+      _options$strategy = _options.strategy,
+      strategy = _options$strategy === void 0 ? state.strategy : _options$strategy,
+      _options$boundary = _options.boundary,
+      boundary = _options$boundary === void 0 ? clippingParents : _options$boundary,
+      _options$rootBoundary = _options.rootBoundary,
+      rootBoundary = _options$rootBoundary === void 0 ? viewport : _options$rootBoundary,
+      _options$elementConte = _options.elementContext,
+      elementContext = _options$elementConte === void 0 ? popper : _options$elementConte,
+      _options$altBoundary = _options.altBoundary,
+      altBoundary = _options$altBoundary === void 0 ? false : _options$altBoundary,
+      _options$padding = _options.padding,
+      padding = _options$padding === void 0 ? 0 : _options$padding;
+  var paddingObject = mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
+  var altContext = elementContext === popper ? reference : popper;
+  var popperRect = state.rects.popper;
+  var element = state.elements[altBoundary ? altContext : elementContext];
+  var clippingClientRect = getClippingRect(isElement(element) ? element : element.contextElement || getDocumentElement(state.elements.popper), boundary, rootBoundary, strategy);
+  var referenceClientRect = getBoundingClientRect(state.elements.reference);
+  var popperOffsets = computeOffsets({
+    reference: referenceClientRect,
+    element: popperRect,
+    strategy: 'absolute',
+    placement: placement
+  });
+  var popperClientRect = rectToClientRect(Object.assign({}, popperRect, popperOffsets));
+  var elementClientRect = elementContext === popper ? popperClientRect : referenceClientRect; // positive = overflowing the clipping rect
+  // 0 or negative = within the clipping rect
+
+  var overflowOffsets = {
+    top: clippingClientRect.top - elementClientRect.top + paddingObject.top,
+    bottom: elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom,
+    left: clippingClientRect.left - elementClientRect.left + paddingObject.left,
+    right: elementClientRect.right - clippingClientRect.right + paddingObject.right
+  };
+  var offsetData = state.modifiersData.offset; // Offsets can be applied only to the popper element
+
+  if (elementContext === popper && offsetData) {
+    var offset = offsetData[placement];
+    Object.keys(overflowOffsets).forEach(function (key) {
+      var multiply = [right, bottom].indexOf(key) >= 0 ? 1 : -1;
+      var axis = [enums_top, bottom].indexOf(key) >= 0 ? 'y' : 'x';
+      overflowOffsets[key] += offset[axis] * multiply;
+    });
+  }
+
+  return overflowOffsets;
+}
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/computeAutoPlacement.js
 
 
@@ -1675,10 +1499,6 @@ function computeAutoPlacement(state, options) {
 
   if (allowedPlacements.length === 0) {
     allowedPlacements = placements;
-
-    if (true) {
-      console.error(['Popper: The `allowedAutoPlacements` option did not allow any', 'placements. Ensure the `placement` option matches the variation', 'of the allowed placements.', 'For example, "auto" cannot be used to allow "bottom-start".', 'Use "auto-start" instead.'].join(' '));
-    }
   } // $FlowFixMe[incompatible-type]: Flow seems to have problems with two array unions...
 
 
@@ -2008,7 +1828,6 @@ function preventOverflow(_ref) {
 
 
 
-
  // eslint-disable-next-line import/no-unused-modules
 
 var toPaddingObject = function toPaddingObject(padding, state) {
@@ -2074,17 +1893,7 @@ function arrow_effect(_ref2) {
     }
   }
 
-  if (true) {
-    if (!isHTMLElement(arrowElement)) {
-      console.error(['Popper: "arrow" element must be an HTMLElement (not an SVGElement).', 'To use an SVG arrow, wrap it in an HTMLElement that will be used as', 'the arrow.'].join(' '));
-    }
-  }
-
   if (!contains(state.elements.popper, arrowElement)) {
-    if (true) {
-      console.error(['Popper: "arrow" modifier\'s `element` must be a child of the popper', 'element.'].join(' '));
-    }
-
     return;
   }
 
@@ -2163,28 +1972,6 @@ function hide(_ref) {
   requiresIfExists: ['preventOverflow'],
   fn: hide
 });
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/popper-lite.js
-
-
-
-
-
-var defaultModifiers = [eventListeners, modifiers_popperOffsets, modifiers_computeStyles, modifiers_applyStyles];
-var popper_lite_createPopper = /*#__PURE__*/popperGenerator({
-  defaultModifiers: defaultModifiers
-}); // eslint-disable-next-line import/no-unused-modules
-
-
-;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/index.js
-
-
-
-
-
-
-
-
-
 ;// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/popper.js
 
 
@@ -2196,9 +1983,9 @@ var popper_lite_createPopper = /*#__PURE__*/popperGenerator({
 
 
 
-var popper_defaultModifiers = [eventListeners, modifiers_popperOffsets, modifiers_computeStyles, modifiers_applyStyles, modifiers_offset, modifiers_flip, modifiers_preventOverflow, modifiers_arrow, modifiers_hide];
+var defaultModifiers = [eventListeners, modifiers_popperOffsets, modifiers_computeStyles, modifiers_applyStyles, modifiers_offset, modifiers_flip, modifiers_preventOverflow, modifiers_arrow, modifiers_hide];
 var popper_createPopper = /*#__PURE__*/popperGenerator({
-  defaultModifiers: popper_defaultModifiers
+  defaultModifiers: defaultModifiers
 }); // eslint-disable-next-line import/no-unused-modules
 
  // eslint-disable-next-line import/no-unused-modules
@@ -2210,9 +1997,6 @@ var popper_createPopper = /*#__PURE__*/popperGenerator({
 /***/ }),
 
 /***/ "./node_modules/flatpickr/dist/esm/utils/polyfills.js":
-/*!************************************************************!*\
-  !*** ./node_modules/flatpickr/dist/esm/utils/polyfills.js ***!
-  \************************************************************/
 /***/ (() => {
 
 "use strict";
@@ -2243,9 +2027,6 @@ if (typeof Object.assign !== "function") {
 /***/ }),
 
 /***/ "./node_modules/flatpickr/dist/l10n/pt.js":
-/*!************************************************!*\
-  !*** ./node_modules/flatpickr/dist/l10n/pt.js ***!
-  \************************************************/
 /***/ (function(__unused_webpack_module, exports) {
 
 (function (global, factory) {
@@ -2318,9 +2099,6 @@ if (typeof Object.assign !== "function") {
 /***/ }),
 
 /***/ "./node_modules/focus-visible/dist/focus-visible.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/focus-visible/dist/focus-visible.js ***!
-  \**********************************************************/
 /***/ (function() {
 
 (function (global, factory) {
@@ -2639,15 +2417,11 @@ if (typeof Object.assign !== "function") {
 /***/ }),
 
 /***/ "./src/components/accordion/accordion.js":
-/*!***********************************************!*\
-  !*** ./src/components/accordion/accordion.js ***!
-  \***********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 class BRAccordion {
   constructor(name, component) {
@@ -2717,17 +2491,13 @@ class BRAccordion {
 /***/ }),
 
 /***/ "./src/components/avatar/avatar.js":
-/*!*****************************************!*\
-  !*** ./src/components/avatar/avatar.js ***!
-  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_dropdown__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/dropdown */ "./src/partial/js/behavior/dropdown.js");
+/* harmony import */ var _partial_js_behavior_dropdown__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/dropdown.js");
 
 
 /**
@@ -2736,23 +2506,33 @@ __webpack_require__.r(__webpack_exports__);
 class BRAvatar {
   /**
    * Instancia um exemplo de comportamento dropdown
-   * @param {object} element - Elemento DOM que representa um componente contento um comportamento de dropdown
+   * @param {string} name - Nome do componente
+   * @param {object} component - Referência ao objeto do DOM
    */
-  constructor(name, element) {
-    this.element = element
+  constructor(name, component) {
+    this.name = name
+    this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define os comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     this._setDropdownBehavior()
   }
 
+  /**
+   * Define os comportamentos do dropdown
+   * @private
+   */
   _setDropdownBehavior() {
-    if (this.element.dataset.toggle === 'dropdown') {
+    if (this.component.parentElement.dataset.toggle === 'dropdown') {
       const config = {
         iconToHide: 'fa-caret-up',
         iconToShow: 'fa-caret-down',
-        trigger: this.element,
+        trigger: this.component.parentElement,
         useIcons: true,
       }
       const dropdown = new _partial_js_behavior_dropdown__WEBPACK_IMPORTED_MODULE_0__["default"](config)
@@ -2767,23 +2547,28 @@ class BRAvatar {
 /***/ }),
 
 /***/ "./src/components/breadcrumb/breadcrumb.js":
-/*!*************************************************!*\
-  !*** ./src/components/breadcrumb/breadcrumb.js ***!
-  \*************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 class BRBreadcrumb {
+  /**
+   * Instancia um componente breadcrumb
+   * @param {string} name - nome do componente
+   * @param {object} component - referencia ao objeto do DOM
+   **/
   constructor(name, component) {
     this.name = name
     this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define os comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     this._setView()
     window.addEventListener('resize', () => {
@@ -2813,6 +2598,10 @@ class BRBreadcrumb {
     this._setView()
   }
 
+  /**
+   * Atualiza a visualização do componente
+   * @private
+   */
   _setView() {
     this._reset()
     for (const crumbList of this.component.querySelectorAll('.crumb-list')) {
@@ -2840,6 +2629,10 @@ class BRBreadcrumb {
     }
   }
 
+  /**
+   * Insere botao de expandir
+   * @private
+   */
   _insertExpandButton() {
     const crumb = this._createCrumb()
     const crumbList = this.component.querySelector('.crumb-list')
@@ -2847,6 +2640,10 @@ class BRBreadcrumb {
     crumbList.insertBefore(crumb, crumbs[1])
   }
 
+  /**
+   * Reinicia componente
+   * @private
+   */
   _reset() {
     this.component.querySelectorAll('.crumb-list .crumb').forEach((crumb) => {
       if (crumb.classList.contains('menu-mobil')) {
@@ -2857,6 +2654,10 @@ class BRBreadcrumb {
     })
   }
 
+  /**
+   * Insere elementos
+   * @private
+   */
   _createCrumb() {
     const crumb = document.createElement('li')
     crumb.classList.add('crumb', 'menu-mobil')
@@ -2870,7 +2671,7 @@ class BRBreadcrumb {
     span.innerHTML = 'Botão Menu'
 
     const folderIcon = document.createElement('i')
-    folderIcon.classList.add('icon', 'fas', 'fa-folder-plus')
+    folderIcon.classList.add('fas', 'fa-folder-plus')
 
     const chevronIcon = document.createElement('i')
     chevronIcon.classList.add('icon', 'fas', 'fa-chevron-right')
@@ -2883,12 +2684,12 @@ class BRBreadcrumb {
     crumb.addEventListener('click', () => {
       let card = this.component.querySelector('.br-card')
       if (card) {
-        folderIcon.classList.remove('icon', 'fas', 'fa-folder-minus')
-        folderIcon.classList.add('icon', 'fas', 'fa-folder-plus')
+        folderIcon.classList.remove('fas', 'fa-folder-minus')
+        folderIcon.classList.add('fas', 'fa-folder-plus')
         this.component.querySelector('.br-card').remove()
       } else {
-        folderIcon.classList.remove('icon', 'fas', 'fa-folder-plus')
-        folderIcon.classList.add('icon', 'fas', 'fa-folder-minus')
+        folderIcon.classList.remove('fas', 'fa-folder-plus')
+        folderIcon.classList.add('fas', 'fa-folder-minus')
         card = this._createList()
         this.component.appendChild(card)
       }
@@ -2897,38 +2698,22 @@ class BRBreadcrumb {
     return crumb
   }
 
+  /**
+   * Cria lista
+   * @private
+   */
   _createList() {
     const card = document.createElement('div')
     card.classList.add('br-card')
 
-    const front = document.createElement('div')
-    front.classList.add('front')
-
-    const content = document.createElement('div')
-    content.classList.add('content')
-
-    const list = document.createElement('div')
-    list.classList.add('br-list')
-
-    card.appendChild(front)
-    front.appendChild(content)
-    content.appendChild(list)
-
     this.component.querySelectorAll('.crumb-list .crumb').forEach((crumb) => {
       if (crumb.classList.contains('d-none')) {
         const item = document.createElement('div')
-        item.classList.add('br-item', 'py-3')
+        item.classList.add('br-item')
 
-        const row = document.createElement('div')
-        row.classList.add('row', 'align-items-center')
-
-        const col = document.createElement('div')
-        col.classList.add('col')
         if (!crumb.classList.contains('home')) {
-          col.appendChild(crumb.querySelector('a').cloneNode(true))
-          row.appendChild(col)
-          item.appendChild(row)
-          list.appendChild(item)
+          item.appendChild(crumb.querySelector('a').cloneNode(true))
+          card.appendChild(item)
         }
       }
     })
@@ -2943,19 +2728,23 @@ class BRBreadcrumb {
 /***/ }),
 
 /***/ "./src/components/card/card.js":
-/*!*************************************!*\
-  !*** ./src/components/card/card.js ***!
-  \*************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/collapse */ "./src/partial/js/behavior/collapse.js");
+/* harmony import */ var _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/collapse.js");
 
+
+/** Classe para instanciar um objeto BRCard */
 class BRCard {
+  /**
+   * Instancia do componente
+   * @property {string} name - Nome do componente em minúsculo
+   * @property {object} component - Objeto referenciando a raiz do componente DOM
+   * @property {string} id - nome da id do ocmponente
+   */
   constructor(name, component, id) {
     this.name = name
     this.component = component
@@ -2963,6 +2752,10 @@ class BRCard {
     this._setBehavior()
   }
 
+  /**
+   * Define o comportamento do componente
+   * @private
+   */
   _setBehavior() {
     this._setFlipBehavior()
     // this._setExpandBehavior()
@@ -2970,6 +2763,11 @@ class BRCard {
     this._setDisableBehavior()
     this._collpaseBehavior()
   }
+
+  /**
+   * Define o comportamento de comprimir (collapse)
+   * @private
+   */
   _collpaseBehavior() {
     this.component
       .querySelectorAll('[data-toggle="collapse"]')
@@ -2984,6 +2782,11 @@ class BRCard {
         collapse.setBehavior()
       })
   }
+
+  /**
+   * Desabilita o componente
+   * @private
+   */
   _setDisableBehavior() {
     if (this.component.classList.contains('disabled')) {
       this.component.setAttribute('aria-hidden', 'true')
@@ -2998,14 +2801,18 @@ class BRCard {
         input.setAttribute('disabled', 'disabled')
       }
       for (const select of selects) {
-        input.setAttribute('disabled', 'disabled')
+        select.setAttribute('disabled', 'disabled')
       }
       for (const textarea of textareas) {
-        input.setAttribute('disabled', 'disabled')
+        textarea.setAttribute('disabled', 'disabled')
       }
     }
   }
 
+  /**
+   * Define o comportamento de girar (flip)
+   * @private
+   */
   _setFlipBehavior() {
     for (const flip of this.component.querySelectorAll('button.flip')) {
       flip.addEventListener('click', () => {
@@ -3018,6 +2825,10 @@ class BRCard {
     }
   }
 
+  /**
+   * Define o comportamento de arrastar (drag)
+   * @private
+   */
   _setDragBehavior() {
     for (const img of this.component.querySelectorAll('img')) {
       img.setAttribute('draggable', 'false')
@@ -3042,18 +2853,14 @@ class BRCard {
 /***/ }),
 
 /***/ "./src/components/carousel/carousel.js":
-/*!*********************************************!*\
-  !*** ./src/components/carousel/carousel.js ***!
-  \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _step_step__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../step/step */ "./src/components/step/step.js");
-/* harmony import */ var _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../partial/js/behavior/swipe */ "./src/partial/js/behavior/swipe.js");
+/* harmony import */ var _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/partial/js/behavior/swipe.js");
+/* harmony import */ var _step_step__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/components/step/step.js");
 
 
 class BRCarousel {
@@ -3071,14 +2878,14 @@ class BRCarousel {
     this.activeStageNum = 0
     // Elementos DOM
     this.DOMstrings = {
-      carouselStage: this.component.querySelector('.carousel-stage'),
-      carouselPages: this.component.querySelectorAll('.carousel-page'),
       carouselNextBtn: this.component.querySelector('.carousel-btn-next'),
+      carouselPages: this.component.querySelectorAll('.carousel-page'),
       carouselPrevBtn: this.component.querySelector('.carousel-btn-prev'),
-      step: this.component.querySelector('.br-step'),
+      carouselStage: this.component.querySelector('.carousel-stage'),
       circular: this.component.hasAttribute('data-circular'),
+      step: this.component.querySelector('.br-step'),
     }
-    this.step = new _step_step__WEBPACK_IMPORTED_MODULE_0__["default"]('br-step', this.DOMstrings.step)
+    this.step = new _step_step__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .Z('br-step', this.DOMstrings.step)
     this._setBehavior()
   }
 
@@ -3202,20 +3009,20 @@ class BRCarousel {
    * @private
    */
   _setBehavior() {
-    this.DOMstrings.carouselNextBtn.addEventListener('click', (e) => {
+    this.DOMstrings.carouselNextBtn.addEventListener('click', () => {
       this.shiftPage(1)
     })
 
-    this.DOMstrings.carouselPrevBtn.addEventListener('click', (e) => {
+    this.DOMstrings.carouselPrevBtn.addEventListener('click', () => {
       this.shiftPage(-1)
     })
 
-    this.DOMstrings.step.addEventListener('click', (e) => {
+    this.DOMstrings.step.addEventListener('click', () => {
       this.setActiveStage(this.step.activeStepNum)
     })
 
     // Swipe
-    const dispatcher = new _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_1__["default"](this.DOMstrings.carouselStage)
+    const dispatcher = new _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .Z(this.DOMstrings.carouselStage)
     dispatcher.on('SWIPE_LEFT', () => {
       this.shiftPage(1)
     })
@@ -3228,33 +3035,44 @@ class BRCarousel {
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BRCarousel);
 
+
 /***/ }),
 
 /***/ "./src/components/checkbox/checkbox.js":
-/*!*********************************************!*\
-  !*** ./src/components/checkbox/checkbox.js ***!
-  \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_checkgroup__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/checkgroup */ "./src/partial/js/behavior/checkgroup.js");
+/* harmony import */ var _partial_js_behavior_checkgroup__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/checkgroup.js");
 
 
+/** Classe para instanciar um objeto BRCheckbox*/
 class BRCheckbox {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     this._setCheckgroupBehavior()
   }
 
+  /**
+   * Define comportamentos do checkgroup
+   * @private
+   */
   _setCheckgroupBehavior() {
     this.component
       .querySelectorAll('input[type="checkbox"][data-parent]')
@@ -3270,24 +3088,13 @@ class BRCheckbox {
 
 /***/ }),
 
-/***/ "./src/components/cookiebar/cookiebar.js":
-/*!***********************************************************!*\
-  !*** ./src/components/cookiebar/cookiebar.js + 4 modules ***!
-  \***********************************************************/
+/***/ "./src/components/cookiebar/cookiebar-data.js":
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "default": () => (/* binding */ BRCookiebar)
-});
-
-// EXTERNAL MODULE: ./src/partial/js/behavior/checkgroup.js
-var checkgroup = __webpack_require__("./src/partial/js/behavior/checkgroup.js");
-;// CONCATENATED MODULE: ./src/components/cookiebar/cookiebar-data.js
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   B: () => (/* binding */ CookiebarData)
+/* harmony export */ });
 /** Classe que representa os dados do cookiebar */
 class CookiebarData {
   /**
@@ -3447,6 +3254,19 @@ class CookiebarData {
     rawFile.send(null)
   }
 }
+
+
+/***/ }),
+
+/***/ "./src/components/cookiebar/cookiebar-templates.js":
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  y: () => (/* binding */ CookiebarTemplates)
+});
 
 ;// CONCATENATED MODULE: ./src/components/cookiebar/cookiebar-labels.js
 /** Classe para tratamento das labels do cookiebar */
@@ -4207,32 +4027,20 @@ class CookiebarTemplates {
   }
 }
 
-;// CONCATENATED MODULE: ./src/components/cookiebar/selectors.js
-/** Constantes representando seletores para o cookiebar */
-const POLITICS_BUTTON = '.actions .br-button.secondary'
-const ACCEPT_BUTTON = '.actions .br-button.primary'
-const ACTION_BUTTONS = `${POLITICS_BUTTON}, ${ACCEPT_BUTTON}`
-const CLOSE_BUTTON = '.br-modal-header .br-button.close'
-const CONTAINER_FLUID = '.br-modal > .br-card .container-fluid'
-const WRAPPER = '.br-modal > .br-card .wrapper'
-const MODAL_FOOTER = '.br-modal > .br-card .br-modal-footer'
-const GROUP_INFO = '.main-content .group-info'
-const COOKIE_CARD = '.main-content .cookie-info .br-card'
-const BROAD_ALERT =
-  '.header .row:nth-child(1) div:nth-child(3) .feedback'
-const GROUP_ALERT = '.row:nth-child(1) div:nth-child(4) .feedback'
-const COOKIE_ALERT = '.row:nth-child(1) div:nth-child(2) .feedback'
-const BR_CHECKBOX = '.br-checkbox input[type="checkbox"]'
-const BR_SWITCH = '.br-switch input[type="checkbox"]'
-const CHECKBOX = `${BR_CHECKBOX}, ${BR_SWITCH}`
-const PARENT_CHECKBOX = '.main-content .br-checkbox input[data-parent]'
-const COOKIES_CHECKED = '.main-content .br-item .cookies-checked'
-const GROUP_BUTTON = '.main-content .br-item .br-button'
-const GROUP_NAME = '.main-content .br-item .group-name'
-const GROUP_SIZE = '.main-content .br-item .group-size'
-const BUTTON_ICON = '.br-button i.fas'
 
-;// CONCATENATED MODULE: ./src/components/cookiebar/cookiebar.js
+/***/ }),
+
+/***/ "./src/components/cookiebar/cookiebar.js":
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Z: () => (/* binding */ BRCookiebar)
+/* harmony export */ });
+/* harmony import */ var _partial_js_behavior_checkgroup__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("./src/partial/js/behavior/checkgroup.js");
+/* harmony import */ var _cookiebar_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/components/cookiebar/cookiebar-data.js");
+/* harmony import */ var _cookiebar_templates__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/components/cookiebar/cookiebar-templates.js");
+/* harmony import */ var _selectors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./src/components/cookiebar/selectors.js");
 
 
 
@@ -4253,8 +4061,8 @@ class BRCookiebar {
   constructor({ name, component, json, lang, mode = 'default', callback }) {
     this.name = name
     this.component = component
-    this.data = new CookiebarData(json, lang)
-    this.templates = new CookiebarTemplates(this.data)
+    this.data = new _cookiebar_data__WEBPACK_IMPORTED_MODULE_0__/* .CookiebarData */ .B(json, lang)
+    this.templates = new _cookiebar_templates__WEBPACK_IMPORTED_MODULE_1__/* .CookiebarTemplates */ .y(this.data)
     this.mode = mode
     this.callback = callback
     this._setUp()
@@ -4297,7 +4105,7 @@ class BRCookiebar {
    * @private
    */
   _setAcceptButtonBehavior() {
-    const acceptButton = this.component.querySelector(ACCEPT_BUTTON)
+    const acceptButton = this.component.querySelector(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .ACCEPT_BUTTON */ .Hw)
 
     // Trata o aceite do cookiebar
     acceptButton.addEventListener('click', () => {
@@ -4325,7 +4133,7 @@ class BRCookiebar {
    */
   _setPoliticsButtonBehavior() {
     this.component
-      .querySelectorAll(POLITICS_BUTTON)
+      .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .POLITICS_BUTTON */ .qB)
       .forEach((politicsButton) => {
         // Expande o cookiebar
         politicsButton.addEventListener('click', () => {
@@ -4346,7 +4154,7 @@ class BRCookiebar {
    */
   _setCloseButtonBehavior() {
     this.component
-      .querySelectorAll(CLOSE_BUTTON)
+      .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .CLOSE_BUTTON */ .pw)
       .forEach((closeButton) => {
         // encolhe o cookiebar (volta ao cookiebar default)
         closeButton.addEventListener('click', () => {
@@ -4359,7 +4167,7 @@ class BRCookiebar {
           }
 
           this.component
-            .querySelector(POLITICS_BUTTON)
+            .querySelector(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .POLITICS_BUTTON */ .qB)
             .classList.remove('d-none')
           document.body.style.overflowY = 'auto'
 
@@ -4378,7 +4186,7 @@ class BRCookiebar {
         this._setOpenView()
       }
       this.component
-        .querySelectorAll(ACTION_BUTTONS)
+        .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .ACTION_BUTTONS */ .Al)
         .forEach((button) => {
           this._setActionButtonResponsive(button)
         })
@@ -4406,7 +4214,7 @@ class BRCookiebar {
   _setToggleGroupBehavior() {
     this.component
       .querySelectorAll(
-        `${`${GROUP_BUTTON}, ${GROUP_NAME}, ${COOKIES_CHECKED}, ${GROUP_SIZE}`}`
+        `${`${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_BUTTON */ ._0}, ${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_NAME */ .jp}, ${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .COOKIES_CHECKED */ .As}, ${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_SIZE */ .jy}`}`
       )
       .forEach((clickable) => {
         clickable.addEventListener(
@@ -4429,7 +4237,7 @@ class BRCookiebar {
     if (element.classList.contains('open')) {
       element.classList.remove('open')
       element.nextElementSibling
-        .querySelectorAll(BR_SWITCH)
+        .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .BR_SWITCH */ .qI)
         .forEach((check) => {
           check.setAttribute('tabindex', -1)
         })
@@ -4438,7 +4246,7 @@ class BRCookiebar {
     } else {
       element.classList.add('open')
       element.nextElementSibling
-        .querySelectorAll(BR_SWITCH)
+        .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .BR_SWITCH */ .qI)
         .forEach((check) => {
           check.setAttribute('tabindex', 0)
         })
@@ -4454,9 +4262,9 @@ class BRCookiebar {
    */
   _setCheckboxBehavior() {
     this.component
-      .querySelectorAll(PARENT_CHECKBOX)
+      .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .PARENT_CHECKBOX */ .UI)
       .forEach((trigger) => {
-        this.checkgroupBehavior = new checkgroup["default"](trigger)
+        this.checkgroupBehavior = new _partial_js_behavior_checkgroup__WEBPACK_IMPORTED_MODULE_3__["default"](trigger)
         this.checkgroupBehavior.setBehavior()
       })
   }
@@ -4466,7 +4274,7 @@ class BRCookiebar {
    * @private
    */
   _setSelectionBehavior() {
-    this.component.querySelectorAll(CHECKBOX).forEach((checkbox) => {
+    this.component.querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .CHECKBOX */ .Bg).forEach((checkbox) => {
       checkbox.addEventListener('change', this._controlSelection.bind(this))
     })
   }
@@ -4549,7 +4357,7 @@ class BRCookiebar {
    */
   _displayBroadAlertMessage() {
     this.component
-      .querySelectorAll(BROAD_ALERT)
+      .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .BROAD_ALERT */ .hP)
       .forEach((broadAlert) => {
         if (
           this.data.allAlertMessage &&
@@ -4568,10 +4376,10 @@ class BRCookiebar {
    * @private
    */
   _displayGroupAlertMessage(groupIndex) {
-    const group = this.component.querySelectorAll(GROUP_INFO)[
+    const group = this.component.querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_INFO */ .eQ)[
       groupIndex
     ]
-    group.querySelectorAll(GROUP_ALERT).forEach((groupAlert) => {
+    group.querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_ALERT */ .qQ).forEach((groupAlert) => {
       if (
         this.data.cookieGroups[groupIndex].groupAlertMessage &&
         (!this.data.cookieGroups[groupIndex].groupSelected ||
@@ -4590,13 +4398,13 @@ class BRCookiebar {
    * @param {number} cookieIndex - Índice do cookie dentro do grupo
    */
   _displayCookieAlertMessage(groupIndex, cookieIndex) {
-    const group = this.component.querySelectorAll(GROUP_INFO)[
+    const group = this.component.querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_INFO */ .eQ)[
       groupIndex
     ]
     const cookie = group.nextElementSibling.querySelectorAll(
-      COOKIE_CARD
+      _selectors__WEBPACK_IMPORTED_MODULE_2__/* .COOKIE_CARD */ .WV
     )[cookieIndex]
-    cookie.querySelectorAll(COOKIE_ALERT).forEach((cookieAlert) => {
+    cookie.querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .COOKIE_ALERT */ .cj).forEach((cookieAlert) => {
       if (
         this.data.cookieGroups[groupIndex].cookieList[cookieIndex]
           .alertMessage &&
@@ -4618,10 +4426,11 @@ class BRCookiebar {
    * @private
    */
   _getParentElementByClass(element, className) {
-    while (!element.classList.contains(className)) {
-      element = element.parentNode
+    parent = element.parentNode
+    while (!parent.classList.contains(className)) {
+      parent = parent.parentNode
     }
-    return element
+    return parent
   }
 
   /**
@@ -4632,7 +4441,7 @@ class BRCookiebar {
    * @private
    */
   _toggleIcon(element, oldIcon, newIcon) {
-    element.querySelectorAll(BUTTON_ICON).forEach((icon) => {
+    element.querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .BUTTON_ICON */ .D2).forEach((icon) => {
       icon.classList.remove(oldIcon)
       icon.classList.add(newIcon)
     })
@@ -4647,7 +4456,7 @@ class BRCookiebar {
   _setGroupAttributes(element, label) {
     element
       .querySelectorAll(
-        `${`${GROUP_BUTTON}, ${GROUP_NAME}, ${COOKIES_CHECKED}, ${GROUP_SIZE}`}`
+        `${`${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_BUTTON */ ._0}, ${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_NAME */ .jp}, ${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .COOKIES_CHECKED */ .As}, ${_selectors__WEBPACK_IMPORTED_MODULE_2__/* .GROUP_SIZE */ .jy}`}`
       )
       .forEach((item) => {
         item.setAttribute('title', label)
@@ -4662,7 +4471,7 @@ class BRCookiebar {
    */
   _scrollUp(element) {
     setTimeout(() => {
-      this.component.querySelectorAll(WRAPPER).forEach(() => {
+      this.component.querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .WRAPPER */ .tB).forEach(() => {
         setTimeout(() => {
           element.scrollIntoView({
             behavior: 'smooth',
@@ -4684,7 +4493,7 @@ class BRCookiebar {
       case 'open':
         this.component.classList.remove('default')
         this.component
-          .querySelectorAll(POLITICS_BUTTON)
+          .querySelectorAll(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .POLITICS_BUTTON */ .qB)
           .forEach((button) => {
             button.classList.add('d-none')
           })
@@ -4707,11 +4516,11 @@ class BRCookiebar {
    * @private
    */
   _setOpenView() {
-    const wrapper = this.component.querySelector(WRAPPER)
+    const wrapper = this.component.querySelector(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .WRAPPER */ .tB)
     const containerFluid = this.component.querySelector(
-      CONTAINER_FLUID
+      _selectors__WEBPACK_IMPORTED_MODULE_2__/* .CONTAINER_FLUID */ .mn
     )
-    const modalFooter = this.component.querySelector(MODAL_FOOTER)
+    const modalFooter = this.component.querySelector(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .MODAL_FOOTER */ .dI)
     const padding = window
       .getComputedStyle(containerFluid, null)
       .getPropertyValue('padding-top')
@@ -4727,7 +4536,7 @@ class BRCookiebar {
    * @private
    */
   _setDefaultView() {
-    this.component.querySelector(WRAPPER).removeAttribute('style')
+    this.component.querySelector(_selectors__WEBPACK_IMPORTED_MODULE_2__/* .WRAPPER */ .tB).removeAttribute('style')
   }
 
   /**
@@ -4783,19 +4592,68 @@ class BRCookiebar {
 
 /***/ }),
 
-/***/ "./src/components/datetimepicker/datetimepicker.js":
-/*!*********************************************************************!*\
-  !*** ./src/components/datetimepicker/datetimepicker.js + 7 modules ***!
-  \*********************************************************************/
+/***/ "./src/components/cookiebar/selectors.js":
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Al: () => (/* binding */ ACTION_BUTTONS),
+/* harmony export */   As: () => (/* binding */ COOKIES_CHECKED),
+/* harmony export */   Bg: () => (/* binding */ CHECKBOX),
+/* harmony export */   D2: () => (/* binding */ BUTTON_ICON),
+/* harmony export */   Hw: () => (/* binding */ ACCEPT_BUTTON),
+/* harmony export */   UI: () => (/* binding */ PARENT_CHECKBOX),
+/* harmony export */   WV: () => (/* binding */ COOKIE_CARD),
+/* harmony export */   _0: () => (/* binding */ GROUP_BUTTON),
+/* harmony export */   cj: () => (/* binding */ COOKIE_ALERT),
+/* harmony export */   dI: () => (/* binding */ MODAL_FOOTER),
+/* harmony export */   eQ: () => (/* binding */ GROUP_INFO),
+/* harmony export */   hP: () => (/* binding */ BROAD_ALERT),
+/* harmony export */   jp: () => (/* binding */ GROUP_NAME),
+/* harmony export */   jy: () => (/* binding */ GROUP_SIZE),
+/* harmony export */   mn: () => (/* binding */ CONTAINER_FLUID),
+/* harmony export */   pw: () => (/* binding */ CLOSE_BUTTON),
+/* harmony export */   qB: () => (/* binding */ POLITICS_BUTTON),
+/* harmony export */   qI: () => (/* binding */ BR_SWITCH),
+/* harmony export */   qQ: () => (/* binding */ GROUP_ALERT),
+/* harmony export */   tB: () => (/* binding */ WRAPPER)
+/* harmony export */ });
+/* unused harmony export BR_CHECKBOX */
+/** Constantes representando seletores para o cookiebar */
+const POLITICS_BUTTON = '.actions .br-button.secondary'
+const ACCEPT_BUTTON = '.actions .br-button.primary'
+const ACTION_BUTTONS = `${POLITICS_BUTTON}, ${ACCEPT_BUTTON}`
+const CLOSE_BUTTON = '.br-modal-header .br-button.close'
+const CONTAINER_FLUID = '.br-modal > .br-card .container-fluid'
+const WRAPPER = '.br-modal > .br-card .wrapper'
+const MODAL_FOOTER = '.br-modal > .br-card .br-modal-footer'
+const GROUP_INFO = '.main-content .group-info'
+const COOKIE_CARD = '.main-content .cookie-info .br-card'
+const BROAD_ALERT =
+  '.header .row:nth-child(1) div:nth-child(3) .feedback'
+const GROUP_ALERT = '.row:nth-child(1) div:nth-child(4) .feedback'
+const COOKIE_ALERT = '.row:nth-child(1) div:nth-child(2) .feedback'
+const BR_CHECKBOX = '.br-checkbox input[type="checkbox"]'
+const BR_SWITCH = '.br-switch input[type="checkbox"]'
+const CHECKBOX = `${BR_CHECKBOX}, ${BR_SWITCH}`
+const PARENT_CHECKBOX = '.main-content .br-checkbox input[data-parent]'
+const COOKIES_CHECKED = '.main-content .br-item .cookies-checked'
+const GROUP_BUTTON = '.main-content .br-item .br-button'
+const GROUP_NAME = '.main-content .br-item .group-name'
+const GROUP_SIZE = '.main-content .br-item .group-size'
+const BUTTON_ICON = '.br-button i.fas'
+
+
+/***/ }),
+
+/***/ "./src/components/datetimepicker/datetimepicker.js":
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "default": () => (/* binding */ datetimepicker)
+  Z: () => (/* binding */ datetimepicker)
 });
 
 ;// CONCATENATED MODULE: ./node_modules/flatpickr/dist/esm/types/options.js
@@ -7365,87 +7223,282 @@ if (typeof window !== "undefined") {
 
 ;// CONCATENATED MODULE: ./src/components/datetimepicker/datetimepicker.js
 
-const Brazilian = (__webpack_require__(/*! flatpickr/dist/l10n/pt */ "./node_modules/flatpickr/dist/l10n/pt.js")["default"].pt)
+const Brazilian = (__webpack_require__("./node_modules/flatpickr/dist/l10n/pt.js")["default"].pt)
 
+/** Classe para instanciar um objeto BRDateTimePicker*/
 class BRDateTimePicker {
-	constructor(name, component, config) {
-		this.name = name
-		this.component = component
-		// localization global
-		esm.localize(Brazilian)
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   * @param {string} config - atributo de configuração do componente
+   * @param {object} language arquivo de linguagem do flatpick por padrão nesse componente vem portugues
+   */
+  constructor(name, component, config, language = Brazilian) {
+    this.name = name
+    this.component = component
+    this.language = language
 
-		this.configAttribute = this.component.getAttribute(
-			'datetimepicker-config'
-		)
+    this.component.addEventListener('blur', () => {
+      if (!isNaN(new Date(this.component.value))) {
+        fp.setDate(this.component.value)
+      }
+    })
 
-		if (this.configAttribute) {
-			// Transforma o atributo em um objeto
-			const properties = this.configAttribute.split(',')
-			this.obj = []
-			properties.forEach((element) => {
-				const tup = element.split(':')
-				this.obj[tup[0]] = tup[1].replaceAll("'", '').trim() // eslint-disable-line
+    this.component.addEventListener('keyup', () => {
+      if (!isNaN(new Date(this.component.value))) {
+        // if the cursor is at the end of the edit and we have a full sized date, allow the date to immediately change, otherwise just move to the correct month without actually changing it
+        if (this.component.selectionStart >= 10)
+          fp.setDate(this.component.value)
+        else fp.jumpToDate(this.component.value)
+      }
+    })
+    // localization global
+    esm.localize(language)
 
-				this.saida = this.obj
-			}, this)
+    this.configAttribute = this.component.getAttribute('datetimepicker-config')
 
-			this.config = this.obj
-		} else {
-			this.config = config
-		}
+    if (this.configAttribute) {
+      // Transforma o atributo em um objeto
+      const properties = this.configAttribute.split(',')
+      this.obj = []
+      properties.forEach((element) => {
+        const tup = element.split(':')
+        this.obj[tup[0]] = tup[1].replaceAll("'", '').trim() // eslint-disable-line
 
-		this._buildDateTimePicker()
-	}
+        this.saida = this.obj
+      }, this)
 
-	_buildDateTimePicker() {
-		let format = 'd/m/Y'
-		let time = false
-		let noCalendar = false
-		switch (this.component.getAttribute('data-type')) {
-			case 'date':
-				format = 'd/m/Y'
-				time = false
-				noCalendar = false
-				break
-			case 'time':
-				format = 'H:i'
-				time = true
-				noCalendar = true
-				break
-			case 'datetime-local':
-				format = 'd/m/Y H:i'
-				time = true
-				noCalendar = false
-				break
-			default:
-				format = 'd/m/Y'
-				time = false
-				noCalendar = false
-				break
-		}
+      this.config = this.obj
+    } else {
+      this.config = config
+    }
 
-		this.config_native = {
-			dateFormat: format,
-			disableMobile: 'true',
-			enableTime: time,
-			minuteIncrement: 1,
+    this._buildDateTimePicker()
+  }
+  /**
+   * Adiciona máscara de data no input
+   * @param {*} elm
+   */
+  _dateInputMask(elm) {
+    elm.setAttribute('maxlength', 10)
+    elm.addEventListener('keypress', (e) => {
+      if (e.keyCode < 47 || e.keyCode > 57) {
+        e.preventDefault()
+      }
 
-			mode: this.component.getAttribute('data-mode'),
-			nextArrow:
-				'<button class="br-button circle small" type="button"><i class="fas fa-angle-right"></i></button>',
-			noCalendar: noCalendar,
-			prevArrow:
-				'<button class="br-button circle small" type="button"><i class="fas fas fa-angle-left"></i></button>',
-			time_24hr: true,
-			wrap: true,
-		}
-		this.config_flatpick = Object.assign(this.config, this.config_native)
+      const len = elm.value.length
 
-		this.calendar = esm(
-			this.component,
-			Object.assign(this.config, this.config_native)
-		)
-	}
+      if (len !== 1 || len !== 3) {
+        if (e.keyCode == 47) {
+          e.preventDefault()
+        }
+      }
+
+      if (len === 2) {
+        elm.value += '/'
+      }
+
+      if (len === 5) {
+        elm.value += '/'
+      }
+    })
+  }
+  /**
+   *  Adiciona máscara de hora no input
+   * @param {*} elm * Dom do elemento input
+   */
+  _dateTimeInputMask(elm) {
+    elm.setAttribute('maxlength', 16)
+    elm.addEventListener('keypress', (e) => {
+      if (e.keyCode < 47 || e.keyCode > 57) {
+        e.preventDefault()
+      }
+
+      const len = elm.value.length
+
+      if (len !== 1 || len !== 3) {
+        if (e.keyCode == 47) {
+          e.preventDefault()
+        }
+      }
+      switch (len) {
+        case 2:
+          elm.value += '/'
+          break
+        case 5:
+          elm.value += '/'
+          break
+        case 10:
+          elm.value += ' '
+          break
+        case 13:
+          elm.value += ':'
+          break
+
+        default:
+          break
+      }
+    })
+  }
+  /**
+   * Coloca máscara com range de data no input
+   * @param {*} elm * Dom do elemento input
+   */
+  _dateRangeInputMask(elm) {
+    elm.setAttribute('maxlength', 25)
+    elm.addEventListener('keypress', (e) => {
+      if (e.keyCode < 47 || e.keyCode > 57) {
+        e.preventDefault()
+      }
+
+      const len = elm.value.length
+
+      if (len !== 1 || len !== 3) {
+        if (e.keyCode === 47) {
+          e.preventDefault()
+        }
+      }
+      this._positionRangeMask(elm, len)
+    })
+  }
+  /**
+   * Insere a máscara na Dom
+   * @param {*} elm Dom do elemento input
+   * @param {*} len Tamanho do elemento inserido
+   */
+  _positionRangeMask(elm, len) {
+    const tamSeparator = this.language.rangeSeparator.length
+    const daySeparator = 10 + tamSeparator + 2
+    const monthSeparator = 10 + tamSeparator + 5
+    elm.setAttribute('maxlength', 20 + tamSeparator)
+
+    switch (len) {
+      case 2:
+        elm.value += '/'
+        break
+      case 5:
+        elm.value += '/'
+        break
+      case 10:
+        elm.value += this.language.rangeSeparator
+        break
+      case daySeparator:
+        elm.value += '/'
+        break
+      case monthSeparator:
+        elm.value += '/'
+        break
+
+      default:
+        break
+    }
+  }
+  /**
+   * Insere máscara de hora
+   *
+   * @param {*} elm dom do elemento input
+   */
+  _timeInputMask(elm) {
+    elm.setAttribute('maxlength', 5)
+    elm.addEventListener('keypress', (e) => {
+      if (e.keyCode < 47 || e.keyCode > 57) {
+        e.preventDefault()
+      }
+
+      const len = elm.value.length
+
+      if (len !== 1 || len !== 3) {
+        if (e.keyCode === 47) {
+          e.preventDefault()
+        }
+      }
+
+      if (len === 2) {
+        elm.value += ':'
+      }
+    })
+  }
+
+  /**
+   * Formata o componente e monta instância flatpickr
+   * @private
+   */
+  _buildDateTimePicker() {
+    let format = 'd/m/Y'
+    let time = false
+    let noCalendar = false
+
+    switch (this.component.getAttribute('data-type')) {
+      case 'date':
+        format = 'd/m/Y'
+        time = false
+        noCalendar = false
+        this._dateInputMask(this.component.querySelectorAll('input')[0])
+        break
+
+      case 'time':
+        format = 'H:i'
+        time = true
+        noCalendar = true
+        this._timeInputMask(this.component.querySelectorAll('input')[0])
+        break
+      case 'datetime-local':
+        format = 'd/m/Y H:i'
+        time = true
+        noCalendar = false
+        this._dateTimeInputMask(this.component.querySelectorAll('input')[0])
+        break
+      case 'datetime-range':
+        format = 'd/m/Y'
+        time = false
+        noCalendar = false
+        this._dateRangeInputMask(this.component.querySelectorAll('input')[0])
+        break
+      default:
+        format = 'd/m/Y'
+        time = false
+        noCalendar = false
+        if (this.component.getAttribute('data-mode') === 'range') {
+          this._dateRangeInputMask(this.component.querySelectorAll('input')[0])
+        } else {
+          this._dateInputMask(this.component.querySelectorAll('input')[0])
+        }
+        break
+    }
+
+    this.config_native = {
+      allowInput: true,
+      dateFormat: format,
+      disableMobile: 'true',
+      enableTime: time,
+      minuteIncrement: 1,
+
+      mode: this.component.getAttribute('data-mode'),
+      nextArrow:
+        '<button class="br-button circle small" type="button"><i class="fas fa-chevron-right"></i></button>',
+      noCalendar: noCalendar,
+      prevArrow:
+        '<button class="br-button circle small" type="button"><i class="fas fas fa-chevron-left"></i></button>',
+      time_24hr: true,
+      wrap: true,
+    }
+    this.config_flatpick = Object.assign(this.config, this.config_native)
+
+    this.calendar = esm(
+      this.component,
+      Object.assign(this.config, this.config_native)
+    )
+
+    this.calendar.config.onOpen.push(() => {
+      document.querySelectorAll('.arrowUp').forEach((element) => {
+        element.classList.add('fas', 'fa-chevron-up')
+      })
+      document.querySelectorAll('.arrowDown').forEach((element) => {
+        element.classList.add('fas', 'fa-chevron-down')
+      })
+    })
+  }
 }
 
 /* harmony default export */ const datetimepicker = (BRDateTimePicker);
@@ -7454,15 +7507,11 @@ class BRDateTimePicker {
 /***/ }),
 
 /***/ "./src/components/footer/footer.js":
-/*!*****************************************!*\
-  !*** ./src/components/footer/footer.js ***!
-  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /**
  * Classe do componente BRFooter
@@ -7616,20 +7665,22 @@ class BRFooter {
 /***/ }),
 
 /***/ "./src/components/header/header.js":
-/*!*****************************************!*\
-  !*** ./src/components/header/header.js ***!
-  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_tooltip__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/tooltip */ "./src/partial/js/behavior/tooltip.js");
+/* harmony import */ var _partial_js_behavior_tooltip__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/tooltip.js");
 
 
+/** Classe para instanciar um objeto BRHeader*/
 class BRHeader {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
@@ -7650,8 +7701,11 @@ class BRHeader {
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
-    this._setLoginBehavior()
     this._setLogoutBehavior()
     this._setSearchBehaviors()
     this._setKeyboardBehaviors()
@@ -7659,6 +7713,10 @@ class BRHeader {
     this._setSticky()
   }
 
+  /**
+   * Define comportamentos de login
+   * @private
+   */
   _setLoginBehavior() {
     for (const login of this.component.querySelectorAll(
       '[data-trigger="login"]'
@@ -7671,6 +7729,10 @@ class BRHeader {
     }
   }
 
+  /**
+   * Define comportamentos de logout
+   * @private
+   */
   _setLogoutBehavior() {
     for (const logout of this.component.querySelectorAll(
       '[data-trigger="logout"]'
@@ -7687,6 +7749,10 @@ class BRHeader {
     }
   }
 
+  /**
+   * Define comportamentos de busca
+   * @private
+   */
   _setSearchBehaviors() {
     // Abrir busca
     if (this.componentSearchTrigger) {
@@ -7706,6 +7772,10 @@ class BRHeader {
     }
   }
 
+  /**
+   * Define comportamentos do teclado
+   * @private
+   */
   _setKeyboardBehaviors() {
     if (this.componentSearchInput) {
       this.componentSearchInput.addEventListener('keydown', (event) => {
@@ -7739,6 +7809,11 @@ class BRHeader {
       })
     }
   }
+
+  /**
+   * Visualização da busca
+   * @private
+   */
   _openSearch() {
     if (this.componentSearch) {
       this.componentSearch.classList.add('active')
@@ -7746,6 +7821,10 @@ class BRHeader {
     }
   }
 
+  /**
+   * Esconde a busca
+   * @private
+   */
   _closeSearch() {
     if (this.componentSearch) {
       this.componentSearch.classList.remove('active')
@@ -7754,6 +7833,10 @@ class BRHeader {
     }
   }
 
+  /**
+   * Exibe notificação
+   * @param {event} event - referencia ao evento
+   */
   handleEvent(event) {
     const hasNotficiationElemeent = this.component
       .querySelector('.br-notification')
@@ -7765,6 +7848,10 @@ class BRHeader {
     }
   }
 
+  /**
+   * Define comportamentos do dropdown
+   * @private
+   */
   _setDropdownBehavior() {
     // TODO: Trocar o código abaixo pelo utilitário dropdown
     this.cleaned = false
@@ -7795,7 +7882,7 @@ class BRHeader {
 
           // Evita que o componente feche o drop ao navegar pelo teclado
           const next = this._nextFocusElement()
-          next.addEventListener('focus', (event) => {
+          next.addEventListener('focus', () => {
             clearTimeout(hideDrop)
           })
         }
@@ -7806,11 +7893,15 @@ class BRHeader {
       // Faz o drop fechar ao clicar fora
       // eslint-disable-next-line no-loop-func
     }
-    this.menuTrigger.addEventListener('focus', (event) => {
+    this.menuTrigger.addEventListener('focus', () => {
       this._cleanDropDownHeader()
     })
   }
 
+  /**
+   * Define comportamentos do tooltip
+   * @private
+   */
   _headerTooltip() {
     if (this.TooltipExampleList) {
       this.TooltipExampleList.forEach((tooltipElem) => {
@@ -7835,6 +7926,11 @@ class BRHeader {
       })
   }
 
+  /**
+   * Limpa referencias do dorpdown
+   * @private
+   * @param {object} ref - Referência ao componente header
+   */
   _cleanDropDownHeaderRef(ref) {
     if (this.cleaned === false) {
       for (const trigger of ref.querySelectorAll('.dropdown.show')) {
@@ -7848,10 +7944,18 @@ class BRHeader {
     this.cleaned = false
   }
 
+  /**
+   * Limpa referencias do dorpdown
+   * @private
+   */
   _cleanDropDownHeader() {
     this._cleanDropDownHeaderRef(this.component)
   }
 
+  /**
+   * Define modo sticky ao header
+   * @private
+   */
   _setSticky() {
     if (this.component.hasAttribute('data-sticky')) {
       window.onscroll = () => {
@@ -7864,8 +7968,12 @@ class BRHeader {
     }
   }
 
+  /**
+   * Foca no próximo elmento de ação
+   * @private
+   */
   _nextFocusElement() {
-    //add all elements we want to include in our selection
+    //lista de elementos de ação
     const focussableElements =
       'a:not([disabled]), button:not([disabled]), input[type=text]:not([disabled]), [tabindex]:not([disabled]):not([tabindex="-1"])'
     if (document.activeElement) {
@@ -7897,17 +8005,19 @@ class BRHeader {
 /***/ }),
 
 /***/ "./src/components/input/input.js":
-/*!***************************************!*\
-  !*** ./src/components/input/input.js ***!
-  \***************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRInput*/
 class BRInput {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
@@ -7915,11 +8025,19 @@ class BRInput {
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     this._setPasswordViewBehavior()
     this._setAutocompleteBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setPasswordViewBehavior() {
     for (const inputPassword of this.component.querySelectorAll(
       'input[type="password"]'
@@ -7940,6 +8058,11 @@ class BRInput {
     }
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   * @param {event} event - referência ao elemento que dispara a ação
+   */
   _toggleShowPassword(event) {
     for (const icon of event.currentTarget.querySelectorAll('.fas')) {
       if (icon.classList.contains('fa-eye')) {
@@ -7962,6 +8085,10 @@ class BRInput {
     }
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setAutocompleteBehavior() {
     for (const inputAutocomplete of this.component.querySelectorAll(
       'input.search-autocomplete'
@@ -7984,6 +8111,11 @@ class BRInput {
     }
   }
 
+  /**
+   * Monta os items de busca para o elemento input
+   * @private
+   * @param {object} element - referencia ao elemento input
+   */
   _buildSearchItems(element) {
     const searchList = window.document.createElement('div')
     searchList.setAttribute('class', 'search-items')
@@ -8021,6 +8153,10 @@ class BRInput {
     }
   }
 
+  /**
+   * Limpa elementos da busca
+   * @private
+   */
   _clearSearchItems() {
     for (const searchItems of this.component.querySelectorAll(
       '.search-items'
@@ -8032,6 +8168,11 @@ class BRInput {
     }
   }
 
+  /**
+   * Define comportamentos do teclado
+   * @private
+   * @param {event} event - referência ao elemento que dispara a ação do teclado
+   */
   _handleArrowKeys(event) {
     switch (event.keyCode) {
       case 13:
@@ -8073,6 +8214,10 @@ class BRInput {
     }
   }
 
+  /**
+   * Muda o foco do item de busca
+   * @private
+   */
   _switchFocus() {
     for (const searchItems of this.component.querySelectorAll(
       '.search-items'
@@ -8090,6 +8235,11 @@ class BRInput {
     }
   }
 
+  /**
+   * Preenche lista de dados
+   * @private
+   * @param {string[]} dataList - Lista de dados
+   */
   setAutocompleteData(dataList) {
     this.dataList = dataList
   }
@@ -8101,28 +8251,39 @@ class BRInput {
 /***/ }),
 
 /***/ "./src/components/item/item.js":
-/*!*************************************!*\
-  !*** ./src/components/item/item.js ***!
-  \*************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRItem*/
+
 class BRItem {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     this._setCheckboxSelection()
     this._setRadioSelection()
   }
 
+  /**
+   * Define comportamentos do checkbox
+   * @private
+   */
   _setCheckboxSelection() {
     for (const checkbox of this.component.querySelectorAll(
       '.br-checkbox input[type="checkbox"]'
@@ -8140,6 +8301,10 @@ class BRItem {
     }
   }
 
+  /**
+   * Define comportamentos do radio
+   * @private
+   */
   _setRadioSelection() {
     for (const radio of this.component.querySelectorAll(
       '.br-radio input[type="radio"]'
@@ -8175,17 +8340,13 @@ class BRItem {
 /***/ }),
 
 /***/ "./src/components/list/list.js":
-/*!*************************************!*\
-  !*** ./src/components/list/list.js ***!
-  \*************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/collapse */ "./src/partial/js/behavior/collapse.js");
+/* harmony import */ var _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/collapse.js");
 
 /**
  * Classe do componente BRList
@@ -8218,9 +8379,9 @@ class BRList {
     // data-toggle="data-toggle"
     // debugger
 
-    this.component.querySelectorAll('.br-list').forEach((trigger) => {
-      // trigger.style.display = 'none'
-    })
+    // this.component.querySelectorAll('.br-list').forEach((trigger) => {
+    //   // trigger.style.display = 'none'
+    // })
     this.component
       .querySelectorAll('[data-toggle="collapse"]')
       .forEach((trigger) => {
@@ -8241,243 +8402,329 @@ class BRList {
 /***/ }),
 
 /***/ "./src/components/menu/menu.js":
-/*!*************************************!*\
-  !*** ./src/components/menu/menu.js ***!
-  \*************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRMenu*/
 class BRMenu {
-  constructor(name, component) {
-    this.name = name
-    this.component = component
-    this.id = this.component.id
-    this.breakpoints = this.component.dataset.breakpoints
-      ? this.component.dataset.breakpoints.split(' ')
-      : ['col-sm-4', 'col-lg-3']
-    this.pushShadow = 'shadow-lg-right'
-    this.trigger = document.querySelector(`[data-target="#${this.id}"]`)
-    this.contextual = this.component.querySelector('[data-toggle="contextual"]')
-    this.dismiss = this.component.querySelectorAll('[data-dismiss="menu"]')
-    this.scrim = this.component.querySelector('.menu-scrim')
-    this.componentFolders = this.component.querySelectorAll('.menu-folder')
-    this.componentItems = this.component.querySelectorAll('.menu-item')
-    this._setBehavior()
-  }
+	/**
+	 * Instancia do objeto
+	 * @param {string} name - Nome do componente em minúsculo
+	 * @param {object} component - Objeto referenciando a raiz do componente DOM
+	 */
+	constructor(name, component) {
+		this.name = name
+		this.component = component
+		this.id = this.component.id
+		this.breakpoints = this.component.dataset.breakpoints
+			? this.component.dataset.breakpoints.split(' ')
+			: ['col-sm-4', 'col-lg-3']
+		this.pushShadow = 'shadow-lg-right'
+		this.trigger = document.querySelector(`[data-target="#${this.id}"]`)
+		this.contextual = this.component.querySelector(
+			'[data-toggle="contextual"]'
+		)
+		this.dismiss = this.component.querySelectorAll('[data-dismiss="menu"]')
+		this.scrim = this.component.querySelector('.menu-scrim')
+		this.componentFolders = this.component.querySelectorAll('.menu-folder')
+		this.componentItems = this.component.querySelectorAll('.menu-item')
+		this._setBehavior()
+	}
 
-  _setBehavior() {
-    this._toggleMenu()
-    this._setDropMenu()
-    this._setSideMenu()
-    this._setKeyboardBehaviors()
-    this._setBreakpoints()
-    this._setView()
-    window.addEventListener('resize', () => {
-      this._setView()
-    })
-  }
+	/**
+	 * Define comportamentos do componente
+	 * @private
+	 */
+	_setBehavior() {
+		this._toggleMenu()
+		this._setDropMenu()
+		this._setSideMenu()
+		this._setKeyboardBehaviors()
+		this._setBreakpoints()
+		this._setView()
+		window.addEventListener('resize', () => {
+			this._setView()
+		})
+	}
 
-  _setView() {
-    const template = document.querySelector('body')
-    const menuContextual = document.querySelector('.menu-trigger')
-    const panel = document.querySelector('.menu-panel')
-    if (menuContextual && window.innerWidth < 992) {
-      template.classList.add('mb-5')
-    } else {
-      template.classList.remove('mb-5')
-    }
-  }
+	/**
+	 * Define visual do componente
+	 * @private
+	 */
+	_setView() {
+		const template = document.querySelector('body')
+		const menuContextual = document.querySelector('.menu-trigger')
+		// const panel = document.querySelector('.menu-panel')
+		if (menuContextual && window.innerWidth < 992) {
+			template.classList.add('mb-5')
+		} else {
+			template.classList.remove('mb-5')
+		}
+	}
 
-  _setBreakpoints() {
-    if (!this.component.classList.contains('push') && !this.contextual) {
-      this.component
-        .querySelector('.menu-panel')
-        .classList.add(...this.breakpoints)
-    }
-  }
+	/**
+	 * Define breakpoints do menu
+	 * @private
+	 */
+	_setBreakpoints() {
+		if (!this.component.classList.contains('push') && !this.contextual) {
+			this.component
+				.querySelector('.menu-panel')
+				.classList.add(...this.breakpoints)
+		}
+	}
 
-  _setKeyboardBehaviors() {
-    // Fechar com tecla ESC
-    this.component.addEventListener('keyup', (event) => {
-      switch (event.code) {
-        case 'Escape':
-          this._closeMenu()
-        default:
-          break
-      }
-    })
-    // Fechar com Tab fora do menu
-    if (this.scrim) {
-      this.scrim.addEventListener('keyup', () => {
-        return this._closeMenu()
-      })
-    }
-  }
+	/**
+	 * Define ações do teclado
+	 * @private
+	 */
+	_setKeyboardBehaviors() {
+		// Fechar com tecla ESC
+		this.component.addEventListener('keyup', (event) => {
+			switch (event.code) {
+				case 'Escape':
+					this._closeMenu()
+				default:
+					break
+			}
+		})
+		// Fechar com Tab fora do menu
+		if (this.scrim) {
+			this.scrim.addEventListener('keyup', () => {
+				return this._closeMenu()
+			})
+		}
+	}
 
-  _toggleMenu() {
-    const trigger = this.contextual ? this.contextual : this.trigger
-    // Clicar no trigger
-    if (trigger) {
-      trigger.addEventListener('click', () => {
-        // Fechar Menu caso esteja aberto
-        if (this.component.classList.contains('active')) {
-          this._closeMenu()
-          return
-        }
-        // Abre Menu
-        this._openMenu()
-        this._focusNextElement()
-      })
-    }
-    // Clicar no dismiss
-    for (const close of this.dismiss) {
-      close.addEventListener('click', () => {
-        return this._closeMenu()
-      })
-    }
-  }
+	/**
+	 * Define comportamentos de abrir/fechar menu
+	 * @private
+	 */
+	_toggleMenu() {
+		const trigger = this.contextual ? this.contextual : this.trigger
+		// Clicar no trigger
+		if (trigger) {
+			trigger.addEventListener('click', () => {
+				// Fechar Menu caso esteja aberto
+				if (this.component.classList.contains('active')) {
+					this._closeMenu()
+					return
+				}
+				// Abre Menu
+				this._openMenu()
+				this._focusNextElement()
+			})
+		}
+		// Clicar no dismiss
+		for (const close of this.dismiss) {
+			close.addEventListener('click', () => {
+				return this._closeMenu()
+			})
+		}
+	}
 
-  _openMenu() {
-    this.component.classList.add('active')
-    if (this.component.classList.contains('push')) {
-      this.component.classList.add(...this.breakpoints, 'px-0')
-    }
-    this.component.focus()
-  }
+	/**
+	 * Define visual do menu aberto
+	 * @private
+	 */
+	_openMenu() {
+		this.component.classList.add('active')
+		if (this.component.classList.contains('push')) {
+			this.component.classList.add(...this.breakpoints, 'px-0')
+		}
+		this.component.focus()
+	}
 
-  _closeMenu() {
-    this.component.classList.remove('active')
-    if (this.component.classList.contains('push')) {
-      this.component.classList.remove(...this.breakpoints, 'px-0')
-    }
-    this._focusNextElement()
-  }
+	/**
+	 * Define visual do menu fechado
+	 * @private
+	 */
+	_closeMenu() {
+		this.component.classList.remove('active')
+		if (this.component.classList.contains('push')) {
+			this.component.classList.remove(...this.breakpoints, 'px-0')
+		}
+		this._focusNextElement()
+	}
 
-  _setDropMenu() {
-    // Configura Drop Menu para filho imediato de ".menu-folder"
-    for (const item of this.component.querySelectorAll(
-      '.menu-folder > a.menu-item'
-    )) {
-      // Inclui ícone de Drop Menu
-      this._createIcon(item, 'fa-angle-down')
-      // Configura como Drop Menu
-      item.parentNode.classList.add('drop-menu')
-      // Inicializa Drop Menu
-      this._toggleDropMenu(item)
-    }
-  }
+	/**
+	 * Configura Drop Menu para filho imediato de ".menu-folder"
+	 * @private
+	 */
+	_setDropMenu() {
+		for (const item of this.component.querySelectorAll(
+			'.menu-folder > a.menu-item'
+		)) {
+			// Inclui ícone de Drop Menu
+			this._createIcon(item, 'fa-chevron-down')
+			// Configura como Drop Menu
+			item.parentNode.classList.add('drop-menu')
+			// Inicializa Drop Menu
+			this._toggleDropMenu(item)
+		}
+	}
 
-  _focusNextElement() {
-    //add all elements we want to include in our selection
-    const focussableElements =
-      'a:not([disabled]), button:not([disabled]), input[type=text]:not([disabled]), [tabindex]:not([disabled]):not([tabindex="-1"])'
-    if (document.activeElement) {
-      const focussable = Array.prototype.filter.call(
-        document.body.querySelectorAll(focussableElements),
-        (element) => {
-          //check for visibility while always include the current activeElement
-          return (
-            element.offsetWidth > 0 ||
-            element.offsetHeight > 0 ||
-            element === document.activeElement
-          )
-        }
-      )
-      const index = focussable.indexOf(document.activeElement)
-      if (index > -1) {
-        const nextElement = focussable[index + 1] || focussable[0]
-        nextElement.focus()
-      }
-    }
-  }
+	/**
+	 * Foca no próximo elemento
+	 * @private
+	 */
+	_focusNextElement() {
+		//lista de elementos que desejamos focar
+		const focussableElements =
+			'a:not([disabled]), button:not([disabled]), input[type=text]:not([disabled]), [tabindex]:not([disabled]):not([tabindex="-1"])'
+		if (document.activeElement) {
+			const focussable = Array.prototype.filter.call(
+				document.body.querySelectorAll(focussableElements),
+				(element) => {
+					// testa a visibilidade e inclui o elemento ativo
+					return (
+						element.offsetWidth > 0 ||
+						element.offsetHeight > 0 ||
+						element === document.activeElement
+					)
+				}
+			)
+			const index = focussable.indexOf(document.activeElement)
+			if (index > -1) {
+				const nextElement = focussable[index + 1] || focussable[0]
+				nextElement.focus()
+			}
+		}
+	}
 
-  _setSideMenu() {
-    // Configura Side Menu para quem não for filho imediato de ".menu-folder"
-    for (const ul of this.component.querySelectorAll('a.menu-item + ul')) {
-      if (!ul.parentNode.classList.contains('menu-folder')) {
-        // Inclui ícone de Side Menu
-        this._createIcon(ul.previousElementSibling, 'fa-angle-right')
-        // Configura como Side Menu
-        ul.parentNode.classList.add('side-menu')
-        // Inicializa Side Menu
-        this._toggleSideMenu(ul.previousElementSibling)
-      }
-    }
-  }
+	/**
+	 * Configura Side Menu para quem não for filho imediato de ".menu-folder"
+	 * @private
+	 */
+	_setSideMenu() {
+		for (const ul of this.component.querySelectorAll('a.menu-item + ul')) {
+			if (!ul.parentNode.classList.contains('menu-folder')) {
+				// Inclui ícone de Side Menu
+				this._createIcon(ul.previousElementSibling, 'fa-angle-right')
+				// Configura como Side Menu
+				ul.parentNode.classList.add('side-menu')
+				// Inicializa Side Menu
+				this._toggleSideMenu(ul.previousElementSibling)
+			}
+		}
+	}
 
-  _toggleDropMenu(element) {
-    element.addEventListener('click', () => {
-      // Fecha Drop Menu caso esteja aberto
-      if (element.parentNode.classList.contains('active')) {
-        element.parentNode.classList.remove('active')
-        return
-      }
+	/**
+	 * Muda estado do Drop Menu - aberto/fechado
+	 * @private
+	 * @param {object} element - referência ao Objeto que fará a ação
+	 */
+	_toggleDropMenu(element) {
+		// Verifica se o elemento já possui click listener através de um atributo especial
+		if (!element.hasAttribute('data-click-listener')) {
+			element.addEventListener('click', () => {
+				// Fecha Drop Menu caso esteja aberto
+				if (element.parentNode.classList.contains('active')) {
+					element.parentNode.classList.remove('active')
+					return
+				}
 
-      // Abre Drop Menu
-      element.parentNode.classList.add('active')
-    })
-  }
+				// Abre Drop Menu
+				element.parentNode.classList.add('active')
+			})
+			// Adiciona atributo especial para indicar que o elemento já possui click listener
+			element.setAttribute('data-click-listener', 'true')
+		}
+	}
 
-  _toggleSideMenu(element) {
-    element.addEventListener('click', () => {
-      // Esconde todos os itens
-      this._hideItems(element)
+	/**
+	 * Muda estado do Side Menu - aberto/fechado
+	 * @private
+	 * @param {object} element - referência ao Objeto que fará a ação
+	 */
+	_toggleSideMenu(element) {
+		// Verifica se o elemento já possui click listener através de um atributo especial
+		if (!element.hasAttribute('data-click-listener')) {
+			element.addEventListener('click', () => {
+				// Esconde todos os itens
+				this._hideItems(element)
 
-      // Mostra itens do Side Menu ativo
-      this._showItems(element.parentNode)
+				// Mostra itens do Side Menu ativo
+				this._showItems(element.parentNode)
 
-      // Fecha Side Menu caso esteja aberto
-      if (element.parentNode.classList.contains('active')) {
-        this._closeSideMenu(element)
-        element.focus()
-        return
-      }
+				// Fecha Side Menu caso esteja aberto
+				if (element.parentNode.classList.contains('active')) {
+					this._closeSideMenu(element)
+					element.focus()
+					return
+				}
 
-      // Abre Side Menu
-      element.parentNode.classList.add('active')
-      element.focus()
-    })
-  }
+				// Abre Side Menu
+				element.parentNode.classList.add('active')
+				element.focus()
+			})
+			// Adiciona atributo especial para indicar que o elemento já possui click listener
+			element.setAttribute('data-click-listener', 'true')
+		}
+	}
 
-  _closeSideMenu(element) {
-    element.parentNode.classList.remove('active')
-    // Verifica se existe Side Menu anterior, caso contrário mostra todos os itens de volta
-    const parentFolder = element.parentNode.closest('.side-menu.active')
-      ? element.parentNode.closest('.side-menu.active')
-      : element.closest('.menu-body')
-    this._showItems(parentFolder)
-  }
+	/**
+	 * Fecha Side Menu
+	 * @private
+	 * @param {object} element - referência ao Objeto que fará a ação
+	 */
+	_closeSideMenu(element) {
+		element.parentNode.classList.remove('active')
+		// Verifica se existe Side Menu anterior, caso contrário mostra todos os itens de volta
+		const parentFolder = element.parentNode.closest('.side-menu.active')
+			? element.parentNode.closest('.side-menu.active')
+			: element.closest('.menu-body')
+		this._showItems(parentFolder)
+	}
 
-  _hideItems(element) {
-    for (const item of element
-      .closest('.menu-body')
-      .querySelectorAll('.menu-item')) {
-      item.setAttribute('hidden', '')
-    }
-  }
+	/**
+	 * Esconde os elementos proximos a referencia
+	 * @private
+	 * @param {object} element - referencia ao Objeto que fará a ação
+	 */
+	_hideItems(element) {
+		for (const item of element
+			.closest('.menu-body')
+			.querySelectorAll('.menu-item')) {
+			item.setAttribute('hidden', '')
+		}
+	}
 
-  _showItems(element) {
-    for (const item of element.querySelectorAll('.menu-item')) {
-      item.removeAttribute('hidden')
-    }
-  }
+	/**
+	 * Mostra os elementos proximos a referencia
+	 * @private
+	 * @param {object} element - referência ao Objeto que fará a ação
+	 */
+	_showItems(element) {
+		for (const item of element.querySelectorAll('.menu-item')) {
+			item.removeAttribute('hidden')
+		}
+	}
 
-  _createIcon(element, icon) {
-    const menuIconContainer = document.createElement('span')
-    menuIconContainer.classList.add('support')
+	/**
+	 * Cria icone filho a referencia
+	 * @private
+	 * @param {object} element - referência ao Objeto pai
+	 * @param {string} icon - nome da classe font awesome do ícone
+	 */
+	_createIcon(element, icon) {
+		// Verifica se já existe container para o ícone
+		if (!element.querySelectorAll('span.support').length) {
+			const menuIconContainer = document.createElement('span')
+			menuIconContainer.classList.add('support')
 
-    const menuIcon = document.createElement('i')
-    menuIcon.classList.add('fas')
-    menuIcon.classList.add(icon)
-    menuIcon.setAttribute('aria-hidden', 'true')
+			const menuIcon = document.createElement('i')
+			menuIcon.classList.add('fas')
+			menuIcon.classList.add(icon)
+			menuIcon.setAttribute('aria-hidden', 'true')
 
-    menuIconContainer.appendChild(menuIcon)
-    element.appendChild(menuIconContainer)
-  }
+			menuIconContainer.appendChild(menuIcon)
+			element.appendChild(menuIconContainer)
+		}
+	}
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BRMenu);
@@ -8486,23 +8733,29 @@ class BRMenu {
 /***/ }),
 
 /***/ "./src/components/message/message.js":
-/*!*******************************************!*\
-  !*** ./src/components/message/message.js ***!
-  \*******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRAlert */
 class BRAlert {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     for (const button of this.component.querySelectorAll(
       '.br-message .close'
@@ -8513,6 +8766,11 @@ class BRAlert {
     }
   }
 
+  /**
+   * Desvincula a instancia do objeto
+   * @private
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   _dismiss(component) {
     component.parentNode.removeChild(component)
   }
@@ -8524,28 +8782,35 @@ class BRAlert {
 /***/ }),
 
 /***/ "./src/components/modal/modal.js":
-/*!***************************************!*\
-  !*** ./src/components/modal/modal.js ***!
-  \***************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _scrim_scrim__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scrim/scrim */ "./src/components/scrim/scrim.js");
+/* harmony import */ var _scrim_scrim__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/components/scrim/scrim.js");
 
+
+/** Classe para instanciar um objeto BRModal*/
 class BRModal {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     for (const brScrim of window.document.querySelectorAll('.br-scrim')) {
-      const scrim = new _scrim_scrim__WEBPACK_IMPORTED_MODULE_0__["default"]('br-scrim', brScrim)
+      const scrim = new _scrim_scrim__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .Z('br-scrim', brScrim)
       for (const button of window.document.querySelectorAll(
         '.br-scrim + button'
       )) {
@@ -8563,19 +8828,21 @@ class BRModal {
 /***/ }),
 
 /***/ "./src/components/notification/notification.js":
-/*!*****************************************************!*\
-  !*** ./src/components/notification/notification.js ***!
-  \*****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_tooltip__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/tooltip */ "./src/partial/js/behavior/tooltip.js");
+/* harmony import */ var _partial_js_behavior_tooltip__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/tooltip.js");
 
+/** Classe para instanciar um objeto BRNotification*/
 class BRNotification {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
@@ -8584,11 +8851,21 @@ class BRNotification {
     this._setBehavior()
   }
 
+  /**
+   * Esconde a notificação relativa a referência
+   * @private
+   * @property {object} action - Referência ao Objeto que dispara a ação
+   */
   _hideNotification(action) {
     const notification = action.parentNode.parentNode
     notification.setAttribute('hidden', '')
   }
 
+  /**
+   * Esconde todas as notificações relativa a referência
+   * @private
+   * @property {object} action - Referência ao Objeto que dispara a ação
+   */
   _hideAllNotifications(action) {
     const notifications =
       action.parentNode.parentNode.parentNode.querySelectorAll('.br-item')
@@ -8597,6 +8874,10 @@ class BRNotification {
     })
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     for (const button of this.component.querySelectorAll(
       '.br-notification .close'
@@ -8608,6 +8889,10 @@ class BRNotification {
     this._notificationTooltip()
   }
 
+  /**
+   * Define tooltip para a notificação
+   * @private
+   */
   _notificationTooltip() {
     const TooltipExampleList = []
 
@@ -8636,6 +8921,11 @@ class BRNotification {
       })
   }
 
+  /**
+   * Adiciona classe para refletir comportamento de fechar
+   * @private
+   * @property {object} componente - Referência ao Objeto
+   */
   _dismiss(component) {
     component.classList.add('close')
   }
@@ -8647,17 +8937,19 @@ class BRNotification {
 /***/ }),
 
 /***/ "./src/components/pagination/pagination.js":
-/*!*************************************************!*\
-  !*** ./src/components/pagination/pagination.js ***!
-  \*************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRPagination*/
 class BRPagination {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
@@ -8665,11 +8957,20 @@ class BRPagination {
     this._setBehaviors()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehaviors() {
     this._setActive()
     this._dropdownBehavior()
   }
 
+  /**
+   * Define visual do componente
+   * @private
+   */
+  // eslint-disable-next-line complexity
   _setLayout() {
     const ul = this.component.querySelector('ul')
     const pages = this.component.querySelectorAll('.page')
@@ -8744,6 +9045,11 @@ class BRPagination {
     }
   }
 
+  /**
+   * Cria elemento no intervalo
+   * @param {string} type - nome do tipo do elmento
+   * @private
+   */
   _createIntervalElement(type) {
     const interval = document.createElement('li')
     interval.setAttribute(`data-${type}-interval`, '')
@@ -8760,6 +9066,10 @@ class BRPagination {
     return interval
   }
 
+  /**
+   * Cria ação de clique na página
+   * @private
+   */
   _setActive() {
     for (const page of this.component.querySelectorAll('.page')) {
       page.addEventListener('click', (event) => {
@@ -8768,6 +9078,10 @@ class BRPagination {
     }
   }
 
+  /**
+   * Cria comportamentos do dropdown
+   * @private
+   */
   _dropdownBehavior() {
     for (const dropdown of this.component.querySelectorAll(
       '[data-toggle="dropdown"]'
@@ -8777,6 +9091,11 @@ class BRPagination {
     }
   }
 
+  /**
+   * Cria ação de clique no dropdown
+   * @param {object} element - referencia ao objeto DOM
+   * @private
+   */
   _dropdownToggle(element) {
     element.addEventListener('click', () => {
       if (element.getAttribute('aria-expanded') === 'false') {
@@ -8792,6 +9111,11 @@ class BRPagination {
     })
   }
 
+  /**
+   * Inicializa elemento de dropdown
+   * @param {object} element - referencia ao objeto DOM
+   * @private
+   */
   _dropdownInit(element) {
     element.parentElement.classList.add('dropdown')
     element.nextElementSibling.setAttribute('role', 'menu')
@@ -8799,16 +9123,31 @@ class BRPagination {
     this._dropdownClose(element)
   }
 
+  /**
+   * Ação de abrir dropdown
+   * @param {object} element - referencia ao objeto DOM
+   * @private
+   */
   _dropdownOpen(element) {
     element.setAttribute('aria-expanded', 'true')
     element.nextElementSibling.removeAttribute('hidden')
   }
 
+  /**
+   * Ação de fechar dropdown
+   * @param {object} element - referencia ao objeto DOM
+   * @private
+   */
   _dropdownClose(element) {
     element.setAttribute('aria-expanded', 'false')
     element.nextElementSibling.setAttribute('hidden', '')
   }
 
+  /**
+   * Define página ativa
+   * @param {object} currentPage - referencia ao objeto DOM
+   * @private
+   */
   _selectPage(currentPage) {
     this.component.querySelectorAll('.page').forEach((page) => {
       page.classList.remove('active')
@@ -8824,15 +9163,11 @@ class BRPagination {
 /***/ }),
 
 /***/ "./src/components/scrim/scrim.js":
-/*!***************************************!*\
-  !*** ./src/components/scrim/scrim.js ***!
-  \***************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 class BRScrim {
   constructor(name, component) {
@@ -8868,7 +9203,7 @@ class BRScrim {
       )
 
       for (const buttonComponent of allComp) {
-        buttonComponent.addEventListener('click', (event) => {
+        buttonComponent.addEventListener('click', () => {
           this.component.classList.remove('active')
         })
       }
@@ -8885,7 +9220,7 @@ class BRScrim {
     }
   }
 }
-const scrimList = []
+// const scrimList = []
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BRScrim);
 for (const buttonBloco1 of window.document.querySelectorAll(
   '.scrimexemplo button'
@@ -8915,33 +9250,55 @@ for (const scrimexamplebig of window.document.querySelectorAll(
 /***/ }),
 
 /***/ "./src/components/select/select.js":
-/*!*****************************************!*\
-  !*** ./src/components/select/select.js ***!
-  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/**
+ * Classe do componente BRSelect
+ */
+
 class BRSelect {
-  constructor(name, component) {
+  /**
+   * Instancia o componente
+   * @property {string} name - Nome do componente em minúsculo
+   * @property {object} component - Objeto referenciando a raiz do componente DOM
+   * @property {string} notFound - (Opcional) String contendo código html para informar que a busca não encontrou nenhuma opção.
+   *                                Se não informado, será usado um código html padrão.
+   */
+
+  constructor(name, component, notFound) {
     this.name = name
     this.component = component
+    this.notFound = notFound
     this.multiple = component.hasAttribute('multiple')
     this._setOptionsList()
     this._setBehavior()
   }
-
+  /**
+   * Retorna os valores dos elementos selecionados
+   * @returns {Object[]} elementos selecionados
+   *
+   */
   get selected() {
     return this._optionSelected('value')
   }
-
+  /**
+   * Retorna os elementos selecionados pelo inputValue
+   * @param {Object[]} elementos selecionados
+   * @returns
+   */
   get selectedValue() {
     return this._optionSelected('inputValue')
   }
 
+  /**
+   * Retorna os elementos options selecionados
+   * @param {Object[]} elementos selecionados
+   * @returns
+   */
   _optionSelected(strOption) {
     let selected = []
     for (const [index, option] of this.optionsList.entries()) {
@@ -8959,22 +9316,47 @@ class BRSelect {
     return selected
   }
 
+  /**
+   * Remove o elemento que indica item não encontrado
+   * @private
+   */
   _removeNotFoundElement() {
     const list = this.component.querySelector('.br-list')
-    // debugger
-    if (list.querySelector('.br-item.disabled')) {
-      list.removeChild(list.querySelector('.br-item.disabled'))
+    if (list.querySelector('.br-item.not-found')) {
+      list.removeChild(list.querySelector('.br-item.not-found'))
     }
   }
 
+  /**
+   * Coloca o texto Item não encontrado no select
+   * @private
+   */
   _addNotFoundElement() {
-    const tag = document.createElement('div')
-    tag.classList.add('br-item')
-    tag.classList.add('disabled')
-    tag.appendChild(document.createTextNode('Item não encontrado'))
+    const image = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAABCCAYAAACl4qNCAAAABHNCSVQICAgIfAhkiAAAGMxJREFUeF7NXQl8FOXZf2bPbLKbbLIJARJChEQSCFc4IqAY/CiIgMZardYD0R9SW/3EVlAkSoAPQaAai1awleKnrVYR0wattVKxthWUI4AYCCEkMeQix26OPWdn+jwzzGaz2WM22YDv78dv1sx7/+e5n/eVgctU4mesH+9WqlZyttaZjEIdxznNsTzn1oDbYVaoY5qAUdWDSnuKc3Xtsh7fcewyTet7Owwz2DPT5z72Y85lfRrHmSB3LIZh6kAdvZ9RGbd0HSr6Vm67cOrlN5/S1/9m92xQKrN5HjI4u2OY22ZLUGg00YxaFc27ORfPslZ1QnwrA0wb73ZdAKX6qzFLbv5b6fCpVjljGQv+mg7ApptLFh+QU9+7zqABE59XNMHpbHuDZ22Twp1UrwlqYv+mYJSPdR7ecmYg/UypPxzt+PM/7nS0mhdxVnueu7t7eH/7U8UZWhil8jgDijcr1m56I1A/xoIPjApQFwPw5raSxSvCGW9QgDHkrbnWbWv5K/CcPpzJBK7Ls0qdaR/HxP60+9CapnD6zHn7tZmu2gvPuFra5nJOpyqctrLqKhiLIipqP+eyb6/etiMoZRAFmUsWVMvpN+LARI+9ewHPqN9DORIjZwLh1EEWZ2FUmuVdR1/+U6h241/91TJbQ8NK1tKZGapupN5zTtc3mnjjjsrnXnjFX58JBft249/b20oWPR5qzIgCo8+4eyyvi/mSBz421MD9f89zjEb/VvfiF5dCEcP59jPhzR13Wc9VbWLbLSP7P8bAWqKcatEMSXz59Mq163x7QnBWIDDI3oKXSAITFTNheQXPcyNCDRqJ9wqlujIqKfv6lr8/Wk/9TXt/16iOqu/2OurqJ0ai/0j0gbKoQpuaes+ph1Z87dufqaC0oLVkcUmgcSIGjGHaqp1ue/tDkViQ3D4Ynm9TqQ3zRzycPtVWXVOMAl0rt+3lqsdo1G5NcuIjZ54o2uE9ZkJBKVENKQVF/uYSEWBiZzyewXZ2fAsoWC7XgqVx4iZqWa3JFXmhHuGFaFNSnjmz6tn/6w1OYLYWEWD0k/+3hGNtt0R4LUG7Y5QAcRMUoIm/nKMOaCxek2haWfHMc7+S08uAgYkf9VCc06Bs4jm2/2yERxnOKFDdxyfvBkDC4912YJRR+HTiKyIIVCnQEhR+M06InxIF6kFUMeRsXrh1cPqsOinhtspnNv1Famss+HCSkuGLWj9YVODd34CBiZ35TCHb2bgh3En2AoG1oUdGh39yCQChpS38ZpTaXgCBQgmEizFXBWrDgKce9pQj0YBRKDrxA5tQXbyjWuqP1GgOmGJzycIy6W8DXl3M5EeP86xdtrtFogQgEBAAAsIDggSQQCVIQYDveARIgQCxVlBoo8E4GZBS6J1Ymkv/JnTjvNgKQxbNA01SYiT2b1D7UETryqo2FeNKApcBAxOd84ADP21NsEF4ZE+oQeE+K5ECqDqxKJFVeQAS3iEgRCUCQFiHqIaEiQCgC9mXDtRxvUcyHzwM5kNHEDQNpC79CT77z1EHFQ2fznWpw58tX7nWw2nIfQOgQc+ASDUDAkY//dnbOVvDuwEXxLEIhkoEgxQ2kh9UpL8FBKg3eDznhLjxGohK7qEUaczGPX8BtqMT2M4uGHrbYohK7bcL7HLiAoxW27bk+ZeSihjRSCZ3jZJhd7d+sDh/4MBMeeIVzmn5mb8VEZWQHCFARApAGSJQCxIXRwARBV0CzQMQUguBSVLGi4KihrIQO9Y/URIoRC30VMcbcRwVcA5HnykRJaG3WHj/fSnapMQnzxRu3CLNB22bIsmuGRDFGPJWf+i2ttzUa6E+VIK6VHgAscjiVMiOqB+GAaVeCQnTkJ3hf9OmSptLT6mgjwoBR6VBSezQDfTfvMsFbpsdbk1pgHP/PAa1bTzE58+AC7oMT70rzfbwgzpXtWV7hr8PZUDA6HNXfMu5urOljkUqQXmi0PSmEoGNcaTwhqYgFqmK5AvKIFAwYLoGf7s6PJup1NE7Djg7vVcA+qWQWjoAPbwC1TBqtaA4EFDZfCN8ev2/waxkIP0xpF5crXbeYlDqtCLlcJzQTqHBNleIkniNbkrN1uKj0h5KrpqBATP9qUaMSCZ7gEHhTewJlV2BJfUI8ktsTAZAInjEjixgGBsDSlUbgop/ww0XVGyyd6jgb84lUg2BRF8/UYwgwhA8VUw0zNPVwG+zDqAlqoD8jRx8fpKHmKxMiMkcDUp8T0VtjBUoTGWIUIQiTD6p1Ol+d25z8TIPMLeWHnDzbMGAgNGNW9KJm6jn8cujzfQYhYI2JW6gByCPwSgpAv4oCKmAYEWqURvdEDtGATkoa0ZpUXsjuYNUIPRJGp74C4OKGvHvgnrduyidnbAx+22o6GBh8moOpmapICV2InS53KCMMwhs8UxSAnAom4gSrwTVKPUxp85tfCHHA0zBh/cj3ykbEDDROQ/akX1pySAU7RGiEi82JgOgHhmEwLqsuOkIssoOxglINVYrfJU9AeKQ3fSnvHrwIOz8+mNIT0awkZjKqnioWVkEIzdvBguxQiw3T5wAh3OuFijuSoCDMtFR8/Lv+ixwYMCMX8b7szn6GoxEJaI2FJiCiP05UcY7wJRHcqVTYDFnJk7rDyZCm5ONjXDdjh6nbprRCCdWrIBFu3fDv6qrhTr35ObCJ6nJaB8ZBPZ2JRQClckws/LZbV9KCyU3zYCA0Y27vxv5V7Rfg9Hbou/l9xLlgK8M4pxdAmsyZCkgOlUHbFc3sOYOODN5ugcY+tL33X8/rP74Y1iYleXZ3D/ceWdA8D48fRqIcojqnsrPh/FDh/YB5q2jR8H0g3zQjUi5IrImZlTa3aceW/NHDztDORMeMPmfqeKY47cwLDvBbW8eynY13IeUgMwZ1VT82kXfFtkqZI+gnPF1uQQASAAK1WTtEHJOirqEo6EJ++DgdE6uZ9Npk69NTxcogb5+qXj/lkNevhRDwOiuSoPEufmgjNbJ6SKidXTpIx4vf7zQE9U03bqvRBYwyfcej7FV7dvhtjX9kHfZRHWGNlPYaNEoFEDo5XIJDpDodEDej0BSiRrConPSJAhkKi6zRVCLy7Nku+Fkb5Y3MHdePRo+rDwHDpNJ8BxQ8WZnl8MoVekNxZUbt/XKAwgJTPycV2e5rLWlnLVFjHwgCJJK29vvdckoFFbma9Ff8ntJFITUQSAS63JbWyE6TYeWvcGzIW6rDeWLU6CYG8uroBMteQMKZ3qqUSV2oREplcSYGGjp7oZ2m02gIjtZ9/jSiXWkNlQ3JS4OHPiuA4W+mf5ZzPCYrRXeRUN0TzdAXoIS6hbfLthA5Ekg1ZvYqUofI8g6snXIeKW/R1p70yQlbK4o3LRaWhO5Z4ICY7rh1RRHW3k557YZeqhEVHd5oNiJaHP0ACS5XC5Z5cI7icUhGAxZ7na0UdrxN7I/dNXEjI6CmBF6wdCTFk7sRPpSq1/aKZsSwqm4DFe+Fh2ibozpzGoAqENn95QFM6DBlCoYrQJHQNBIDZc8CgTSYICjHzf24W8eesyjpZhCyRj9tFUnOXu7R8cWJuvxeyEbI3c8L36hvYNbIkAEgmAs4pNn0fikisj+WEsN6NKG4z8NqHRiNFraDKIU0RoXN+e73/5/OPstu+56nMtSBIbyeW5vBTiEVDPdxMC53OtRQ+uJwBHVkhpN7h16DoZarRuZdlf5L9a8I00+qIwxzt2x1Nl0ZFevlaK7RbAzBMck+bTwK7/k26KnwMLoSa4ZpAjMA0M20CUoAgqNAdzdTaBO0ELqyGnAMX7c82Q4kt9ECBGgwYibsvPn46Cx6aIwDT2yLSpdyLqoDE0eAl3Ibs7X1MJVI9OEv3vXoffnzldDclKSUJ/qJSWaYNOWX0Nq+Wn4HeoPbdjltZhn04EMYNykBWA1TRQUADEehLLO3gUXvz1AnySoVGqImpyAXgUMPyRELqZtys0deWTJ8lrvvQ7IyvTXFB7hupt6VCKamuC+v+SdJQ+xUgRIMC7R/qBN5Z0W+vyRDXQJHmUOrW+VwYguew7ZViKCYwGn4wHZX/aZ7aMhPt4nCCO7tf+KM/MXwqGvj8G9SJTnVQpoww8AUORVj1oGuoy+qQuWL1YD23JS6GzI+DmgnpQUMR+bKtbQXLlhm8etJc3YLzBjbz+lqan4jQ1V4F5+Dg8bw2iiGKOnjxuVAaQKRh0t+LcE1uWyoJZlAE1iFGiTdKAx6QWZQU5GEuwubrnsrW16M1cgokiWG268DT7/QrTnpuai5X/0hPDbOO91NDL77BF4A5MwOg8gVQX67MyIGKPqBOP+s2ufnyutTwoz+11y0k8OZnaffL2i12aQdxhZEh6TELzHVIhVsZ11+IsFXWoqUoYDooab0M+F3lqf3aQYCWk3rnYz1n5Y9j4PBjCz594C//5SzMGbOmUyHC2/ADHjl4Fm+Ay/8+oFTNoUaG84ASMevDsiGlpUyrDlp1cVveYB5tbSsrYPFvu3/OOv27rQYa7Y5z1LohZM6BNZGcoQztYC0VeNQKOQR1AScJLBP2uiGBKgrtZ2YBV+Y2t+N2UwgJFYGQ2YPX4qNGcUBf1QfIFpqz0CKffeMWAXDio55qrNxbh5jOSVFSKZlHjudzcTF72Ta63Zf4RmS3JFVHkp7lEDSm0MRKUAGLKHgzJKdK/ILc4WVH+wtB8JmiLQq7vOw1v7UJ/c8QLV86aYUaMzoEHd4/bx14a1VKHMFBWO+GgeLtZ+AylL7hQ0R19PgfNiC6DcQLbuFJ7BiibJ9FpF4XMevk5xf3PJrWZq4xeYoUuPJlkOFTcTIFJhLedBn2EEQ04agtPXxR5qs0i2UECLxedFymyRWdiuC4MKzDXTc+HgV544VchZpYy4Ci58d14ARlKfpUb2unpofL9UAIRAG373jwL3p1B2q5JSr6p8+mlB5RTO0jCqA8TGAgJDL3RZd7dwzg4T/kP10AmmWZkoQ/rvRyJg3OjGZzu6MOXo45Ab4PkgBgEYb1Y2NXciCv/jsucjAUObTsE1b08AydG63/9RoBZj3hQwXjM1YL+YNLIOTwMUSRXoFAD9lk4CCBQjHQ3wPiKgn/b0HmfTodvUqOsnzh4dUoaEWhlNmkAhA3LNQvnq8sO3TxtUirnu2hlwx4NPBp3+S5sLofLMN0KdURnZUFVZ7mFl3mFpYmONe0o9mTpDFs/32y/aQHVnn92U5i1bfCsKwJgwasbxfCEqUv9CxO4XSGv2psmgqDpqnBg+2/I3G0ovouJsboEPNr8VCkfP+7x0lG8B9OWyE9/A/yy4HVovlPvt7423/gRvvPUu/OPj93u995YxeXlT4YXX/xp0Po8svQWOff0foU7mmBw4iyANu/OHaAbEh+03I71Jmzr0+oqn1v1LGtRYUJrve05TopjddEAU118pATPm+Y1z7HW1n6K5MmBkiFqI5B2NzWiYaeG91a9GBBjqpATZYsHiG/32Z0YPddmJU5A/e2ZAYGbNuga27CwNGxhJxoTr1DQf48Bljb2v+/Cv3hQIQMhd5oqlfDJpIr1YmfdhmozCXzbhVz5E9g4GqUiqMtkwJGNI1uzdsFt2t8EoxreTA//8j0BdI9NSIX1k4PNT3hQza9YMBMaT4+13Xv4oRlKXwwGmo5wHewOPjvWoz7rKtt9Ag5H4QG9cie/ZTP+W//bNW62V55+QvXsyKkqufHe3Fd4vel1GC7GKHGCIMqbMnAfVNd95+t2180VYcs+P/Y7jLfynoIH56zc+CZ9i0I4hf5nceI0EijAQBrKs3+wiZ5uYeOCn+AVm1FMrzJzNFlEHFbEzBzkj8Yveu/73EQfm8VVrEYg7BEohuZI+MjUgMN4UM3fuDbCuOPhZW38Uk/qAaPnLiXh2nubBVu+xIcW1M+5brCd2BSTVPsBM/P2vf2gpO9VbWsrexsAVSfgT1ZDHeM+zv5XdoxyKkd3ZpYreFJOXNw2F/0dhUwwJf8pJC5a8gdF2sJxEmYJ+Xd+CeRJbu8u2r5JNMVdvWPOas6XFk4AW7qID1RdYGUYOyS0TaVYW7hy9nZj9ZmV+DEzvedibeOiqwHAinTbxU1DOvItyxj+vJYKiaJm3RpC1bf179u8uBDFZw92GnvquNvSToYyJNCsLd0berOz666+D517ZGzbFjFh2n182Ro73ztNIJYJjJXDBWzW+6D65c3ZAivEFJvvFjR/Yqmt7HTsLd+H+6gsGJrIzSrDYUyg/XDzYrKy/FJP20/t7Wf0EiLUata5GH1kSYPOU0YkfdR7atDAgML7XaFy9/umdztbWsI+Ft33+HzzNZQL7hQZImD2jF+8lUKREcMo3vtLAeLOy/soYEv5k9XNuLXSf48FxUR4gEhCKmKEvdx3c8KhsGZO1df0j9roL28OlkpZPPoOu8gqP887bs0oqJSUxkKr8fZAx06+dD0eOiRHJ/mplI5Yvh+7zol3Sn6IakntXx/6HPXF+3z4YOiyDhxHQwBGPmOWfPx9V85sXLLzTKd83j+3oZBdRCxU6cucLjGRgkoPvSgv/SAATnbMEJXRYW+TZe4VGzyaOv9lQvXtOYDuGrH3EfJL3DQ2ZRas+cbVbfhDOl9D17RkBDHLk6ceO6ZM0R5QiHCrC55VWl71Z2fTpU+HFXeH7yqLG3CUko3hyIMLYLJUx88uOL1b19hP5tBfsGF85M+b5wjH2uqaTmCkSsZsuSPBTAp1CrYqoryyM/fBU9bZjbr55ITz53O6g3fgzMHXjlvYLFMpc1abPn4+EENTdEDAenLlxzeuu5hb5/vkQO0Qpr8TGKC3ovacj58TsDzDe6vKCBfOhcGtwb7c/YIhikCWFPbzalHXccuCXIS/X8wCTcCkJwGukqIxnnqjDzBZT2KP7aeCx/PFdOFpZZmwTmEwJkZiCp4/4YWOgAzN2qNx0042wZovg6A1YIkUxiqh4u370rdmN78yoDrWgHmBQCUCjp7q1ZKGHrq9a8/h0sNo/xWzE4MHrUKPgeymCGa53+Z5FUwRvcagiRRZD1WNRQ6QkQSpulHm5194IDz26Jnxgxi4RT2DLLMTClPHZSzo++7ms1NKQGVuji56c6e7o/ARXMaAb+0hldmKGDD3D0cpm5YhZlKGKFMAKVc/3/QM/WwkP/iygy0qoHgmKUSdPWG359NHNcufXBxgxPuDaLWVrUEc5L27Itrd3/oW1WPwefZYzmBSTcba2heWS+ef+j4SIob/yUck70Fgvuvr9AUObHqrMvmEBZGaND5tiojEPTW5RGkdu6/yiMPRkvDrsA0ygiBq1ydq27mV03S/nneHfDyYZmS48JRaOjAm2+CW3zfHE4tPSR0Nt9TkwzpwuXMTg7uqC0lf+LHfvBgUYgX1pTes7Dq1bG+5E/LKyYLed5hRvTHZYbZvwVtY7wmVvUtLfjOQMiLVgCGAApbPD4qEkt5uFE0cPCb0lF9wknm/Bc/sTjSkwnB/Y3TIOhx1OnRBS7ISE+rLDYmptKIphlGqX0jRuacf+n/+hP8sMKmPElBomjgPnS96sjQZacPastmbfuw852s33smZLLoZ0ZWX/ucxmwW9W/9Z7/ZlvyDbSfTKkBVqra6HtH1+EbNOfCsGAUeqHN2uTx93UUnKHiGg/SkjhTxk0GN0yB7tYc17j8ZiGvZ/c4Wgz34JG5GSMfqb5m4t3GLb+D3tAyszsx7z9NpGS7MgDISQYIjiNe/dh0ntP4qJ3Q0Ybj1eipAjZpm7zWdnTYKISQJd5W5/6eLqhWxWb/pLl818EV/NkjBQSGO8+6EANZtO0Y/LAulAXO2duWL2IYd0LkM3McXf2XGsi9UceZ7pjTCrkrhHYBV0jgrdgcHiaS3qKV5D0EKR0qst3fQSIb1oqnTAghYP6onbOdgVYayl6hTnYeLmQQiseUuKszTK2S6yi0JmEs6dSQbXZjWC9x3DsI51fbepZlOwe+1YMCxhqTsoBZodVE2uTLnhGoJDVBb6Be8HZg7HVHx/4KbKwH7Ft7dNYS8cApty/phRJpNh7uO75YKMhIKwyZtinamPaL1o/vM9/clv/pjuw+8pEoErz8RhGma8MCjSfPASJr2u8y15V+2NXV/cMW1V1/669CGPBlAjRXYlh3p4Lm8Jo3beqQhNzSqE2vKPL/NGLTW9OFK3VCJewKSbC48Oc82Xz2786ci/vcM5zNF9MwrB2xIZwtCIgeE0JK3pfBlSUUabT+H/o2KtwXNxlObL93IA6k9H4igPjPcc5NWXjUIbd6LhQv9je0DwVlYUYcnxSKIGKHNDo2gCFZjiYj9WFjLsH2h/UqlCGRHUoVNHHeIXm7zHJ03bWvz1VnMRlKt8rYHzXnF93PJVnmfFoQEzCsz14EwMzDEHT2OsbNXgAyum2Odqs56tsaoOh1tGm1LJdw9pdzkkuRqUfhflro7Hd1e7uRk82KV7hhQ6yntv/MJbSiZpZG9onuOmuemVcxmHgmQoVz59sfHv6qcuEgd9h/gsitjFaPKd5sQAAAABJRU5ErkJggg==`
+    const notFoundElement = `
+      <div class="br-item not-found">
+        <div class="container pl-0 pr-0">
+          <div class="row">
+            <div class="col-auto">
+              <img src="${image}">
+            </div>
+            <div class="col">
+              <p><strong>Ops!</strong> Não encontramos o que você está procurando!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
     const list = this.component.querySelector('.br-list')
-    list.appendChild(tag)
+    list.insertAdjacentHTML(
+      'beforeend',
+      this.notFound ? this.notFound : notFoundElement
+    )
   }
+  /**
+   * Cria listagem de elementos do select
+   * @private
+   */
   _setOptionsList() {
     this.optionsList = []
     for (const item of this.component.querySelectorAll('.br-list .br-item')) {
@@ -8993,19 +9375,30 @@ class BRSelect {
       }
     }
   }
-
+  /**
+   * Reseta estado da lista
+   * @private
+   */
   resetOptionsList() {
     this._unsetSelectionBehavior()
     this._setOptionsList()
     this._setSelectionBehavior()
   }
-
+  /**
+   * Define o comportamento do componente
+   * @private
+   */
   _setBehavior() {
+    this._setSearchIcon()
     this._setDropdownBehavior()
     this._setKeyboardBehavior()
     this._setSelectionBehavior()
     this._setFilterBehavior()
   }
+  /**
+   * Define o comportamento de dropdown
+   * @private
+   */
 
   _setDropdownBehavior() {
     for (const input of this.component.querySelectorAll(
@@ -9035,6 +9428,10 @@ class BRSelect {
       }
     })
   }
+  /**
+   * Define o comportamento de teclado
+   * @private
+   */
 
   _setKeyboardBehavior() {
     for (const input of this.component.querySelectorAll(
@@ -9047,6 +9444,10 @@ class BRSelect {
       list.addEventListener('keydown', this._handleKeydownOnList.bind(this))
     }
   }
+  /**
+   * Retira o comportamento de teclado
+   * @private
+   */
 
   _unsetKeyboardBehavior() {
     for (const input of this.component.querySelectorAll(
@@ -9060,6 +9461,11 @@ class BRSelect {
     }
   }
 
+  /**
+   * Verifica a navegação
+   * @param {object} event evento que foi ativado
+   * @private
+   */
   _handleKeydownOnInput(event) {
     //Close Select
     if (event.shiftKey && event.key === 'Tab') {
@@ -9079,6 +9485,10 @@ class BRSelect {
       }
     }
   }
+  /**
+   * Define comportamentos de teclado na lista
+   * @private
+   */
 
   _handleKeydownOnList(event) {
     event.preventDefault()
@@ -9103,7 +9513,10 @@ class BRSelect {
         break
     }
   }
-
+  /**
+   * Define comportamentos de teclado no option
+   * @private
+   */
   _setKeyClickOnOption(list) {
     for (const [index, item] of list.querySelectorAll('.br-item').entries()) {
       if (this.optionsList[index].focus) {
@@ -9111,11 +9524,28 @@ class BRSelect {
           '.br-radio input[type="radio"], .br-checkbox input[type="checkbox"]'
         )) {
           check.click()
+          this._sendEvent()
         }
       }
     }
   }
 
+  /**
+   * Envia o evento onchange
+   * @private
+   */
+  _sendEvent() {
+    const clickEvent = new CustomEvent('onChange', {
+      bubbles: true,
+      detail: this.component,
+    })
+    this.component.dispatchEvent(clickEvent)
+  }
+
+  /**
+   * preseleciona o elemento apartir da classe css .selected
+   * @private
+   */
   _setDefaultSelected() {
     const selectedItems = this.component.querySelectorAll('.br-list .selected')
 
@@ -9127,6 +9557,11 @@ class BRSelect {
     }
   }
 
+  /**
+   * Retorna posição do elemento no select
+   * @param {element} component elemento que vai ser pesquisado
+   * @returns {integer} valor da posição
+   */
   _positionSelected(component) {
     for (const [index, componente] of this.component
       .querySelectorAll('.br-list .br-item')
@@ -9137,7 +9572,13 @@ class BRSelect {
     }
     return 0
   }
-
+  /**
+   * Desfine comportamento do clique no checkbox
+   * @param {int} index
+   * @param {object} item -  Objeto do item clicado
+   * @param {object} event  -  Objeto do evento do clique
+   * @private
+   */
   _handleClickOnCheck(index, item, event) {
     if (!this.multiple) {
       for (const [index2, item2] of this.component
@@ -9175,8 +9616,12 @@ class BRSelect {
         }
       }
     }
+    this._sendEvent()
   }
-
+  /**
+   * Define comportamentos na seleção
+   * @private
+   */
   _setSelectionBehavior() {
     this.selectionHandler = []
     this._setDefaultSelected()
@@ -9194,13 +9639,19 @@ class BRSelect {
       }
     }
   }
-
+  /**
+   * retira comportamento  de clique na seleção
+   * @private
+   */
   _unsetSelectionBehavior() {
     this.selectionHandler.forEach((item) => {
       item.element.removeEventListener('click', item.handler, false)
     })
   }
-
+  /**
+   * Define comportamentos no filtro do input
+   * @private
+   */
   _setFilterBehavior() {
     for (const input of this.component.querySelectorAll(
       '.br-input input[type="text"]'
@@ -9221,7 +9672,10 @@ class BRSelect {
       })
     }
   }
-
+  /**
+   * Define filtro no list
+   * @private
+   */
   _filter(value) {
     let hasVisible = false
     for (const [index, item] of this.component
@@ -9245,11 +9699,13 @@ class BRSelect {
       }
     }
     if (hasVisible === false) {
-      // debugger
       this._addNotFoundElement()
     }
   }
-
+  /**
+   * Define atributo checked com click
+   * @private
+   */
   _setAttribute() {
     for (const item2 of this.component.querySelectorAll('.br-list .br-item')) {
       for (const check2 of item2.querySelectorAll(
@@ -9261,6 +9717,13 @@ class BRSelect {
       }
     }
   }
+
+  /**
+   * Seleciona o elemento e retira checked dos outros elementos
+   * @param {integer} index Posição do elemento na lista
+   * @param {*} item elemento em que vai ser selecionado
+   * @private
+   */
   _setSelected(index, item) {
     item.classList.add('selected')
     for (const check of item.querySelectorAll('.br-radio, .br-checkbox')) {
@@ -9274,6 +9737,12 @@ class BRSelect {
     this._setInput()
   }
 
+  /**
+   * Retira o estado selecionado do elemento
+   * @param {integer} index Posição do elemento na lista
+   * @param {*} item elemento em que vai ser desselecionado
+   * @private
+   */
   _removeSelected(index, item) {
     item.classList.remove('selected')
     for (const check of item.querySelectorAll('.br-radio, .br-checkbox')) {
@@ -9286,7 +9755,10 @@ class BRSelect {
       this._setInput()
     }
   }
-
+  /**
+   * Determina o input
+   * @private
+   */
   _setInput() {
     for (const input of this.component.querySelectorAll(
       '.br-input input[type="text"]'
@@ -9295,14 +9767,41 @@ class BRSelect {
         input.value = this.selected
       } else if (this.selected.length === 0) {
         input.value = ''
-      } else if (this.selected.length === 1) {
-        input.value = this.selected
       } else {
-        input.value = `${this.selected[0]} + (${this.selected.length - 1})`
+        this.mountSelectedValues(input)
       }
     }
   }
+  /**
+   * Monta a string apresentada no campo input do multiselect
+   * @param {object} input Referencia o elemento input do select
+   */
+  mountSelectedValues(input) {
+    const GAP = 0.4
+    let amount = 1
+    let value = this.selected.toString().replaceAll(',', ', ')
+    const tempSpan = document.createElement('span')
+    tempSpan.innerHTML = value
+    document.querySelector('body').insertAdjacentElement('beforeend', tempSpan)
 
+    while (tempSpan.offsetWidth > input.offsetWidth - input.offsetWidth * GAP) {
+      value = this.selected
+        .slice(0, this.selected.length - amount)
+        .toString()
+        .replaceAll(',', ', ')
+        .concat(` + (${amount})`)
+      tempSpan.innerHTML = value
+      amount++
+    }
+    input.value = value
+
+    tempSpan.remove()
+  }
+  /**
+   * Retorna elemento posterior ao focado
+   * @returns {object}
+   * @private
+   */
   // eslint-disable-next-line complexity
   _getNextItem() {
     const list = this.component.querySelectorAll('.br-list .br-item')
@@ -9338,7 +9837,11 @@ class BRSelect {
     }
     return ''
   }
-
+  /**
+   * Retorna elemento anterior ao focado
+   * @returns {object}
+   * @private
+   */
   _getPreviousItem() {
     const list = this.component.querySelectorAll('.br-list .br-item')
     let iFocused
@@ -9361,7 +9864,10 @@ class BRSelect {
       return list[iVisible]
     }
   }
-
+  /**
+   * Reseta valor do input
+   * @private
+   */
   _resetInput() {
     for (const input of this.component.querySelectorAll(
       '.br-input input[type="text"]'
@@ -9369,12 +9875,19 @@ class BRSelect {
       input.value = ''
     }
   }
-
+  /**
+   * Reseta o focus dos elementos
+   * @private
+   */
   _resetFocus() {
     for (const option of this.optionsList) {
       option.focus = false
     }
   }
+  /**
+   * Reseta o focus dos elementos visiveis
+   * @private
+   */
 
   _resetVisible() {
     const list = this.component.querySelectorAll('.br-list .br-item')
@@ -9383,7 +9896,10 @@ class BRSelect {
       list[index].classList.remove('d-none')
     }
   }
-
+  /**
+   * Abre o select aberto
+   * @private
+   */
   _openSelect() {
     for (const list of this.component.querySelectorAll('.br-list')) {
       list.setAttribute('expanded', '')
@@ -9396,7 +9912,10 @@ class BRSelect {
     }
     this._resetInput()
   }
-
+  /**
+   * Fecha o select aberto
+   * @private
+   */
   _closeSelect() {
     for (const list of this.component.querySelectorAll('.br-list')) {
       list.removeAttribute('expanded')
@@ -9411,6 +9930,29 @@ class BRSelect {
     this._resetFocus()
     this._resetVisible()
   }
+  /**
+   * Adiciona ícone de busca
+   * @private
+   */
+  _setSearchIcon() {
+    const brInput = this.component.querySelector('.br-input')
+    const dropButton = this.component.querySelector('[data-trigger]')
+    // Ícone de busca
+    const searchIcon = document.createElement('i')
+    searchIcon.classList.add('fas', 'fa-search')
+    searchIcon.setAttribute('aria-hidden', 'true')
+    // Container para o ícone
+    const inputIcon = document.createElement('div')
+    inputIcon.classList.add('input-icon')
+    inputIcon.appendChild(searchIcon)
+    // Estrutura para input com ícone
+    const inputGroup = document.createElement('div')
+    inputGroup.classList.add('input-group')
+    inputGroup.appendChild(inputIcon)
+    inputGroup.appendChild(brInput.querySelector('input'))
+    brInput.appendChild(inputGroup)
+    brInput.appendChild(dropButton)
+  }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BRSelect);
@@ -9419,40 +9961,37 @@ class BRSelect {
 /***/ }),
 
 /***/ "./src/components/step/step.js":
-/*!*************************************!*\
-  !*** ./src/components/step/step.js ***!
-  \*************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRStep */
 class BRStep {
   constructor(name, component) {
     /**
-     * Instancia um componente carousel
-     * @param {string} name - Component name
-     * @param {object} component - DOM root Object reference
+     * Instancia do componente
+     * @param {string} name - Nome do componente em minúsculo
+     * @param {object} component - Objeto referenciando a raiz do componente DOM
      * @property {number} activeStepNum - Número do palco ativo
      * @property {array} DOMStrings - instancia dos elementos internos do componente
      */
     this.name = name
     this.component = component
     this.activeStepNum = 0
-    // DOM elements
     this.DOMstrings = {
+      // stepsBar: this.component.querySelector('.step-progress'),
+      stepsBar: this.component,
       stepsBarClass: 'step-progress',
-      stepsBar: this.component.querySelector('.step-progress'),
       stepsBtnClass: 'step-progress-btn',
       stepsBtns: this.component.querySelectorAll('.step-progress-btn'),
     }
 
     /**
-     * Remove class from a set of items
-     * @param {object} elemSet - Elelment's List
-     * @param {string} button - Attribute name
+     * Remove uma classe css de uma lista de elementos
+     * @param {object} elemSet - Lista de elementos
+     * @param {string} button - Nome do atributo
      */
     this.removeAttributes = (elemSet, attrName) => {
       elemSet.forEach((elem) => {
@@ -9461,9 +10000,10 @@ class BRStep {
     }
 
     /**
-     * Return exect parent node of the element
-     * @param {object} elem - element
-     * @param {string} button - father's class
+     * Retorna o nó pai do elemento com o nome da classe específica
+     * @param {object} elem - Referência ao elemento
+     * @param {string} parentClass - Nome da classe pai
+     * @returns {object} Referência ao elemento pai
      */
     this.findParent = (elem, parentClass) => {
       let currentNode = elem
@@ -9473,22 +10013,19 @@ class BRStep {
       return currentNode
     }
 
-    /** get active button step number
-     * @param {object} elem - element
+    /** Retorna o número do passo de referencia
+     * @param {object} elem - Referência ao botão de passo
+     * @returns {number} Número do passo
      */
     this.getActiveStep = (elem) => {
       return Array.from(this.DOMstrings.stepsBtns).indexOf(elem)
     }
 
-    /** Set all steps before clicked (and clicked too) to active
-     * @param {number} num - step number
+    /** Define o número do passo de referência como ativo
+     * @param {number} num - numero do passo de referência
      */
     this.setActiveStep = function (num) {
-      // remove active state from all the state
       this.removeAttributes(this.DOMstrings.stepsBtns, 'active')
-      // this.removeAttributes(this.DOMstrings.stepsBtns, 'disabled')
-
-      // set picked items to active
       this.DOMstrings.stepsBtns.forEach((elem, index) => {
         if (index === num) {
           elem.removeAttribute('disabled')
@@ -9499,7 +10036,7 @@ class BRStep {
     }
 
     /**
-     * Prints numbers labels into steps
+     * Mostra os números dos rótulos dos passos
      */
     this.setStepsNum = () => {
       this.DOMstrings.stepsBtns.forEach((elem, index) => {
@@ -9516,7 +10053,7 @@ class BRStep {
       })
     }
 
-    /** Filters active step into range
+    /** Testa se o passo está dentro do escopo e o define como ativo
      * @param {number} num - step number
      */
     this.setStep = (num) => {
@@ -9528,65 +10065,64 @@ class BRStep {
   }
 
   /**
-   * Set component behaviors
+   * Define comportamentos do componente
    * @private
    */
   _setBehavior() {
-    // STEPS BAR CLICK FUNCTION
     this.DOMstrings.stepsBar.addEventListener('click', (e) => {
-      // check if click target is a step button
       const eventTarget = e.target
       if (!eventTarget.classList.contains(`${this.DOMstrings.stepsBtnClass}`)) {
         e.target.parentNode.click()
         return
       }
-      // get active button step number
       const activeStepNum = this.getActiveStep(eventTarget)
-      // set all steps before clicked (and clicked too) to active
       this.setActiveStep(activeStepNum)
     })
 
-    // Set Steps label number
     this.setStepsNum()
-    // Set default active step
     if (this.component.hasAttribute('data-initial')) {
       this.setStep(this.component.getAttribute('data-initial'))
     } else this.setStep(1)
 
-    // set steps buttons grid style if it needs to scroll horizontaly
     if (
       !this.component.classList.contains('vertical') &&
       !this.component.hasAttribute('data-scroll')
     ) {
-      const stepsWidth =
-        Math.round(100 / this.DOMstrings.stepsBtns.length) - 0.5
-      // this.DOMstrings.stepsBar.style.gridTemplateColumns = `repeat(auto-fit, minmax(100px, ${stepsWidth}% ))`
+      // const stepsWidth = Math.round(100 / this.DOMstrings.stepsBtns.length) - 0.5
     }
   }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BRStep);
 
+
 /***/ }),
 
 /***/ "./src/components/tab/tab.js":
-/*!***********************************!*\
-  !*** ./src/components/tab/tab.js ***!
-  \***********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRTab*/
+
 class BRTab {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     for (const ancor of this.component.querySelectorAll('.tab-nav')) {
       this.height = ancor.clientHeight
@@ -9605,7 +10141,7 @@ class BRTab {
       ancor.style.setProperty('--height-nav', `${this.height}px`)
       ancor.style.setProperty('--right-gradient-nav', `${this.leftPosition}px`)
 
-      this.positionScroll(ancor, this.component)
+      this.positionScroll(ancor)
 
       this.navigationRight = this.navigationRight + 4
 
@@ -9613,8 +10149,8 @@ class BRTab {
         ancor.classList.add('tab-nav-right')
       }
 
-      ancor.onscroll = (event) => {
-        this.positionScroll(ancor, this.component)
+      ancor.onscroll = () => {
+        this.positionScroll(ancor)
 
         if (this.navigationLeft <= 0) {
           ancor.classList.add('tab-nav-left')
@@ -9643,14 +10179,21 @@ class BRTab {
       )
       ancor.addEventListener('keyup', (e) => {
         e.preventDefault()
-        this.positionKeyboard(e, this)
+        this.positionKeyboard(e)
+      })
+
+      ancor.addEventListener('blur', () => {
+        this.hiddenTooltips()
       })
     }
     this.tabitems = this.component.querySelectorAll('tab-item')
   }
 
-  positionKeyboard(event, componentTab) {
-    // event.preventDefault()
+  /**
+   * Mapeia as teclas pressionadas
+   * @param {event} event - evento que disparou a ação
+   */
+  positionKeyboard(event) {
     const keys = {
       end: 35,
       home: 36,
@@ -9662,10 +10205,10 @@ class BRTab {
     const key = event.keyCode
     this.tabitems = this.component.querySelectorAll('.tab-item')
     this.buttons = this.component.querySelectorAll('button')
+
     switch (key) {
       case keys.end:
         event.preventDefault()
-        // Activate last tab
         this.clean()
         this._switchTab(this.tabitems[this.tabitems.length - 1])
         this._switchContent(this.tabitems[this.tabitems.length - 1])
@@ -9679,8 +10222,6 @@ class BRTab {
         this.tabitems[0].focus()
         event.stopPropagation()
         break
-      // Up and down are in keydown
-      // because we need to prevent page scroll >:)
       case keys.left:
         event.preventDefault()
         this.position(event.target, -1)
@@ -9698,7 +10239,9 @@ class BRTab {
         break
       case 32:
         event.preventDefault()
+        this.hiddenTooltips()
         event.target.click()
+
         event.stopPropagation()
         break
       default:
@@ -9706,6 +10249,25 @@ class BRTab {
     }
   }
 
+  /**
+   *  Esconde todos tooltip
+   *
+   */
+  hiddenTooltips() {
+    const tooltips = document.querySelectorAll('.br-tooltip')
+
+    tooltips.forEach((element) => {
+      element.hidden = true
+      element.style.visbility = 'hidden'
+      element.removeAttribute('data-show')
+    })
+  }
+
+  /**
+   * Define o deslocamento da posição ativa
+   * @property {object} target - referencia ao objeto DOM
+   * @property {number} direction - incremento à posição
+   */
   positionActive(target, direction) {
     let contComponent = 0
     let contComponentActive = 0
@@ -9735,13 +10297,24 @@ class BRTab {
     }
   }
 
+  /**
+   * Define o deslocamento da posição ativa do tab-item interno
+   * @property {object} target - referencia ao objeto DOM
+   * @property {number} direction - incremento à posição
+   */
   position(target, direction) {
     this.positionQuery(target, direction, '.tab-item')
   }
 
+  /**
+   * Define o deslocamento da posição ativa do elemento referenciado
+   * @property {object} target - referencia ao objeto DOM
+   * @property {number} direction - incremento à posição
+   * @property {string} query - string de referencia
+   */
   positionQuery(target, direction, query) {
     let contComponent = 0
-    const contComponentActive = 0
+    // const contComponentActive = 0
     let contComponentFocus = 0
     const tabItems2 = target.parentElement.parentElement.querySelectorAll(query)
     for (const component of tabItems2) {
@@ -9763,6 +10336,10 @@ class BRTab {
     }
   }
 
+  /**
+   * Define a posição ativa do elemento referenciado
+   * @property {object} target - referencia ao objeto DOM
+   */
   setPosition(target) {
     let contComponent = 0
     let contComponentActive = 0
@@ -9780,13 +10357,13 @@ class BRTab {
     }
     if (tabItems2.length > contComponentActive && contComponentActive >= 0) {
       this.clean()
-
       this._switchContent(tabItems2[contComponentActive])
-
-      // x[0].focus()
     }
   }
 
+  /**
+   * Reinicia estados
+   */
   clean() {
     for (const ancor of event.currentTarget.parentElement.querySelectorAll(
       'button'
@@ -9803,7 +10380,11 @@ class BRTab {
     }
   }
 
-  positionScroll(ancor, component) {
+  /**
+   * Realiza rolagem até a âncora
+   * @property {object} ancor - referencia ao objeto DOM
+   */
+  positionScroll(ancor) {
     this.navItems = ancor.querySelectorAll('.tab-item')
     this.lastItempos = Math.ceil(
       this.navItems[this.navItems.length - 1].getBoundingClientRect().right
@@ -9813,6 +10394,11 @@ class BRTab {
     )
     this.navigationRight = Math.floor(ancor.getBoundingClientRect().right)
   }
+
+  /**
+   * Muda para a aba referenciada
+   * @property {object} currentTab - referencia ao objeto DOM
+   */
   _switchTab(currentTab) {
     for (const tabItem of this.component.querySelectorAll(
       '.tab-nav .tab-item:not([not-tab="true"])'
@@ -9826,6 +10412,10 @@ class BRTab {
     }
   }
 
+  /**
+   * Muda para o conteudo da aba referenciada
+   * @property {object} currentTab - referencia ao objeto DOM
+   */
   _switchContent(currentTab) {
     for (const button of currentTab.querySelectorAll('button')) {
       for (const tabPanel of this.component.querySelectorAll(
@@ -9851,23 +10441,26 @@ class BRTab {
 /***/ }),
 
 /***/ "./src/components/table/table.js":
-/*!***************************************!*\
-  !*** ./src/components/table/table.js ***!
-  \***************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/collapse */ "./src/partial/js/behavior/collapse.js");
-/* harmony import */ var _partial_js_behavior_dropdown__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../partial/js/behavior/dropdown */ "./src/partial/js/behavior/dropdown.js");
+/* harmony import */ var _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/partial/js/behavior/collapse.js");
+/* harmony import */ var _partial_js_behavior_dropdown__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/dropdown.js");
 
 
 
+/** Classe para instanciar um objeto BRTable*/
 /* eslint-disable complexity */
 class BRTable {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   * @param {number} sequence - 'índice do componente para sobreposição'
+   */
   constructor(name, component, sequence) {
     this.name = name
     this.component = component
@@ -9877,9 +10470,12 @@ class BRTable {
     this._setBehaviors()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehaviors() {
     this._makeResponsiveTable()
-    this._headerBehavior()
     this._setHeaderWidth()
     this._searchBehavior()
     this._dropdownBehavior()
@@ -9889,6 +10485,10 @@ class BRTable {
     this._getBRHeaderHeight()
   }
 
+  /**
+   * Configura a altura do cabeçalho
+   * @private
+   */
   _getBRHeaderHeight() {
     const BRHeader = document.querySelector('.br-header')
     if (BRHeader) {
@@ -9898,6 +10498,10 @@ class BRTable {
     }
   }
 
+  /**
+   * Configura reponsividade da tabela
+   * @private
+   */
   _makeResponsiveTable() {
     const responsiveClass = 'responsive'
     if (!this.component.querySelector(`.${responsiveClass}`)) {
@@ -9908,25 +10512,12 @@ class BRTable {
     }
   }
 
-  _headerBehavior() {
-    // this._hideThead()
-
-    window.addEventListener('resize', () => {
-      // this._hideThead()
-    })
-
-    for (const responsive of this.component.querySelectorAll('.responsive')) {
-      if (window.innerWidth > 575) {
-        // this._setSyncScroll(responsive)
-      }
-    }
-
-    // this._cloneHeaders()
-  }
-
+  /**
+   * Configura rolagem
+   * @private
+   */
   _makeScroller() {
     const scrollerTag = document.createElement('div')
-    // this._setSyncScroll(scrollerTag)
     scrollerTag.classList.add('scroller')
     for (const header of this._table.querySelectorAll('thead tr th')) {
       const clonedHeader = document.createElement('div')
@@ -9947,27 +10538,10 @@ class BRTable {
     return scrollerTag
   }
 
-  _cloneHeaders() {
-    const headersTag = document.createElement('div')
-    headersTag.classList.add('headers')
-    headersTag.style.top = `${this._header.offsetHeight}px`
-    headersTag.appendChild(this._makeScroller())
-    this._header.after(headersTag)
-  }
-
-  _hideThead() {
-    this._table.style.marginTop = `-${
-      this._table.querySelector('thead').offsetHeight
-    }px`
-  }
-
-  _setSyncScroll(element) {
-    element.classList.add('syncscroll')
-    element.setAttribute('name', `table-${this._sequence}`)
-    element.setAttribute('style', 'overflow-y: hidden')
-    // element.setAttribute('tabindex', 0)
-  }
-
+  /**
+   * Configura largura do cabeçalho
+   * @private
+   */
   _setHeaderWidth() {
     for (const clonedHeader of this.component.querySelectorAll(
       '.headers > div'
@@ -9979,6 +10553,11 @@ class BRTable {
       }
     }
   }
+
+  /**
+   * Configura coportamento do dropdown
+   * @private
+   */
   _dropdownBehavior() {
     this.component
       .querySelectorAll('[data-toggle="dropdown"]')
@@ -9989,11 +10568,15 @@ class BRTable {
           trigger,
           useIcons: true,
         }
-        const dropdown = new _partial_js_behavior_dropdown__WEBPACK_IMPORTED_MODULE_1__["default"](config)
+        const dropdown = new _partial_js_behavior_dropdown__WEBPACK_IMPORTED_MODULE_0__["default"](config)
         dropdown.setBehavior()
       })
   }
 
+  /**
+   * Configura comportamento de colapsar
+   * @private
+   */
   _collpaseBehavior() {
     this.component
       .querySelectorAll('[data-toggle="collapse"]')
@@ -10004,11 +10587,15 @@ class BRTable {
           trigger,
           useIcons: true,
         }
-        const collapse = new _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_0__["default"](config)
+        const collapse = new _partial_js_behavior_collapse__WEBPACK_IMPORTED_MODULE_1__["default"](config)
         collapse.setBehavior()
       })
   }
 
+  /**
+   * Configura comportamento da busca
+   * @private
+   */
   _searchBehavior() {
     if (this.component.dataset.search) {
       const trigger = this.component.querySelector('[data-toggle="search"]')
@@ -10035,10 +10622,21 @@ class BRTable {
     }
   }
 
+  /**
+   * Inicializa a busca
+   * @private
+   * @param {object} trigger - Objeto referente ao elemento que dispara a ação
+   */
   _searchInit(trigger) {
     trigger.setAttribute('aria-expanded', 'false')
   }
 
+  /**
+   * Abre a busca
+   * @private
+   * @param {object} trigger - Objeto referente ao elemento que dispara a ação
+   * @param {object} target - Objeto referente ao alvo da ação
+   */
   _searchOpen(trigger, target) {
     trigger.setAttribute('aria-expanded', 'true')
     target.classList.add('show')
@@ -10046,6 +10644,12 @@ class BRTable {
     target.querySelector('input').focus()
   }
 
+  /**
+   * Fecha a busca
+   * @private
+   * @param {object} trigger - Objeto referente ao elemento que dispara a ação
+   * @param {object} target - Objeto referente ao alvo da ação
+   */
   _searchClose(trigger, target) {
     target.querySelector('input').value = ''
     target.classList.remove('show')
@@ -10054,13 +10658,16 @@ class BRTable {
     trigger.setAttribute('aria-expanded', 'false')
   }
 
+  /**
+   * Configura densidades
+   * @private
+   */
   _densityBehavior() {
     const desityTriggers = this.component.querySelectorAll('[data-density]')
     for (const desityTrigger of desityTriggers) {
       desityTrigger.addEventListener('click', () => {
         this.component.classList.remove('small', 'medium', 'large')
         this.component.classList.add(desityTrigger.dataset.density)
-        // this._hideThead()
         this._dropdownClose(
           desityTrigger
             .closest('.dropdown')
@@ -10070,6 +10677,10 @@ class BRTable {
     }
   }
 
+  /**
+   * Configura ações de clique
+   * @private
+   */
   _setClickActions() {
     const headerCheckbox = this.component.querySelector(
       '.headers [type="checkbox"]'
@@ -10102,6 +10713,12 @@ class BRTable {
     }
   }
 
+  /**
+   * Configura seleção da linha
+   * @private
+   * @param {object} checkbox - Objeto referente ao checkbox
+   * @param {boolean} check - define se a linha deve ser selecionada
+   */
   _setRow(checkbox, check) {
     const tr = checkbox.parentNode.parentNode.parentNode
     if (check) {
@@ -10115,6 +10732,14 @@ class BRTable {
     }
   }
 
+  /**
+   * Configura seleção da linha
+   * @private
+   * @param {object} checkbox - Objeto referente ao checkbox
+   * @param {object} selectedBar - Objeto referente a barra contextual
+   * @param {object} tableCheckboxes - Objeto referente a lista de checkboxes
+   * @param {object} headerCheckbox - Objeto referente ao checkbox do header
+   */
   _checkRow(checkbox, selectedBar, tableCheckboxes, headerCheckbox) {
     const check = checkbox.checked
     this._setRow(checkbox, check)
@@ -10126,18 +10751,35 @@ class BRTable {
     )
   }
 
+  /**
+   * Seleciona todas as linhas
+   * @private
+   * @param {object} tableCheckboxes - Objeto referente a lista de checkboxes
+   */
   _checkAllRows(tableCheckboxes) {
     for (const checkbox of tableCheckboxes) {
       this._setRow(checkbox, true)
     }
   }
 
+  /**
+   * Desseleciona todas as linhas
+   * @private
+   * @param {object} tableCheckboxes - Objeto referente a lista de checkboxes
+   */
   _uncheckAllRows(tableCheckboxes) {
     for (const checkbox of tableCheckboxes) {
       this._setRow(checkbox, false)
     }
   }
 
+  /**
+   * Seleciona toda a tabela
+   * @private
+   * @param {object} selectedBar - Objeto referente a barra contextual
+   * @param {object} tableCheckboxes - Objeto referente a lista de checkboxes
+   * @param {object} headerCheckbox - Objeto referente ao checkbox do header
+   */
   _checkAllTable(selectedBar, tableCheckboxes, headerCheckbox) {
     let count = tableCheckboxes.length
     const infoCount = selectedBar.querySelector('.info .count')
@@ -10151,6 +10793,14 @@ class BRTable {
     this._setSelectedBar(count, selectedBar, tableCheckboxes, headerCheckbox)
   }
 
+  /**
+   * Define visualização dos itens selecionados na barra contextual
+   * @private
+   * @param {number} count - número de itens selecionados
+   * @param {object} selectedBar - Objeto referente a barra contextual
+   * @param {object} tableCheckboxes - Objeto referente a lista de checkboxes
+   * @param {object} headerCheckbox - Objeto referente ao checkbox do header
+   */
   _setSelectedBar(count, selectedBar, tableCheckboxes, headerCheckbox) {
     const infoCount = selectedBar.querySelector('.info .count')
     const infoText = selectedBar.querySelector('.info .text')
@@ -10175,109 +10825,6 @@ class BRTable {
       selectedBar.classList.remove('show')
     }
   }
-
-  /**
-   * @fileoverview syncscroll - scroll several areas simultaniously
-   * @version 0.0.3
-   *
-   * @license MIT, see http://github.com/asvd/intence
-   * @copyright 2015 asvd <heliosframework@gmail.com>
-   */
-  // static _syncscroll() {
-  //   const scroll = 'scroll'
-  //   const elems = document.getElementsByClassName(`sync${scroll}`)
-  //   const EventListener = 'EventListener'
-  //   const length = 'length'
-  //   const names = {}
-  //   // clearing existing listeners
-  //   let i, j, el, found, name
-  //   for (name in names) {
-  //     if (Object.prototype.hasOwnProperty.call(names, name)) {
-  //       for (i = 0; i < names[name][length]; i++) {
-  //         names[name][i][`remove${EventListener}`](
-  //           scroll,
-  //           names[name][i].syn,
-  //           0
-  //         )
-  //       }
-  //     }
-  //   }
-  //   // setting-up the new listeners
-  //   for (i = 0; i < elems[length]; i++) {
-  //     found = j = 0
-  //     el = elems[i]
-  //     if (!(name = el.getAttribute('name'))) {
-  //       // name attribute is not set
-  //       continue
-  //     }
-  //     el = el[`${scroll}er`] || el // needed for intence
-  //     // searching for existing entry in array of names;
-  //     // searching for the element in that entry
-  //     for (; j < (names[name] = names[name] || [])[length]; j++) {
-  //       found |= names[name][j] === el
-  //     }
-  //     if (!found) {
-  //       names[name].push(el)
-  //     }
-  //     el.eX = el.eY = 0
-  //     this._elSyn(el, name, scroll, elems, EventListener, length, names)
-  //   }
-  // }
-
-  static _elSyn(el, name, scroll, elems, EventListener, length, names) {
-    const addEventListener = `add${EventListener}`
-    const client = 'client'
-    const Height = 'Height'
-    const Left = 'Left'
-    const mathRound = Math.round
-    const Top = 'Top'
-    const Width = 'Width'
-    el[addEventListener](
-      scroll,
-      () => {
-        const otherElems = names[name]
-        let scrollX = el[scroll + Left]
-        let scrollY = el[scroll + Top]
-        const xRate = scrollX / (el[scroll + Width] - el[client + Width])
-        const yRate = scrollY / (el[scroll + Height] - el[client + Height])
-        const updateX = scrollX !== el.eX
-        const updateY = scrollY !== el.eY
-        el.eX = scrollX
-        el.eY = scrollY
-        otherElems.forEach((element) => {
-          if (element !== el) {
-            if (
-              updateX &&
-              mathRound(
-                element[scroll + Left] -
-                  (scrollX = element.eX =
-                    mathRound(
-                      xRate *
-                        (element[scroll + Width] - element[client + Width])
-                    ))
-              )
-            ) {
-              element[scroll + Left] = scrollX
-            }
-            if (
-              updateY &&
-              mathRound(
-                element[scroll + Top] -
-                  (scrollY = element.eY =
-                    mathRound(
-                      yRate *
-                        (element[scroll + Height] - element[client + Height])
-                    ))
-              )
-            ) {
-              element[scroll + Top] = scrollY
-            }
-          }
-        })
-      },
-      0
-    )
-  }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BRTable);
@@ -10286,40 +10833,49 @@ class BRTable {
 /***/ }),
 
 /***/ "./src/components/tag/tag.js":
-/*!***********************************!*\
-  !*** ./src/components/tag/tag.js ***!
-  \***********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRTag*/
 class BRTag {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     if (this.component.classList.contains('interaction-select')) {
       // Inicializa selecionado
       if (this.component.querySelector('input').getAttribute('checked')) {
         this.component.classList.add('selected')
       }
-      // debugger
-
       this._setSelection()
     }
     this._closeTag()
+    this._dismissTag()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setSelection() {
     const label = this.component.querySelector('label')
     const input = this.component.querySelector('input')
-    const tagRadio = input.getAttribute('type') === 'radio' ? true : false
+    // const tagRadio = input.getAttribute('type') === 'radio' ? true : false
 
     label.addEventListener('click', (event) => {
       this._toggleSelection(input, event)
@@ -10331,11 +10887,14 @@ class BRTag {
     })
   }
 
+  /**
+   * Muda estado do radio
+   * @private
+   * @param {object} input - referencia DOM ao input
+   */
   _toggleRadio(input) {
-    // debugger
     if (this.component.querySelector('[type="radio"')) {
       const nameTag = input.getAttribute('name')
-
       for (const tagRadio of window.document.querySelectorAll(
         `[name=${nameTag}]`
       )) {
@@ -10344,6 +10903,12 @@ class BRTag {
     }
   }
 
+  /**
+   * Muda estado do input
+   * @private
+   * @param {object} input - referencia DOM ao input
+   * @param {event} event - ação que disparou o evento
+   */
   _toggleSelection(input, event) {
     event.preventDefault()
     this._toggleRadio(input)
@@ -10355,26 +10920,55 @@ class BRTag {
     this._setCheck(input)
   }
 
+  /**
+   * Define estado do input para selecionado
+   * @private
+   * @param {object} input - referencia DOM ao input
+   */
   _setCheck(input) {
     input.setAttribute('checked', 'checked')
     input.parentElement.classList.add('selected')
   }
 
+  /**
+   * Define estado do input para desselecionado
+   * @private
+   * @param {object} input - referencia DOM ao input
+   */
   _removeCheck(input) {
     input.removeAttribute('checked')
     input.parentElement.classList.remove('selected')
   }
 
+  /**
+   * Define comportamento do botão de fechar usando classe (compatibilidade)
+   * @private
+   */
   _closeTag() {
-    const button = this.component.querySelector('.br-button.close')
+    const closeBtn = this.component.querySelector('.br-button.close')
 
-    if (button) {
-      const brTag = button.closest('.br-tag')
+    if (closeBtn) {
+      const brTag = closeBtn.closest('.br-tag')
 
       brTag.addEventListener('click', () => {
-        button.closest('.br-tag').remove()
+        closeBtn.closest('.br-tag').remove()
       })
     }
+  }
+
+  /**
+   * Define comportamento do botão de fechar usando data-dismiss
+   * @private
+   */
+  _dismissTag() {
+    this.component.querySelectorAll('[data-dismiss]').forEach((closeBtn) => {
+      closeBtn.addEventListener('click', () => {
+        const target = document.querySelector(
+          `#${closeBtn.getAttribute('data-dismiss')}`
+        )
+        if (target) target.remove()
+      })
+    })
   }
 }
 
@@ -10389,17 +10983,19 @@ for (const brTag of window.document.querySelectorAll('.br-tag')) {
 /***/ }),
 
 /***/ "./src/components/textarea/textarea.js":
-/*!*********************************************!*\
-  !*** ./src/components/textarea/textarea.js ***!
-  \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/** Classe para instanciar um objeto BRTextArea*/
 class BRTextArea {
+  /**
+   * Instancia do objeto
+   * @param {string} name - Nome do componente em minúsculo
+   * @param {object} component - Objeto referenciando a raiz do componente DOM
+   */
   constructor(name, component) {
     this.name = name
     this.component = component
@@ -10407,6 +11003,10 @@ class BRTextArea {
     this._setKeyup()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     this.limit = this.component.querySelector('.limit')
     this.current = this.component.querySelector('.current')
@@ -10420,8 +11020,12 @@ class BRTextArea {
     this.currentValue = this.component.querySelector('.current')
   }
 
+  /**
+   * Define ações do teclado
+   * @private
+   */
   _setKeyup() {
-    this.component.addEventListener('keyup', (event) => {
+    this.component.addEventListener('keyup', () => {
       const characterCount = this.component.querySelector('textarea').textLength
       if (characterCount <= this.maximum && !this.characters) {
         this.limit.innerHTML = ''
@@ -10450,17 +11054,13 @@ class BRTextArea {
 /***/ }),
 
 /***/ "./src/components/tooltip/tooltip.js":
-/*!*******************************************!*\
-  !*** ./src/components/tooltip/tooltip.js ***!
-  \*******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _popperjs_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @popperjs/core */ "./node_modules/@popperjs/core/lib/popper.js");
+/* harmony import */ var _popperjs_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@popperjs/core/lib/popper.js");
 
 class BRTooltip {
   constructor(name, component) {
@@ -10472,13 +11072,13 @@ class BRTooltip {
     this.popover = component.hasAttribute('popover')
     this.notification = component.classList.contains('br-notification')
     this.timer = component.getAttribute('timer')
-
+    let positionNotification = this.notification
+    ? 'bottom'
+    : 'top'
     this.active = component.hasAttribute('active')
     this.placement = positions.includes(place)
       ? place
-      : this.notification
-      ? 'bottom'
-      : 'top'
+      : positionNotification
     this.popperInstance = null
     this.showEvents = ['mouseenter', 'click', 'focus']
     this.hideEvents = ['mouseleave', 'blur']
@@ -10515,23 +11115,18 @@ class BRTooltip {
         })
       })
     }
-    // Abre os elementos que devem aparecer já ativos
-    // if (this.active) {
-    //   this._show(event)
-    // }
+   
   }
 
   _create() {
     this._setLayout()
 
-    // if (typeof this.activator.getBoundingClientRect === 'undefined') {
-    // }
 
     // Cria a instancia do popper
     if (this.notification) {
       this.component.setAttribute('notification', '')
 
-      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__.createPopper)(this.activator, this.component, {
+      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__/* .createPopper */ .fi)(this.activator, this.component, {
         modifiers: [
           {
             name: 'offset',
@@ -10542,19 +11137,27 @@ class BRTooltip {
           {
             name: 'preventOverflow',
             options: {
-              altAxis: false, // false by default
-              mainAxis: true, // true by default
-              // rootBoundary: 'body',
+              altAxis: false, 
+              mainAxis: true, 
+              
             },
           },
         ],
-        // placement: this.placement,
-        placement: 'bottom',
+        placement: this.placement,
+        
         strategy: 'fixed',
       })
     } else {
-      const ac = this.activator.getBoundingClientRect()
-      const tt = this.component.getBoundingClientRect()
+      let ac = new DOMRect()
+      const tt = new DOMRect()
+
+      
+      
+      
+     
+        ac = this.activator.getBoundingClientRect()
+      
+
       const bw = document.body.clientWidth
       if (this.placement === 'right') {
         this.placement =
@@ -10564,7 +11167,7 @@ class BRTooltip {
         this.placement = ac.x - tt.width > 0 ? this.placement : 'top'
       }
 
-      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__.createPopper)(this.activator, this.component, {
+      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__/* .createPopper */ .fi)(this.activator, this.component, {
         modifiers: [
           {
             name: 'offset',
@@ -10575,18 +11178,14 @@ class BRTooltip {
           {
             name: 'preventOverflow',
             options: {
-              altAxis: true, // false by default
-              // boundary: 'body',
-              mainAxis: true, // true by default
-              // rootBoundary: 'document',
-              tether: false, // true by default
+              altAxis: true, 
+              mainAxis: true,
+              tether: false, 
             },
           },
         ],
         placement: this.placement,
       })
-
-      const style = window.getComputedStyle(this.component)
     }
   }
 
@@ -10595,11 +11194,13 @@ class BRTooltip {
     this.component.setAttribute('data-show', '')
     this.component.style.zIndex = 99
     this._fixPosition()
+    
     // Importante pois "display: none" conflitua com a instancia do componente e precisa ser setado aqui já que pelo css ativa o efeito fade no primeiro carregamento
 
     this.component.style.visibility = 'visible'
     if (this.timer) {
       clearTimeout(this.closeTimer)
+      console.log("Timer",this.timer)
       this.closeTimer = setTimeout(
         this._hide,
         this.timer,
@@ -10669,21 +11270,17 @@ class BRTooltip {
 /***/ }),
 
 /***/ "./src/components/upload/upload.js":
-/*!*****************************************!*\
-  !*** ./src/components/upload/upload.js ***!
-  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _components_tooltip_tooltip__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/tooltip/tooltip */ "./src/components/tooltip/tooltip.js");
+/* harmony import */ var _components_tooltip_tooltip__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/components/tooltip/tooltip.js");
 
+/** Classe para instanciar um objeto BRUpload */
 class BRUpload {
   /**
-   *
    * @param {*} name nome do componente
    * @param {*} component componente
    * @param {*} uploadFiles  promisse de status do upload
@@ -10701,10 +11298,14 @@ class BRUpload {
     this._setBehavior()
   }
 
+  /**
+   * Define comportamentos do componente
+   * @private
+   */
   _setBehavior() {
     if (this._inputElement) {
       const button = document.createElement('button')
-      button.className = 'br-button upload-button'
+      button.className = 'upload-button'
       button.setAttribute('type', 'button')
 
       if (this._inputElement.getAttribute('multiple'))
@@ -10748,6 +11349,10 @@ class BRUpload {
     this._setDragAndDropBehavior()
   }
 
+  /**
+   * Define comportamento de arrastar(drag) e posicionar(drop)
+   * @private
+   */
   _setDragAndDropBehavior() {
     const uploadButton = this.component.querySelector('.upload-button')
 
@@ -10764,6 +11369,11 @@ class BRUpload {
     uploadButton.addEventListener('drop', this._handleDrop.bind(this))
   }
 
+  /**
+   * Evita os eventos padrao e propagação de evento
+   * @private
+   * @param {event} event - referencia ao evento
+   */
   _preventDefaults(event) {
     event.preventDefault()
     event.stopPropagation()
@@ -10777,6 +11387,11 @@ class BRUpload {
     this.component.classList.remove('dragging')
   }
 
+  /**
+   * Ação de posicionar (drop)
+   * @private
+   * @param {event} event - referencia ao evento
+   */
   _handleDrop(event) {
     this.component.classList.remove('dragging')
     const dt = event.dataTransfer
@@ -10784,6 +11399,11 @@ class BRUpload {
     this._handleFiles(files)
   }
 
+  /**
+   * Testa se o objeto que disparou a ação está desabilitado
+   * @private
+   * @param {event} event - referencia ao evento
+   */
   _isDisabled(event) {
     const isDisabled = event.target.getAttribute('disabled')
     if (isDisabled) {
@@ -10793,10 +11413,18 @@ class BRUpload {
     }
   }
 
+  /**
+   * Simula ação de clicar no input
+   * @private
+   */
   _clickUpload() {
     this._inputElement.click()
   }
 
+  /**
+   * Limpa mensagem de feedback
+   * @private
+   */
   _removeMessage() {
     for (const message of this.component.querySelectorAll('.feedback')) {
       message.parentNode.removeChild(message)
@@ -10804,6 +11432,10 @@ class BRUpload {
     }
   }
 
+  /**
+   * Remove mensagem de estado
+   * @private
+   */
   _removeStatus() {
     const remStatus = ['danger', 'warning', 'info', 'success']
     remStatus.forEach((el) => {
@@ -10812,6 +11444,11 @@ class BRUpload {
     })
   }
 
+  /**
+   * Define mensagem de feedback
+   * @private
+   * @param {string} status - estados: danger / info / success / warning
+   */
   _feedback(status, text) {
     const icone = `<i class="fas fa-times-circle" aria-hidden="true"></i>${text}`
     const dataStatus = `data-${status}`
@@ -10842,16 +11479,27 @@ class BRUpload {
     this._fileList.before(message)
   }
 
+  /**
+   * Adiciona arquivos a lista
+   * @private
+   * @param {File[]} files - lista de arquivos
+   */
   _concatFiles(files) {
     const newFiles = !files.length
       ? Array.from(this._inputElement.files)
       : Array.from(files)
     this._fileArray = this._fileArray.concat(newFiles)
   }
+
+  /**
+   * Adiciona arquivos a lista
+   * @private
+   * @param {File[]} files - lista de arquivos
+   */
   _handleFiles(files) {
     this._removeMessage()
     if (!this._inputElement.multiple && files.length > 1) {
-      this._feedback('danger', 'É permitido o envio de somente um arquivo.')
+      this._feedback('danger', 'É permitido o envio de somente 1 arquivo.')
     } else if (!this._inputElement.multiple && this._fileArray.length > 0) {
       this._fileArray = []
       this._concatFiles(files)
@@ -10866,6 +11514,10 @@ class BRUpload {
     }
   }
 
+  /**
+   * Atualiza lista de arquivos eliminando redundâncias
+   * @private
+   */
   _updateFileList() {
     this._removeStatus()
     if (this.component.nextElementSibling === this._textHelp) {
@@ -10892,6 +11544,10 @@ class BRUpload {
     }
   }
 
+  /**
+   * Mostra mensagem de carregamento
+   * @private
+   */
   uploadLoading() {
     const loading = document.createElement('div')
     const carga = document.createElement('span')
@@ -10904,6 +11560,11 @@ class BRUpload {
     this._fileList.appendChild(loading)
   }
 
+  /**
+   * Faz upload de arquivo na posição definida
+   * @private
+   * @param {Number} position - numero do ínidice da posição
+   */
   uploadingFile(position) {
     if (this._uploadFiles) {
       this._fileArray[position].requested = true
@@ -10914,9 +11575,14 @@ class BRUpload {
     }
   }
 
+  /**
+   * Renderiza item na posição definida
+   * @private
+   * @param {Number} position - numero do ínidice da posição
+   */
   _renderItem(position) {
     const li = document.createElement('div')
-    li.className = 'br-item'
+    li.className = 'br-item d-flex'
     this._fileList.appendChild(li)
     li.innerHTML = ''
     const name = document.createElement('div')
@@ -10941,7 +11607,7 @@ class BRUpload {
     li.appendChild(tooltip)
     info.classList.add('text-primary-default', 'mr-auto')
     const del = document.createElement('div')
-    del.className = 'support'
+    del.className = 'support mr-n2'
     const btndel = document.createElement('button')
     const spanSize = document.createElement('span')
     spanSize.className = 'mr-1'
@@ -10965,10 +11631,15 @@ class BRUpload {
     this._fileArray[position].nowait = true
     const tooltipList = []
     for (const brTooltip of window.document.querySelectorAll('.br-tooltip')) {
-      tooltipList.push(new _components_tooltip_tooltip__WEBPACK_IMPORTED_MODULE_0__["default"]('br-tooltip', brTooltip))
+      tooltipList.push(new _components_tooltip_tooltip__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .Z('br-tooltip', brTooltip))
     }
   }
 
+  /**
+   * Formata tamanho do arquivo
+   * @private
+   * @param {Number} nBytes - quantidade de bytes do arquivo
+   */
   _calcSize(nBytes) {
     let sOutput = ''
     for (
@@ -10983,6 +11654,12 @@ class BRUpload {
     return sOutput
   }
 
+  /**
+   * Remove arquivo na posição definida
+   * @private
+   * @param {Number} index - numero do ínidice da posição
+   * @param {event} event - evento que disparou a ação
+   */
   _removeFile(index, event) {
     event.stopPropagation()
     event.preventDefault()
@@ -10996,6 +11673,11 @@ class BRUpload {
     if (!this._inputElement.multiple) this._inputElement.value = ''
   }
 
+  /**
+   * Atualiza arquivos da lista
+   * @private
+   * @param {File[]} files - lista de arquivos
+   */
   _updateFileListItems(files) {
     const fileInput = new ClipboardEvent('').clipboardData || new DataTransfer()
     for (let i = 0, len = files.length; i < len; i++)
@@ -11010,45 +11692,53 @@ class BRUpload {
 /***/ }),
 
 /***/ "./src/components/wizard/wizard.js":
-/*!*****************************************!*\
-  !*** ./src/components/wizard/wizard.js ***!
-  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../partial/js/behavior/swipe */ "./src/partial/js/behavior/swipe.js");
+/* harmony import */ var _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/swipe.js");
 
+
+/** Classe para instanciar um objeto BRWizard*/
 class BRWizard {
+  /**
+   * Instância do componente
+   * @param {string} name - nome do componente
+   * @param {object} component - referencia ao objeto do DOM
+   **/
   constructor(name, component) {
     this.name = name
     this.component = component
-    // DOM elements
     this.DOMstrings = {
       stepFormPanelClass: 'wizard-panel',
-      // stepFormPanels: document.querySelectorAll('.wizard-panel'),
       stepFormPanels: this.component.querySelectorAll('.wizard-panel'),
       stepNextBtnClass: 'wizard-btn-next',
       stepPrevBtnClass: 'wizard-btn-prev',
-      // stepsBar: document.querySelector('.wizard-progress'),
       stepsBar: this.component.querySelector('.wizard-progress'),
       stepsBarClass: 'wizard-progress',
       stepsBtnClass: 'wizard-progress-btn',
-      // stepsBtns: document.querySelectorAll(`.wizard-progress-btn`),
       stepsBtns: this.component.querySelectorAll('.wizard-progress-btn'),
-      // stepsForm: document.querySelector('.wizard-form'),
       stepsForm: this.component.querySelector('.wizard-form'),
     }
-    // remove class from a set of items
+    /**
+     * Retira o atributo de uma lista de elementos
+     * @param {object[]} elementSet - Lista de objetos
+     * @param {string} attrName - Nome do atribbuto
+     */
     this.removeAttributes = (elemSet, attrName) => {
       elemSet.forEach((elem) => {
         elem.removeAttribute(attrName)
       })
     }
-    // return exect parent node of the element
+
+    /**
+     * Retorna o elemento pai do objeto com a classe de referência
+     * @param {object} elem - Lista de objetos
+     * @param {string} parentClass - nome da classe de referência
+     * @returns {object}
+     */
     this.findParent = (elem, parentClass) => {
       let currentNode = elem
       while (!currentNode.classList.contains(parentClass)) {
@@ -11056,28 +11746,34 @@ class BRWizard {
       }
       return currentNode
     }
-    // get active button step number
+
+    /**
+     * Retorna o índice do elemento botão de passo
+     * @param {object} elem - botão de passo
+     * @returns {number}
+     */
     this.getActiveStep = (elem) => {
       return Array.from(this.DOMstrings.stepsBtns).indexOf(elem)
     }
-    // set all steps before clicked (and clicked too) to active
-    this.setActiveStep = function (activeStepNum) {
-      // remove active state from all the state
-      this.removeAttributes(this.DOMstrings.stepsBtns, 'active')
-      // this.removeAttributes(this.DOMstrings.stepsBtns, 'disabled')
 
-      // set picked items to active
+    /**
+     * Define o estado do botão ativo e limpa os demais estados dos botões
+     * @param {number} activeStepNum - número do botão ativo
+     */
+    this.setActiveStep = function (activeStepNum) {
+      this.removeAttributes(this.DOMstrings.stepsBtns, 'active')
       this.DOMstrings.stepsBtns.forEach((elem, index) => {
         if (index === activeStepNum) {
           elem.removeAttribute('disabled')
           elem.setAttribute('active', '')
         }
-        // if (index > activeStepNum) {
-        //   elem.setAttribute('disabled', 'disabled')
-        // }
       })
     }
-    // get active panel
+
+    /**
+     * Retorna o índice do painel ativo
+     * @returns {number}
+     */
     this.getActivePanel = () => {
       let activePanel
       this.DOMstrings.stepFormPanels.forEach((elem) => {
@@ -11087,7 +11783,11 @@ class BRWizard {
       })
       return activePanel
     }
-    // open active panel (and close unactive panels)
+
+    /**
+     * Abre o painel ativo e fecha paineis inativos
+     * @param {number} activePanelNum - numero do painel
+     */
     this.setActivePanel = (activePanelNum) => {
       // remove active class from all the panels
       this.removeAttributes(this.DOMstrings.stepFormPanels, 'active')
@@ -11098,45 +11798,67 @@ class BRWizard {
         }
       })
     }
+
+    /**
+     * Define números dos passos
+     */
     this.setStepsNum = () => {
       this.DOMstrings.stepsBtns.forEach((elem, index) => {
         elem.setAttribute('step', index + 1)
       })
     }
+
+    /**
+     * Define passo e painel ativo
+     * @param {number} num - numero do passo
+     */
     this.setStep = (num) => {
       const activeStep = num <= this.DOMstrings.stepsBtns.length ? num - 1 : 0
       this.setActiveStep(activeStep)
       this.setActivePanel(activeStep)
     }
+
+    /**
+     * Retrai painel de passos
+     */
     this.collapseSteps = () => {
       this.component.setAttribute('collapsed', '')
     }
+
+    /**
+     * Expande painel de passos
+     */
     this.expandSteps = () => {
       this.component.removeAttribute('collapsed')
     }
+
     this._setBehavior()
   }
 
+  /**
+   * Define os comportamentos do componente
+   * @private
+   */
   _setBehavior() {
-    // STEPS BAR CLICK FUNCTION
+    /**
+     * Mapeia clique na barra de passos
+     */
     this.DOMstrings.stepsBar.addEventListener('click', (e) => {
-      // check if click target is a step button
       const eventTarget = e.target
       if (!eventTarget.classList.contains(`${this.DOMstrings.stepsBtnClass}`)) {
         e.target.parentNode.click()
         return
       }
-      // get active button step number
       const activeStep = this.getActiveStep(eventTarget)
-      // set all steps before clicked (and clicked too) to active
       this.setActiveStep(activeStep)
-      // open active panel
       this.setActivePanel(activeStep)
     })
-    // PREV/NEXT BTNS CLICK
+
+    /**
+     * Mapeia clique nos botões de navegação
+     */
     this.DOMstrings.stepsForm.addEventListener('click', (e) => {
       const eventTarget = e.target
-      // check if we clicked on `PREV` or NEXT` buttons
       if (
         !(
           eventTarget.classList.contains(
@@ -11147,7 +11869,6 @@ class BRWizard {
       ) {
         return
       }
-      // find active panel
       const activePanel = this.findParent(
         eventTarget,
         `${this.DOMstrings.stepFormPanelClass}`
@@ -11155,7 +11876,6 @@ class BRWizard {
       let activePanelNum = Array.from(this.DOMstrings.stepFormPanels).indexOf(
         activePanel
       )
-      // set active step and active panel onclick
       if (
         eventTarget.classList.contains(`${this.DOMstrings.stepPrevBtnClass}`)
       ) {
@@ -11168,13 +11888,13 @@ class BRWizard {
       this.setActiveStep(activePanelNum)
       this.setActivePanel(activePanelNum)
     })
-    // Set Steps label number
+
     this.setStepsNum()
-    // Set default active step
+
     if (this.component.hasAttribute('step')) {
       this.setStep(this.component.getAttribute('step'))
     }
-    // set steps buttons grid style if it needs to scroll horizontaly
+
     if (
       this.component.hasAttribute('scroll') &&
       !this.component.hasAttribute('vertical')
@@ -11183,8 +11903,11 @@ class BRWizard {
         Math.round(100 / this.DOMstrings.stepsBtns.length) - 0.5
       this.DOMstrings.stepsBar.style.gridTemplateColumns = `repeat(auto-fit, minmax(100px, ${stepsWidth}% ))`
     }
-    // Swipe
-    const dispatcher = new _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_0__["default"](this.DOMstrings.stepsBar)
+
+    /**
+     * Configura gestos (swipe)
+     */
+    const dispatcher = new _partial_js_behavior_swipe__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .Z(this.DOMstrings.stepsBar)
     if (this.component.hasAttribute('vertical')) {
       dispatcher.on('SWIPE_LEFT', () => {
         this.collapseSteps()
@@ -11208,20 +11931,17 @@ class BRWizard {
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BRWizard);
 
+
 /***/ }),
 
 /***/ "./src/partial/js/behavior/accordion.js":
-/*!**********************************************!*\
-  !*** ./src/partial/js/behavior/accordion.js ***!
-  \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Accordion)
 /* harmony export */ });
-/* harmony import */ var _collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collapse */ "./src/partial/js/behavior/collapse.js");
+/* harmony import */ var _collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/collapse.js");
 
 
 /**
@@ -11325,13 +12045,9 @@ class Accordion extends _collapse__WEBPACK_IMPORTED_MODULE_0__["default"] {
 /***/ }),
 
 /***/ "./src/partial/js/behavior/checkgroup.js":
-/*!***********************************************!*\
-  !*** ./src/partial/js/behavior/checkgroup.js ***!
-  \***********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Checkgroup)
 /* harmony export */ });
@@ -11564,13 +12280,9 @@ class Checkgroup {
 /***/ }),
 
 /***/ "./src/partial/js/behavior/collapse.js":
-/*!*********************************************!*\
-  !*** ./src/partial/js/behavior/collapse.js ***!
-  \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Collapse)
 /* harmony export */ });
@@ -11762,17 +12474,13 @@ class Collapse {
 /***/ }),
 
 /***/ "./src/partial/js/behavior/dropdown.js":
-/*!*********************************************!*\
-  !*** ./src/partial/js/behavior/dropdown.js ***!
-  \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Dropdown)
 /* harmony export */ });
-/* harmony import */ var _collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collapse */ "./src/partial/js/behavior/collapse.js");
+/* harmony import */ var _collapse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/partial/js/behavior/collapse.js");
 
 
 /**
@@ -11876,13 +12584,9 @@ class Dropdown extends _collapse__WEBPACK_IMPORTED_MODULE_0__["default"] {
 /***/ }),
 
 /***/ "./src/partial/js/behavior/scrim.js":
-/*!******************************************!*\
-  !*** ./src/partial/js/behavior/scrim.js ***!
-  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Scrim)
 /* harmony export */ });
@@ -11962,19 +12666,15 @@ class Scrim {
 /***/ }),
 
 /***/ "./src/partial/js/behavior/swipe.js":
-/*!******************************************!*\
-  !*** ./src/partial/js/behavior/swipe.js ***!
-  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Swipe": () => (/* binding */ Swipe),
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* unused harmony export Swipe */
 class Swipe {
-  constructor(element, options = {}) {
+  constructor(element) {
     this.evtMap = {
       SWIPE_DOWN: [],
       SWIPE_LEFT: [],
@@ -12034,44 +12734,45 @@ class Swipe {
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Swipe);
 
+
 /***/ }),
 
 /***/ "./src/partial/js/behavior/tooltip.js":
-/*!********************************************!*\
-  !*** ./src/partial/js/behavior/tooltip.js ***!
-  \********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _popperjs_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @popperjs/core */ "./node_modules/@popperjs/core/lib/popper.js");
+/* harmony import */ var _popperjs_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@popperjs/core/lib/popper.js");
 
 // import 'tippy.js/dist/tippy.css' // optional for styling
 class Tooltip {
   /**
    * Instancia um comportamento Tooltip
-   * @param {object} - Objeto de configuração inicial para destructuring
+   * @param {object} - Objeto de configuração inicial para tooltip
+   * @property {object} component - Elemento DOM do tooltip (opcional se tiver o textTooltip)
    * @property {object} activator - Elemento DOM que representa o acionador do comportmento tooltip
-   * @property {string} place - Local onde vai aparecer o tooltip
-   * @property {string} timer - Tempo em que vai aparecer o tooltip
-   * @property {string} placement - Local onde vai aparecer o tooltip
+   * @property {string} place -Local onde vai aparecer o tooltip ('top', 'right', 'bottom', 'left')
+   * @property {string} timer - Tempo em que vai aparecer o tooltip em milisegunto (opcional)
+   * @property {string} textTooltip - Texto que vai ser mostrado quando não estiver instaciado o atributo component
+   * @property {string} type - Tipo de tooltip (info, warning) padrão info
+   * @property {boolean} onActivator - Adiciona o tooltip dentro do elemento ativador padrão false
    */
-  // eslint-disable-next-line complexity
+  
   constructor({
     component,
     activator,
     place = 'top',
     timer,
     active,
-    placement = 'top',
     textTooltip,
     type = 'info',
+    onActivator = false
   }) {
+    
     const text_tooltip = textTooltip ? textTooltip : component
-
+    this.onActivator = onActivator 
     this.activator = activator
     this.component = component
       ? component
@@ -12080,7 +12781,7 @@ class Tooltip {
     this.place =
       this.component.getAttribute('place') === null
         ? this.component.getAttribute('place')
-        : 'top'
+        : place
     const positions = ['top', 'right', 'bottom', 'left']
     this.popover = this.component.hasAttribute('popover')
     this.notification = this.component.classList.contains('br-notification')
@@ -12088,11 +12789,13 @@ class Tooltip {
       ? this.component.getAttribute('timer')
       : timer
     this.active = this.component.hasAttribute('active')
+      ? this.component.hasAttribute('active')
+      : active
     this.placement = positions.includes(place)
       ? place
       : this.notification
-      ? 'bottom'
-      : 'top'
+
+      
     this.popperInstance = null
     this.showEvents = ['mouseenter', 'click', 'focus']
     this.hideEvents = ['mouseleave', 'blur']
@@ -12100,7 +12803,9 @@ class Tooltip {
     this._create()
     this._setBehavior()
   }
-
+  /**
+   * Instancializa o behavior
+   */
   _setBehavior() {
     // Ação de abrir padrao ao entrar no ativador
     if (this.activator) {
@@ -12111,7 +12816,7 @@ class Tooltip {
       })
     }
     // Adiciona ação de fechar ao botao do popover
-    // if (this.popover || this.notification) {
+    
     if (this.popover) {
       const closeBtn = this.component.querySelector('.close')
       closeBtn.addEventListener('click', (event) => {
@@ -12128,8 +12833,9 @@ class Tooltip {
     }
   }
   /**
-   * Seta o conteudo do tooltip
-   * @param {*} contentText
+   * Inclui o conteudo do tooltip
+   * @param {*} contentText conteudo do texto do tooltip
+   * @param {*} type tipo de tooltip
    * @returns  - retorna o objeto com tooltip
    */
   _setContent(contentText, type) {
@@ -12139,24 +12845,28 @@ class Tooltip {
     text_tooltip.setAttribute(type, type)
     text_tooltip.innerText = `${contentText}`
     text_tooltip.classList.add('br-tooltip')
+    //TODO: Retirar sample que utiliza não conflita com tooltip componente que está sendo depreciado
     text_tooltip.classList.add('sample')
-    if (this.activator) {
-      // this.activator.parentElement.parentElement.parentElement.appendChild(
-      // text_tooltip
-      // )
+    if (this.activator && this.onActivator) {
+      this.activator.appendChild(text_tooltip)
+    }else{
+      document.body.appendChild(text_tooltip)
     }
-    document.body.appendChild(text_tooltip)
 
     return text_tooltip
   }
 
-  /* Cria a instancia do popper*/
+  /**
+   * Cria a instancia do popper
+   * @private
+   */
+
   _create() {
     this._setLayout()
 
     if (this.notification) {
       this.component.setAttribute('notification', '')
-      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__.createPopper)(this.activator, this.component, {
+      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__/* .createPopper */ .fi)(this.activator, this.component, {
         modifiers: [
           {
             name: 'offset',
@@ -12169,27 +12879,20 @@ class Tooltip {
             options: {
               altAxis: false, // false by default
               mainAxis: true, // true by default
+              
             },
           },
+          {name: 'flip',options: {fallbackPlacements: ['top', 'right'],},},
         ],
         // placement: this.placement,
         placement: 'bottom',
         strategy: 'fixed',
       })
     } else {
-      const ac = this.activator.getBoundingClientRect()
-      const tt = this.component.getBoundingClientRect()
-      const bw = document.body.clientWidth
-
-      if (this.placement === 'right') {
-        this.placement =
-          ac.x + ac.width + tt.width > bw ? 'top' : this.placement
-      }
-      if (this.placement === 'left') {
-        this.placement = ac.x - tt.width > 0 ? this.placement : 'top'
-      }
-
-      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__.createPopper)(this.activator, this.component, {
+      
+    
+      
+      this.popperInstance = (0,_popperjs_core__WEBPACK_IMPORTED_MODULE_0__/* .createPopper */ .fi)(this.activator, this.component, {
         modifiers: [
           {
             name: 'offset',
@@ -12200,27 +12903,32 @@ class Tooltip {
           {
             name: 'preventOverflow',
             options: {
-              altAxis: true, // false by default
-              // boundary: 'body',
-              mainAxis: true, // true by default
-              // rootBoundary: 'document',
-              tether: false, // true by default
+              altAxis: true, 
+              mainAxis: true, 
+              
+              
             },
           },
+          {name: 'flip',options: {fallbackPlacements: ['top', 'right',"bottom","left"],},},
         ],
         placement: this.placement,
       })
     }
   }
-
+  /**
+   * Mostra o tooltip e define o timeout se tiver
+   * @param {object} event  evento javascript
+   */
   _show(event) {
+    
     this.component.style.display = 'unset'
     this.component.setAttribute('data-show', '')
     this.component.style.zIndex = 9999
-    this._fixPosition()
+    this.popperInstance.update()
     // Importante pois "display: none" conflitua com a instancia do componente e precisa ser setado aqui já que pelo css ativa o efeito fade no primeiro carregamento
     this.component.style.visibility = 'visible'
     if (this.timer) {
+      console.log("timer",this.timer)
       clearTimeout(this.closeTimer)
       this.closeTimer = setTimeout(
         this._hide,
@@ -12230,8 +12938,12 @@ class Tooltip {
       )
     }
   }
+
+  
+
   /**
    * Esconde o componente
+   * @private
    */
   _hide(event, component) {
     component.removeAttribute('data-show')
@@ -12239,7 +12951,10 @@ class Tooltip {
     component.style.visibility = 'hidden'
     clearTimeout(component.closeTimer)
   }
-
+  /**
+   * Cria o laytout do tooltip
+   * @private
+   */
   _setLayout() {
     // Cria a setinha que aponta para o item que criou o tooltip
     const arrow = document.createElement('div')
@@ -12260,7 +12975,10 @@ class Tooltip {
       this.component.appendChild(close)
     }
   }
-
+  /**
+   * Muda icone da seta
+   * @private
+   */
   _toggleActivatorIcon() {
     const icon = this.activator.querySelector('button svg')
     if (icon) {
@@ -12269,77 +12987,28 @@ class Tooltip {
     }
     this.activator.toggleAttribute('active')
   }
-
-  _fixPosition() {
-    if (this.notification) {
-      setTimeout(() => {
-        const ac = this.activator.getBoundingClientRect()
-
-        this.component.style = `position: fixed !important; top: ${
-          ac.top + ac.height + 10
-        }px !important; left: auto; right: 8px; display: unset; bottom: auto;`
-        this.component.querySelector(
-          '.arrow'
-        ).style = `position: absolute; left: auto; right: ${
-          document.body.clientWidth - ac.right + ac.width / 5
-        }px !important;`
-      }, 100)
-    }
-    // debugger
-  }
+  
+  
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tooltip);
 
 
+
 /***/ }),
 
 /***/ "./src/partial/js/globals-class.js":
-/*!*****************************************************!*\
-  !*** ./src/partial/js/globals-class.js + 2 modules ***!
-  \*****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Accordion": () => (/* reexport */ behavior_accordion["default"]),
-  "BRAccordion": () => (/* reexport */ accordion["default"]),
-  "BRAvatar": () => (/* reexport */ avatar["default"]),
-  "BRBreadcrumb": () => (/* reexport */ breadcrumb["default"]),
-  "BRCard": () => (/* reexport */ card["default"]),
-  "BRCheckbox": () => (/* reexport */ checkbox_checkbox["default"]),
-  "BRCookiebar": () => (/* reexport */ cookiebar["default"]),
-  "BRDateTimePicker": () => (/* reexport */ datetimepicker["default"]),
-  "BRFooter": () => (/* reexport */ footer["default"]),
-  "BRHeader": () => (/* reexport */ header["default"]),
-  "BRInput": () => (/* reexport */ input["default"]),
-  "BRItem": () => (/* reexport */ item["default"]),
-  "BRList": () => (/* reexport */ list["default"]),
-  "BRMenu": () => (/* reexport */ menu["default"]),
-  "BRMessage": () => (/* reexport */ message["default"]),
-  "BRModal": () => (/* reexport */ modal["default"]),
-  "BRNotification": () => (/* reexport */ notification["default"]),
-  "BRPagination": () => (/* reexport */ pagination["default"]),
-  "BRScrim": () => (/* reexport */ scrim_scrim["default"]),
-  "BRSelect": () => (/* reexport */ select_select["default"]),
-  "BRTab": () => (/* reexport */ tab["default"]),
-  "BRTable": () => (/* reexport */ table["default"]),
-  "BRTag": () => (/* reexport */ tag["default"]),
-  "BRTextarea": () => (/* reexport */ textarea_textarea["default"]),
-  "BRTooltip": () => (/* reexport */ tooltip["default"]),
-  "BRUpload": () => (/* reexport */ upload["default"]),
-  "BRWizard": () => (/* reexport */ wizard["default"]),
-  "Checkgroup": () => (/* reexport */ checkgroup["default"]),
-  "Collapse": () => (/* reexport */ collapse["default"]),
-  "Dropdown": () => (/* reexport */ dropdown["default"]),
-  "Globals": () => (/* binding */ Globals),
-  "Swipe": () => (/* reexport */ swipe["default"]),
-  "default": () => (/* binding */ Globals)
+  Dropdown: () => (/* reexport */ dropdown["default"]),
+  Globals: () => (/* binding */ Globals)
 });
+
+// UNUSED EXPORTS: Accordion, BRAccordion, BRAvatar, BRBreadcrumb, BRCard, BRCheckbox, BRCookiebar, BRDateTimePicker, BRFooter, BRHeader, BRInput, BRItem, BRList, BRMenu, BRMessage, BRModal, BRNotification, BRPagination, BRScrim, BRSelect, BRTab, BRTable, BRTag, BRTextarea, BRTooltip, BRUpload, BRWizard, Checkgroup, Collapse, Swipe, default
 
 // EXTERNAL MODULE: ./src/components/accordion/accordion.js
 var accordion = __webpack_require__("./src/components/accordion/accordion.js");
@@ -12353,7 +13022,7 @@ var card = __webpack_require__("./src/components/card/card.js");
 var carousel = __webpack_require__("./src/components/carousel/carousel.js");
 // EXTERNAL MODULE: ./src/components/checkbox/checkbox.js
 var checkbox_checkbox = __webpack_require__("./src/components/checkbox/checkbox.js");
-// EXTERNAL MODULE: ./src/components/cookiebar/cookiebar.js + 4 modules
+// EXTERNAL MODULE: ./src/components/cookiebar/cookiebar.js
 var cookiebar = __webpack_require__("./src/components/cookiebar/cookiebar.js");
 ;// CONCATENATED MODULE: ./src/components/cookiebar/jsonData.js
 const jsonData = `[
@@ -12526,6 +13195,9 @@ var header = __webpack_require__("./src/components/header/header.js");
 // EXTERNAL MODULE: ./src/components/input/input.js
 var input = __webpack_require__("./src/components/input/input.js");
 ;// CONCATENATED MODULE: ./src/components/input/input-data.js
+/**
+ * Dados para popular o input de exemplo
+ * @constant {string[]} */
 const inputData = [
   'Afeganistão',
   'África do Sul',
@@ -12811,16 +13483,8 @@ var tooltip = __webpack_require__("./src/components/tooltip/tooltip.js");
 var upload = __webpack_require__("./src/components/upload/upload.js");
 // EXTERNAL MODULE: ./src/components/wizard/wizard.js
 var wizard = __webpack_require__("./src/components/wizard/wizard.js");
-// EXTERNAL MODULE: ./src/partial/js/behavior/accordion.js
-var behavior_accordion = __webpack_require__("./src/partial/js/behavior/accordion.js");
-// EXTERNAL MODULE: ./src/partial/js/behavior/checkgroup.js
-var checkgroup = __webpack_require__("./src/partial/js/behavior/checkgroup.js");
-// EXTERNAL MODULE: ./src/partial/js/behavior/collapse.js
-var collapse = __webpack_require__("./src/partial/js/behavior/collapse.js");
 // EXTERNAL MODULE: ./src/partial/js/behavior/dropdown.js
 var dropdown = __webpack_require__("./src/partial/js/behavior/dropdown.js");
-// EXTERNAL MODULE: ./src/partial/js/behavior/swipe.js
-var swipe = __webpack_require__("./src/partial/js/behavior/swipe.js");
 ;// CONCATENATED MODULE: ./src/partial/js/globals-class.js
 // Script Templates
 
@@ -12860,312 +13524,306 @@ var swipe = __webpack_require__("./src/partial/js/behavior/swipe.js");
 
 
 class Globals {
-	initInstanceAll() {
-		this.initInstanceAccordion()
-		this.initInstanceAvatar()
-		this.initInstanceBreadcrumb()
-		this.initInstanceCard()
-		this.initInstanceCarousel()
-		this.initInstanceCheckbox()
-		this.initInstanceCookiebar()
-		this.initInstanceDateTimePicker()
-		this.initInstanceFooter()
-		this.initInstanceInput()
-		this.initInstanceHeader()
-		this.initInstanceItem()
-		this.initInstanceList()
-		this.initInstanceMenu()
-		this.initInstanceMessage()
-		this.initInstanceModal()
-		this.initInstanceNotification()
-		this.initInstancePagination()
-		this.initInstanceScrim()
-		this.initInstanceSelect()
-		this.initInstanceStep()
-		this.initInstanceTable()
-		this.initInstanceTabs()
-		this.initInstanceTextarea()
-		this.initInstanceUpload()
-		this.initInstanceWizard()
-		this.initInstanceTooltip()
-	}
+  initInstanceAll() {
+    this.initInstanceAccordion()
+    this.initInstanceAvatar()
+    this.initInstanceBreadcrumb()
+    this.initInstanceCard()
+    this.initInstanceCarousel()
+    this.initInstanceCheckbox()
+    this.initInstanceCookiebar()
+    this.initInstanceDateTimePicker()
+    this.initInstanceFooter()
+    this.initInstanceInput()
+    this.initInstanceHeader()
+    this.initInstanceItem()
+    this.initInstanceList()
+    this.initInstanceMenu()
+    this.initInstanceMessage()
+    this.initInstanceModal()
+    this.initInstanceNotification()
+    this.initInstancePagination()
+    this.initInstanceScrim()
+    this.initInstanceSelect()
+    this.initInstanceStep()
+    this.initInstanceTable()
+    this.initInstanceTabs()
+    this.initInstanceTextarea()
+    this.initInstanceUpload()
+    this.initInstanceWizard()
+    this.initInstanceTooltip()
+  }
 
-	initInstanceAccordion() {
-		const accordionList = []
-		for (const brAccordion of window.document.querySelectorAll(
-			'.br-accordion'
-		)) {
-			accordionList.push(new accordion["default"]('br-accordion', brAccordion))
-		}
-	}
+  initInstanceAccordion() {
+    const accordionList = []
+    for (const brAccordion of window.document.querySelectorAll(
+      '.br-accordion'
+    )) {
+      accordionList.push(new accordion/* default */.Z('br-accordion', brAccordion))
+    }
+  }
 
-	initInstanceAvatar() {
-		const avatarList = []
-		for (const brAvatar of window.document.querySelectorAll('.br-avatar')) {
-			avatarList.push(new avatar["default"]('br-avatar', brAvatar))
-		}
-	}
+  initInstanceAvatar() {
+    const avatarList = []
+    for (const brAvatar of window.document.querySelectorAll('.br-avatar')) {
+      avatarList.push(new avatar/* default */.Z('br-avatar', brAvatar))
+    }
+  }
 
-	initInstanceBreadcrumb() {
-		const breadcrumbList = []
-		for (const brBreadcrumb of window.document.querySelectorAll(
-			'.br-breadcrumb'
-		)) {
-			breadcrumbList.push(new breadcrumb["default"]('br-breadcrumb', brBreadcrumb))
-		}
-	}
+  initInstanceBreadcrumb() {
+    const breadcrumbList = []
+    for (const brBreadcrumb of window.document.querySelectorAll(
+      '.br-breadcrumb'
+    )) {
+      breadcrumbList.push(new breadcrumb/* default */.Z('br-breadcrumb', brBreadcrumb))
+    }
+  }
 
-	initInstanceDateTimePicker() {
-		const datetimepickerList = []
-		for (const brDateTimePicker of window.document.querySelectorAll(
-			'.br-datetimepicker'
-		)) {
-			datetimepickerList.push(
-				new datetimepicker["default"]('br-datetimepicker', brDateTimePicker, {})
-			)
-		}
-	}
+  initInstanceDateTimePicker() {
+    const datetimepickerList = []
+    for (const brDateTimePicker of window.document.querySelectorAll(
+      '.br-datetimepicker'
+    )) {
+      datetimepickerList.push(
+        new datetimepicker/* default */.Z('br-datetimepicker', brDateTimePicker, {})
+      )
+    }
+  }
 
-	initInstanceHeader() {
-		const headerList = []
-		for (const brHeader of window.document.querySelectorAll('.br-header')) {
-			headerList.push(new header["default"]('br-header', brHeader))
-		}
-	}
-	initInstanceFooter() {
-		const listFooter = []
-		for (const brFooter of window.document.querySelectorAll('.br-footer')) {
-			listFooter.push(new footer["default"]('br-footer', brFooter))
-		}
-	}
+  initInstanceHeader() {
+    const headerList = []
+    for (const brHeader of window.document.querySelectorAll('.br-header')) {
+      headerList.push(new header/* default */.Z('br-header', brHeader))
+    }
+  }
+  initInstanceFooter() {
+    const listFooter = []
+    for (const brFooter of window.document.querySelectorAll('.br-footer')) {
+      listFooter.push(new footer/* default */.Z('br-footer', brFooter))
+    }
+  }
 
-	initInstanceInput() {
-		const inputList = []
-		for (const brInput of window.document.querySelectorAll('.br-input')) {
-			inputList.push(new input["default"]('br-input', brInput))
-		}
-		for (const brInput of inputList) {
-			brInput.component
-				.querySelectorAll('input.search-autocomplete')
-				.forEach(() => {
-					brInput.setAutocompleteData(input_data)
-				})
-		}
-	}
+  initInstanceInput() {
+    const inputList = []
+    for (const brInput of window.document.querySelectorAll('.br-input')) {
+      inputList.push(new input/* default */.Z('br-input', brInput))
+    }
+    for (const brInput of inputList) {
+      brInput.component
+        .querySelectorAll('input.search-autocomplete')
+        .forEach(() => {
+          brInput.setAutocompleteData(input_data)
+        })
+    }
+  }
 
-	initInstanceItem() {
-		const itemList = []
-		for (const brItem of window.document.querySelectorAll('.br-item')) {
-			itemList.push(new item["default"]('br-item', brItem))
-		}
-	}
+  initInstanceItem() {
+    const itemList = []
+    for (const brItem of window.document.querySelectorAll('.br-item')) {
+      itemList.push(new item/* default */.Z('br-item', brItem))
+    }
+  }
 
-	initInstanceList() {
-		const listList = []
-		for (const brList of window.document.querySelectorAll(
-			'.br-list:not([data-sub])'
-		)) {
-			listList.push(new list["default"]('br-list', brList))
-		}
-	}
+  initInstanceList() {
+    const listList = []
+    for (const brList of window.document.querySelectorAll(
+      '.br-list:not([data-sub])'
+    )) {
+      listList.push(new list/* default */.Z('br-list', brList))
+    }
+  }
 
-	initInstanceMenu() {
-		const menuList = []
-		for (const brMenu of window.document.querySelectorAll('.br-menu')) {
-			menuList.push(new menu["default"]('br-menu', brMenu))
-		}
-	}
+  initInstanceMenu() {
+    const menuList = []
+    for (const brMenu of window.document.querySelectorAll('.br-menu')) {
+      menuList.push(new menu/* default */.Z('br-menu', brMenu))
+    }
+  }
 
-	initInstanceMessage() {
-		const alertList = []
-		for (const brMessage of window.document.querySelectorAll(
-			'.br-message'
-		)) {
-			alertList.push(new message["default"]('br-message', brMessage))
-		}
-	}
+  initInstanceMessage() {
+    const alertList = []
+    for (const brMessage of window.document.querySelectorAll('.br-message')) {
+      alertList.push(new message/* default */.Z('br-message', brMessage))
+    }
+  }
 
-	initInstanceModal() {
-		const modalList = []
-		for (const brModal of window.document.querySelectorAll('.br-modal')) {
-			modalList.push(new modal["default"]('br-modal', brModal))
-		}
-		for (const brScrim of window.document.querySelectorAll('.br-scrim')) {
-			const scrim = new scrim_scrim["default"]('br-scrim', brScrim)
-			for (const button of window.document.querySelectorAll(
-				'.br-scrim + button'
-			)) {
-				button.addEventListener('click', () => {
-					scrim.showScrim()
-				})
-			}
-		}
-	}
+  initInstanceModal() {
+    const modalList = []
+    for (const brModal of window.document.querySelectorAll('.br-modal')) {
+      modalList.push(new modal/* default */.Z('br-modal', brModal))
+    }
+    for (const brScrim of window.document.querySelectorAll('.br-scrim')) {
+      const scrim = new scrim_scrim/* default */.Z('br-scrim', brScrim)
+      for (const button of window.document.querySelectorAll(
+        '.br-scrim + button'
+      )) {
+        button.addEventListener('click', () => {
+          scrim.showScrim()
+        })
+      }
+    }
+  }
 
-	initInstanceNotification() {
-		const notificationList = []
-		for (const brNotification of window.document.querySelectorAll(
-			'.br-notification'
-		)) {
-			notificationList.push(
-				new notification["default"]('br-notification', brNotification)
-			)
-		}
-	}
+  initInstanceNotification() {
+    const notificationList = []
+    for (const brNotification of window.document.querySelectorAll(
+      '.br-notification'
+    )) {
+      notificationList.push(
+        new notification/* default */.Z('br-notification', brNotification)
+      )
+    }
+  }
 
-	initInstancePagination() {
-		const paginationList = []
-		for (const brPagination of window.document.querySelectorAll(
-			'.br-pagination'
-		)) {
-			paginationList.push(new pagination["default"]('br-pagination', brPagination))
-		}
-	}
+  initInstancePagination() {
+    const paginationList = []
+    for (const brPagination of window.document.querySelectorAll(
+      '.br-pagination'
+    )) {
+      paginationList.push(new pagination/* default */.Z('br-pagination', brPagination))
+    }
+  }
 
-	initInstanceScrim() {
-		const scrimList = []
-		for (const brScrim of window.document.querySelectorAll('.br-scrim')) {
-			scrimList.push(new scrim_scrim["default"]('br-scrim', brScrim))
-		}
-		for (const buttonBloco1 of window.document.querySelectorAll(
-			'.bloco1 button'
-		)) {
-			buttonBloco1.addEventListener('click', () => {
-				for (const brScrim of scrimList) {
-					brScrim.showScrim()
-				}
-			})
-		}
-	}
+  initInstanceScrim() {
+    const scrimList = []
+    for (const brScrim of window.document.querySelectorAll('.br-scrim')) {
+      scrimList.push(new scrim_scrim/* default */.Z('br-scrim', brScrim))
+    }
+    for (const buttonBloco1 of window.document.querySelectorAll(
+      '.bloco1 button'
+    )) {
+      buttonBloco1.addEventListener('click', () => {
+        for (const brScrim of scrimList) {
+          brScrim.showScrim()
+        }
+      })
+    }
+  }
 
-	initInstanceSelect() {
-		const selectList = []
-		for (const brSelect of window.document.querySelectorAll('.br-select')) {
-			selectList.push(new select_select["default"]('br-select', brSelect))
-		}
-	}
+  initInstanceSelect() {
+    const selectList = []
+    for (const brSelect of window.document.querySelectorAll('.br-select')) {
+      const brselect = new select_select/* default */.Z('br-select', brSelect)
+      //Exemplo de uso de listener do select
+      // brSelect.addEventListener('onChange', () => {})
 
-	initInstanceTable() {
-		const tableList = []
-		for (const [index, brTable] of window.document
-			.querySelectorAll('.br-table')
-			.entries()) {
-			tableList.push(new table["default"]('br-table', brTable, index))
-		}
-	}
+      selectList.push(brselect)
+    }
+  }
 
-	initInstanceTag() {
-		const tagList = []
-		for (const brTag of window.document.querySelectorAll('.br-tag')) {
-			tagList.push(new tag["default"]('br-tag', brTag))
-		}
-	}
+  initInstanceTable() {
+    const tableList = []
+    for (const [index, brTable] of window.document
+      .querySelectorAll('.br-table')
+      .entries()) {
+      tableList.push(new table/* default */.Z('br-table', brTable, index))
+    }
+  }
 
-	initInstanceTabs() {
-		const abasList = []
-		for (const brTab of window.document.querySelectorAll('.br-tab')) {
-			abasList.push(new tab["default"]('br-tab', brTab))
-		}
-	}
+  initInstanceTag() {
+    const tagList = []
+    for (const brTag of window.document.querySelectorAll('.br-tag')) {
+      tagList.push(new tag/* default */.Z('br-tag', brTag))
+    }
+  }
 
-	initInstanceTooltip() {
-		const tooltipList = []
-		for (const brTooltip of window.document.querySelectorAll(
-			'.br-tooltip'
-		)) {
-			tooltipList.push(new tooltip["default"]('br-tooltip', brTooltip))
-		}
-	}
+  initInstanceTabs() {
+    const abasList = []
+    for (const brTab of window.document.querySelectorAll('.br-tab')) {
+      abasList.push(new tab/* default */.Z('br-tab', brTab))
+    }
+  }
 
-	initInstanceUpload() {
-		const uploadList = []
-		function uploadTimeout() {
-			return new Promise((resolve) => {
-				// Colocar aqui um upload para o servidor e retirar o timeout
-				return setTimeout(resolve, 500)
-			})
-		}
-		for (const brUpload of window.document.querySelectorAll('.br-upload')) {
-			uploadList.push(new upload["default"]('br-upload', brUpload, uploadTimeout))
-		}
-	}
+  initInstanceTooltip() {
+    const tooltipList = []
+    for (const brTooltip of window.document.querySelectorAll('.br-tooltip')) {
+      tooltipList.push(new tooltip/* default */.Z('br-tooltip', brTooltip))
+    }
+  }
 
-	initInstanceStep() {
-		const stepList = []
-		for (const brStep of window.document.querySelectorAll('.br-step')) {
-			stepList.push(new step["default"]('br-step', brStep))
-		}
-	}
+  initInstanceUpload() {
+    const uploadList = []
+    function uploadTimeout() {
+      return new Promise((resolve) => {
+        // Colocar aqui um upload para o servidor e retirar o timeout
+        return setTimeout(resolve, 500)
+      })
+    }
+    for (const brUpload of window.document.querySelectorAll('.br-upload')) {
+      uploadList.push(new upload/* default */.Z('br-upload', brUpload, uploadTimeout))
+    }
+  }
 
-	initInstanceWizard() {
-		const wizardList = []
-		for (const brWizard of window.document.querySelectorAll('.br-wizard')) {
-			wizardList.push(new wizard["default"]('br-wizard', brWizard))
-		}
-	}
+  initInstanceStep() {
+    const stepList = []
+    for (const brStep of window.document.querySelectorAll('.br-step')) {
+      stepList.push(new step/* default */.Z('br-step', brStep))
+    }
+  }
 
-	initInstanceCard() {
-		const listCard = []
-		for (const brCard of window.document.querySelectorAll('.br-card')) {
-			listCard.push(new card["default"]('br-card', brCard))
-		}
-	}
-	initInstanceCarousel() {
-		const carouselList = []
-		for (const brCarousel of window.document.querySelectorAll(
-			'.br-carousel'
-		)) {
-			carouselList.push(new carousel["default"]('br-carousel', brCarousel))
-		}
-	}
+  initInstanceWizard() {
+    const wizardList = []
+    for (const brWizard of window.document.querySelectorAll('.br-wizard')) {
+      wizardList.push(new wizard/* default */.Z('br-wizard', brWizard))
+    }
+  }
 
-	initInstanceCheckbox() {
-		const checkboxList = []
-		for (const brCheckbox of window.document.querySelectorAll(
-			'.br-checkbox'
-		)) {
-			checkboxList.push(new checkbox_checkbox["default"]('br-checkbox', brCheckbox))
-		}
-	}
+  initInstanceCard() {
+    const listCard = []
+    for (const brCard of window.document.querySelectorAll('.br-card')) {
+      listCard.push(new card/* default */.Z('br-card', brCard))
+    }
+  }
+  initInstanceCarousel() {
+    const carouselList = []
+    for (const brCarousel of window.document.querySelectorAll('.br-carousel')) {
+      carouselList.push(new carousel/* default */.Z('br-carousel', brCarousel))
+    }
+  }
 
-	initInstanceCookiebar() {
-		/** Exemplo de instanciação de um objeto cookiebar */
-		const cookiebarList = []
-		for (const brCookiebar of window.document.querySelectorAll(
-			'.br-cookiebar'
-		)) {
-			const params = {
-				// callback: (outputJSON) => { console.log(JSON.parse(outputJSON)) console.log(outputJSON) },
-				component: brCookiebar,
-				json: cookiebar_jsonData,
-				lang: 'pt-br',
-				mode: 'default',
-				name: 'br-cookiebar',
-			}
-			// CookiebarData.loadJSON('./data.json', (response) => {
-			//   return (params.json = response)
-			// })
-			cookiebarList.push(new cookiebar["default"](params))
-		}
+  initInstanceCheckbox() {
+    const checkboxList = []
+    for (const brCheckbox of window.document.querySelectorAll('.br-checkbox')) {
+      checkboxList.push(new checkbox_checkbox/* default */.Z('br-checkbox', brCheckbox))
+    }
+  }
 
-		/** Exemplo de instanciação do cookibar apenas sem necessidade de um HTML base */
-		// BRCookiebar.createCookiebar(jsonData, showOutput)
-	}
+  initInstanceCookiebar() {
+    /** Exemplo de instanciação de um objeto cookiebar */
+    const cookiebarList = []
+    for (const brCookiebar of window.document.querySelectorAll(
+      '.br-cookiebar'
+    )) {
+      const params = {
+        // callback: (outputJSON) => { console.log(JSON.parse(outputJSON)) console.log(outputJSON) },
+        component: brCookiebar,
+        json: cookiebar_jsonData,
+        lang: 'pt-br',
+        mode: 'default',
+        name: 'br-cookiebar',
+      }
+      // CookiebarData.loadJSON('./data.json', (response) => {
+      //   return (params.json = response)
+      // })
+      cookiebarList.push(new cookiebar/* default */.Z(params))
+    }
 
-	initInstanceTextarea() {
-		const textareaList = []
-		for (const brTextarea of window.document.querySelectorAll(
-			'.br-textarea'
-		)) {
-			textareaList.push(new textarea_textarea["default"]('br-textarea', brTextarea))
-		}
-	}
-	initInstanceWizard() {
-		const wizardList = []
-		for (const brWizard of window.document.querySelectorAll('.br-wizard')) {
-			wizardList.push(new wizard["default"]('br-wizard', brWizard))
-		}
-	}
+    /** Exemplo de instanciação do cookibar apenas sem necessidade de um HTML base */
+    // BRCookiebar.createCookiebar(jsonData, showOutput)
+  }
+
+  initInstanceTextarea() {
+    const textareaList = []
+    for (const brTextarea of window.document.querySelectorAll('.br-textarea')) {
+      textareaList.push(new textarea_textarea/* default */.Z('br-textarea', brTextarea))
+    }
+  }
+  initInstanceWizard() {
+    const wizardList = []
+    for (const brWizard of window.document.querySelectorAll('.br-wizard')) {
+      wizardList.push(new wizard/* default */.Z('br-wizard', brWizard))
+    }
+  }
 }
 
 
@@ -13233,50 +13891,47 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-/*!*************************************************!*\
-  !*** ./src/partial/js/core-init.js + 5 modules ***!
-  \*************************************************/
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Accordion": () => (/* reexport */ behavior_accordion["default"]),
-  "BRAccordion": () => (/* reexport */ accordion["default"]),
-  "BRAlert": () => (/* reexport */ message["default"]),
-  "BRBreadcrumb": () => (/* reexport */ breadcrumb["default"]),
-  "BRCard": () => (/* reexport */ card["default"]),
-  "BRCarousel": () => (/* reexport */ carousel["default"]),
-  "BRCheckbox": () => (/* reexport */ checkbox_checkbox["default"]),
-  "BRCookiebar": () => (/* reexport */ cookiebar["default"]),
-  "BRDateTimePicker": () => (/* reexport */ datetimepicker["default"]),
-  "BRFooter": () => (/* reexport */ footer["default"]),
-  "BRHeader": () => (/* reexport */ header["default"]),
-  "BRInput": () => (/* reexport */ input["default"]),
-  "BRItem": () => (/* reexport */ item["default"]),
-  "BRList": () => (/* reexport */ list["default"]),
-  "BRMenu": () => (/* reexport */ menu["default"]),
-  "BRModal": () => (/* reexport */ modal["default"]),
-  "BRNotification": () => (/* reexport */ notification["default"]),
-  "BRPagination": () => (/* reexport */ pagination["default"]),
-  "BRScrim": () => (/* reexport */ scrim["default"]),
-  "BRSelect": () => (/* reexport */ select_select["default"]),
-  "BRStep": () => (/* reexport */ step["default"]),
-  "BRTab": () => (/* reexport */ tab["default"]),
-  "BRTable": () => (/* reexport */ table["default"]),
-  "BRTag": () => (/* reexport */ tag["default"]),
-  "BRTextarea": () => (/* reexport */ textarea_textarea["default"]),
-  "BRTooltip": () => (/* reexport */ tooltip["default"]),
-  "BRUpload": () => (/* reexport */ upload["default"]),
-  "BRWizard": () => (/* reexport */ wizard["default"]),
-  "Checkgroup": () => (/* reexport */ behavior_checkgroup["default"]),
-  "Collapse": () => (/* reexport */ behavior_collapse["default"]),
-  "Dropdown": () => (/* reexport */ globals_class.Dropdown),
-  "Globals": () => (/* reexport */ globals_class.Globals),
-  "Swipe": () => (/* reexport */ swipe["default"]),
-  "Tooltip": () => (/* reexport */ behavior_tooltip["default"]),
-  "behavior": () => (/* binding */ behavior),
-  "globals": () => (/* binding */ globals)
+  Accordion: () => (/* reexport */ behavior_accordion["default"]),
+  BRAccordion: () => (/* reexport */ accordion/* default */.Z),
+  BRAlert: () => (/* reexport */ message/* default */.Z),
+  BRBreadcrumb: () => (/* reexport */ breadcrumb/* default */.Z),
+  BRCard: () => (/* reexport */ card/* default */.Z),
+  BRCarousel: () => (/* reexport */ carousel/* default */.Z),
+  BRCheckbox: () => (/* reexport */ checkbox_checkbox/* default */.Z),
+  BRCookiebar: () => (/* reexport */ cookiebar/* default */.Z),
+  BRDateTimePicker: () => (/* reexport */ datetimepicker/* default */.Z),
+  BRFooter: () => (/* reexport */ footer/* default */.Z),
+  BRHeader: () => (/* reexport */ header/* default */.Z),
+  BRInput: () => (/* reexport */ input/* default */.Z),
+  BRItem: () => (/* reexport */ item/* default */.Z),
+  BRList: () => (/* reexport */ list/* default */.Z),
+  BRMenu: () => (/* reexport */ menu/* default */.Z),
+  BRModal: () => (/* reexport */ modal/* default */.Z),
+  BRNotification: () => (/* reexport */ notification/* default */.Z),
+  BRPagination: () => (/* reexport */ pagination/* default */.Z),
+  BRScrim: () => (/* reexport */ scrim/* default */.Z),
+  BRSelect: () => (/* reexport */ select_select/* default */.Z),
+  BRStep: () => (/* reexport */ step/* default */.Z),
+  BRTab: () => (/* reexport */ tab/* default */.Z),
+  BRTable: () => (/* reexport */ table/* default */.Z),
+  BRTag: () => (/* reexport */ tag/* default */.Z),
+  BRTextarea: () => (/* reexport */ textarea_textarea/* default */.Z),
+  BRTooltip: () => (/* reexport */ tooltip/* default */.Z),
+  BRUpload: () => (/* reexport */ upload/* default */.Z),
+  BRWizard: () => (/* reexport */ wizard/* default */.Z),
+  Checkgroup: () => (/* reexport */ behavior_checkgroup["default"]),
+  Collapse: () => (/* reexport */ behavior_collapse["default"]),
+  Dropdown: () => (/* reexport */ globals_class.Dropdown),
+  Globals: () => (/* reexport */ globals_class.Globals),
+  Swipe: () => (/* reexport */ swipe/* default */.Z),
+  Tooltip: () => (/* reexport */ behavior_tooltip["default"]),
+  behavior: () => (/* binding */ behavior),
+  globals: () => (/* binding */ globals)
 });
 
 // EXTERNAL MODULE: ./node_modules/focus-visible/dist/focus-visible.js
@@ -13291,7 +13946,7 @@ var card = __webpack_require__("./src/components/card/card.js");
 var carousel = __webpack_require__("./src/components/carousel/carousel.js");
 // EXTERNAL MODULE: ./src/components/checkbox/checkbox.js
 var checkbox_checkbox = __webpack_require__("./src/components/checkbox/checkbox.js");
-// EXTERNAL MODULE: ./src/components/cookiebar/cookiebar.js + 4 modules
+// EXTERNAL MODULE: ./src/components/cookiebar/cookiebar.js
 var cookiebar = __webpack_require__("./src/components/cookiebar/cookiebar.js");
 // EXTERNAL MODULE: ./src/components/datetimepicker/datetimepicker.js + 7 modules
 var datetimepicker = __webpack_require__("./src/components/datetimepicker/datetimepicker.js");
@@ -13360,11 +14015,15 @@ class AccordionExample {
     this.element = element
     this._setBehavior()
   }
-
+  /**
+   * Inicia comportamento do exemplo
+   */
   _setBehavior() {
     this._setAccordionBehavior()
   }
-
+  /**
+   * Encontra os data-toggle accordion  e coloca util Accordion
+   */
   _setAccordionBehavior() {
     this.element
       .querySelectorAll('[data-toggle="accordion"]')
@@ -13398,10 +14057,18 @@ class CheckgroupExample {
     this.element = element
     this._setBehavior()
   }
-
+  /**
+   * Inicia comportamento do exemplo
+   * @private
+   */
   _setBehavior() {
     this._setCheckgroupBehavior()
   }
+
+  /**
+   * Encontra os data-toggle checkbox  com data-parent e coloca util Checkgroup
+   * @private
+   */
 
   _setCheckgroupBehavior() {
     this.element
@@ -13430,11 +14097,17 @@ class CollapseExample {
     this.element = element
     this._setBehavior()
   }
-
+  /**
+   * Instancia o utilitario
+   * @private
+   */
   _setBehavior() {
     this._setCollapseBehavior()
   }
-
+  /**
+   * Instancia o utilitario no data-toggle collapse
+   * @private
+   */
   _setCollapseBehavior() {
     this.element
       .querySelectorAll('[data-toggle="collapse"]')
@@ -13470,11 +14143,16 @@ class DropdownExample {
     this.element = element
     this._setBehavior()
   }
-
+  /**
+   * Inicia comportamento do exemplo
+   */
   _setBehavior() {
     this._setDropdownBehavior()
   }
 
+  /**
+   * Encontra os data-toggle dropdown  e coloca util Dropdown
+   */
   _setDropdownBehavior() {
     this.element
       .querySelectorAll('[data-toggle="dropdown"]')
@@ -13495,13 +14173,90 @@ class DropdownExample {
 
 // EXTERNAL MODULE: ./src/partial/js/behavior/scrim.js
 var behavior_scrim = __webpack_require__("./src/partial/js/behavior/scrim.js");
+;// CONCATENATED MODULE: ./src/util/tooltip/tooltip.js
+
+
+/**
+ * Classe de exemplo do comportamento tooltip
+ */
+class TooltipExample {
+  /**
+   * Instancia um exemplo de comportamento tooltip
+   * @param {object} element - Elemento sDOM que representa um componente contento um comportamento de tooltip
+   */
+  constructor(element) {
+    this.element = element
+    
+  }
+  /**
+   * Inicia comportamento do exemplo
+   * @private
+   */
+  _setBehavior() {
+    
+  }
+
+  /**
+   * Encontra os data-tooltip-text  e coloca util Tooltip
+   * @private
+   */
+
+  run() {
+    const TooltipExampleList = []
+
+    window.document
+      .querySelectorAll('[data-tooltip-text]:not(.notification-tooltip)')
+      .forEach((TooltipExample) => {
+        const texttooltip = TooltipExample.getAttribute('data-tooltip-text')
+        const config = {
+          activator: TooltipExample,
+          place: 'left',
+          textTooltip: texttooltip,
+          
+        }
+        TooltipExampleList.push(new behavior_tooltip["default"](config))
+      })
+
+    document.querySelectorAll('[data-tooltip-target]').forEach((trigger) => {
+      const targets = document.querySelectorAll(
+        trigger.getAttribute('data-tooltip-target')
+      )
+
+      targets.forEach((target) => {
+        const place =
+          target.getAttribute('place') !== null
+            ? target.getAttribute('place')
+            : 'left'
+
+        const config = {
+          activator: trigger,
+          component: target,
+          place: place,
+          type: 'warning',
+          
+        }
+        // const tooltip = new Tooltip(config)
+        new behavior_tooltip["default"](config)
+      })
+    })
+  }
+}
+
+/* harmony default export */ const tooltip_tooltip = (TooltipExample);
+
 ;// CONCATENATED MODULE: ./src/partial/js/core.behavior.js
+/**
+ * Classe que instancia os exemplos de uso dos utilitários
+ */
+
 // import TooltipExample from '../../util/tooltip/tooltip'
 
 
 
 
 
+// import Tooltip from './behavior/tooltip'
+// import Tooltip from './behavior/tooltip'
 
 
 class Behavior {
@@ -13565,42 +14320,9 @@ class Behavior {
     }
   }
   _initInstanceTooltipExample() {
-    const TooltipExampleList = []
-
-    window.document
-      .querySelectorAll('[data-tooltip-text]:not(.notification-tooltip)')
-      .forEach((TooltipExample) => {
-        const texttooltip = TooltipExample.getAttribute('data-tooltip-text')
-        const config = {
-          activator: TooltipExample,
-          placement: 'top',
-          textTooltip: texttooltip,
-        }
-
-        TooltipExampleList.push(new behavior_tooltip["default"](config))
-      })
-
-    document.querySelectorAll('[data-tooltip-target]').forEach((trigger) => {
-      const targets = document.querySelectorAll(
-        trigger.getAttribute('data-tooltip-target')
-      )
-
-      targets.forEach((target) => {
-        const place =
-          target.getAttribute('place') !== null
-            ? target.getAttribute('place')
-            : 'top'
-
-        const config = {
-          activator: trigger,
-          component: target,
-          place: place,
-          placement: 'top',
-          type: 'warning',
-        }
-        const tooltip = new behavior_tooltip["default"](config)
-      })
-    })
+    const x = new tooltip_tooltip()
+    x.run()
+    
   }
 }
 
