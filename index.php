@@ -136,20 +136,20 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                         </div>
                                         <?php endif; ?>
                                         <?php if ($this->params->get('redes_sociais', '1')) : ?>
-                                        <div class="menu-social">
-                                            <div class="text-semi-bold mb-1">Redes Sociais</div>
-                                            <div class="sharegroup">
+                                        <div class="social-network">
+                                            <div class="social-network-title">Redes Sociais</div>
+                                            <div class="d-flex">
                                                 <?php if (!empty($this->params->get('redes_instagram', ''))) : ?>
-                                                <div class="share"><a class="br-button circle" href="<?php echo $this->params->get('redes_instagram', ''); ?>" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a></div>
+                                                <a class="br-button circle" href="<?php echo $this->params->get('redes_instagram', ''); ?>" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                                                 <?php endif; ?>
                                                 <?php if (!empty($this->params->get('redes_twitter', ''))) : ?>
-                                                <div class="share"><a class="br-button circle" href="<?php echo $this->params->get('redes_twitter', ''); ?>" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a></div>
+                                                <a class="br-button circle" href="<?php echo $this->params->get('redes_twitter', ''); ?>" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
                                                 <?php endif; ?>
                                                 <?php if (!empty($this->params->get('redes_facebook', ''))) : ?>
-                                                <div class="share"><a class="br-button circle" href="<?php echo $this->params->get('redes_facebook', ''); ?>" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></div>
+                                                <a class="br-button circle" href="<?php echo $this->params->get('redes_facebook', ''); ?>" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
                                                 <?php endif; ?>
                                                 <?php if (!empty($this->params->get('redes_youtube', ''))) : ?>
-                                                <div class="share"><a class="br-button circle" href="<?php echo $this->params->get('redes_youtube', ''); ?>" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a></div>
+                                                <a class="br-button circle" href="<?php echo $this->params->get('redes_youtube', ''); ?>" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
