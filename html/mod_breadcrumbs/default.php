@@ -29,7 +29,7 @@ use Joomla\CMS\WebAsset\WebAssetManager;
 			array_shift($list);
 			if (!empty($list)) : ?>
 				<li class="crumb home">
-					<div class="br-button circle"><span class="sr-only"><?php echo $params->get('homeText', "Página inicial"); ?></span><a href="<?php echo Uri::root(); ?>"><i class="icon fas fa-home"></i></a></div>
+					<a class="br-button circle" href="<?php echo Uri::root(); ?>"><span class="sr-only"><?php echo $params->get('homeText', "Página inicial"); ?></span><i class="fas fa-home"></i></a>
 				</li>
 			<?php endif;
 		}
