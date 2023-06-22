@@ -22,6 +22,7 @@
 	<positions>
         <position>menuacesso</position>
 		<position>search</position>
+		<position>menu-body</position>
 		<position>menu-logos</position>
 		<position>menu-links</position>
 		<position>main-top</position>
