@@ -154,6 +154,45 @@ div.com-content-category-blog div.tags {
     margin-bottom: 12px;
 }
 
+div #ouvidoria-acessoinformacao-header h1 {
+    color: #0c326f;
+    font-size: 36px;
+    font-weight: 600;
+    margin: 0 0 24px;
+}
+
+div #ouvidoria-acessoinformacao-header h2 {
+    line-height: 32px;
+    font-size: 22px;
+    font-weight: 500;
+    margin-top: 0px;
+    margin-bottom: 24px;
+    padding-bottom: 0px;
+}
+
+div #ouvidoria-acessoinformacao-cards div.card-content {
+    min-height: 230px;
+    color: #0c326f;
+}
+
+div #ouvidoria-acessoinformacao-cards div.card-content i {
+    display: block;
+    --icon-size: var(--icon-size-3x);
+    margin-bottom: 30px;
+}
+
+div #ouvidoria-acessoinformacao-cards div.card-content span {
+    display: block;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+div #ouvidoria-acessoinformacao-cards a:not(:disabled):hover {
+    background-image: none;
+}
+
 footer div.social-network i {
     --icon-size: var(--icon-size-2x);
 }
@@ -206,7 +245,7 @@ div.tags span a.tags-link {
     color: white !important;
 }
 
-.contrast a{
+.contrast a {
     color: yellow !important;
 }
 
@@ -228,6 +267,7 @@ div.tags span a.tags-link {
 }
 
 .contrast input[type=text],
+.contrast input[type=text]::placeholder,
 .contrast input[type=password],
 .contrast input[type=url],
 .contrast input[type=search],
@@ -245,7 +285,15 @@ div.tags span a.tags-link {
     color: white !important;
 }
 
+.contrast .br-cookiebar .br-button {
+    border: 1px solid #fff !important;
+}
+
 .contrast a.br-item,
-.contrast a.menu-item{
+.contrast a.menu-item {
     background-color: transparent;
+}
+
+.contrast div.br-card {
+    border: 1px solid #fff;
 }

@@ -94,6 +94,16 @@
 					description="Apresentado no rodapé do menu."
 					default=""
 					filter="raw" />
+				<field name="componente_atendimentocidadao" type="radio" layout="joomla.form.field.radio.switcher" default="1"
+					label="Componente Atendimento ao Cidadão"
+					description="A parte de atendimento ao cidadão é um dos componentes fixos do site, possuindo atalhos para a Ouvidoria e os itens dos Canais de Atendimento. Exibido na página inicial." >
+					<option value="0">Não</option>
+					<option value="1">Sim</option>
+				</field>
+				<field name="atendimentocidadao_siorg" type="text" label="Órgão SIORG"
+					description="Código do órgão SIORG utilizado para direcionamento ao Fala.BR"
+					showon="componente_atendimentocidadao:1"
+					default="26" />
 				<field name="imagem_footer_brasil" type="radio" layout="joomla.form.field.radio.switcher" default="1"
 					label="Exibir logo Brasil" description="Marca do Governo Federal, exibida no rodapé da página.">
 					<option value="0">Não</option>

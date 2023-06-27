@@ -165,13 +165,63 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             </div>
                         </div>
                         <div class="col">
+                            <?php if ($app->getMenu()->getActive() != $app->getMenu()->getDefault()) : ?>
                             <jdoc:include type="modules" name="breadcrumbs" />
+                            <?php endif; ?>
                             <div class="main-content pl-sm-3" id="main-content">
                                 <jdoc:include type="message" />
                                 <jdoc:include type="modules" name="content-top" />
                                 <jdoc:include type="component" />
                                 <jdoc:include type="modules" name="content-bottom" />
                             </div>
+                            <?php if ($this->params->get('componente_atendimentocidadao', '1')) : ?>
+                            <?php if ($app->getMenu()->getActive() == $app->getMenu()->getDefault()) : ?>
+                            <div id="ouvidoria-acessoinformacao">
+                                <div class="row d-block mx-auto text-center" id="ouvidoria-acessoinformacao-header">
+                                    <h1>Ouvidoria e Acesso à Informação</h1>
+                                    <h2>Você pode realizar manifestações nos seguintes canais</h2>
+                                </div>
+                                <div class="row mx-auto px-3" id="ouvidoria-acessoinformacao-cards">
+                                    <div class="col-md">
+                                        <div class="br-card hover">
+                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=1&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
+                                                <div class="card-content d-flex flex-column justify-content-center align-items-center">
+                                                    <i class="fas fa-bullhorn" aria-hidden="true"></i><span>Denúncia</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="br-card hover">
+                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=5&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
+                                                <div class="card-content d-flex flex-column justify-content-center align-items-center">
+                                                    <i class="fas fa-comments" aria-hidden="true"></i><span>Solicitação</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="br-card hover">
+                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=4&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
+                                                <div class="card-content d-flex flex-column justify-content-center align-items-center">
+                                                    <i class="fas fa-thumbs-up" aria-hidden="true"></i><span>Elogio</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="br-card hover">
+                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=3&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
+                                                <div class="card-content d-flex flex-column justify-content-center align-items-center">
+                                                    <i class="fas fa-thumbs-down" aria-hidden="true"></i><span>Reclamação</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <jdoc:include type="modules" name="main-bottom" />
