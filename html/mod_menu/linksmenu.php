@@ -9,7 +9,18 @@ use Joomla\CMS\HTML\HTMLHelper;
 foreach ($list as $i => &$item) {
     $attributes = array();
     
-    $linktype = '<span class="mr-1">' . $item->title . '</span><i class="fas fa-external-link-square-alt" aria-hidden="true"></i>';
+    switch ($item->type) :
+        case 'alias':
+        case 'component':
+            $linktype = '<span>' . $item->title . '</span>';
+            if ($item->menu_icon) {
+                $linktype = '<i class="fas ' . $item->menu_icon . '" aria-hidden="true"></i>' . $linktype;
+            }
+            break;
+        default:
+            $linktype = '<span class="mr-1">' . $item->title . '</span><i class="fas fa-external-link-square-alt" aria-hidden="true"></i>';
+            break;
+    endswitch;
     
     if ($item->browserNav == 1) {
         $attributes['target'] = '_blank';
