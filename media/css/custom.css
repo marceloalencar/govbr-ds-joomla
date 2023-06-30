@@ -132,6 +132,7 @@ div.com-content-category-blog__items {
 div.com-tags-tag__category,
 div.com-content-category-blog__item {
     padding-bottom: 16px;
+    margin-bottom: 36px;
 }
 
 div.com-content-category-blog__item img.itemImage {
