@@ -210,6 +210,30 @@ div.tags span a.tags-link {
     margin: 0 0 25px;
 }
 
+div.com-content-article .cabecalho-linha .outstanding-title
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-transform: uppercase;
+    padding-bottom: 36px;
+    color: #333;
+    font-size: 16px !important;
+    font-weight: bold;
+    margin: 0 !important;
+    white-space: nowrap;
+}
+
+div.com-content-article .cabecalho-linha .outstanding-title::before,
+div.com-content-article .cabecalho-linha .outstanding-title::after {
+    background: #ccc;
+    content: '';
+    height: 1px;
+    width: 100%;
+    margin: 0 12px;
+}
+
 /* Modo Alto Contraste */
 
 .contrast,
