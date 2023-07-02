@@ -171,26 +171,38 @@ div #ouvidoria-acessoinformacao-header h2 {
     padding-bottom: 0px;
 }
 
-div #ouvidoria-acessoinformacao-cards div.card-content {
+div #ouvidoria-acessoinformacao-cards div.card-content span
+{
+    text-transform: uppercase;
+}
+
+.br-card div.card-content {
     min-height: 230px;
     color: #0c326f;
 }
 
-div #ouvidoria-acessoinformacao-cards div.card-content i {
+.br-card div.card-content i {
     display: block;
     --icon-size: var(--icon-size-3x);
     margin-bottom: 30px;
 }
 
-div #ouvidoria-acessoinformacao-cards div.card-content span {
+.br-card div.card-content img {
+    object-fit: contain;
+}
+
+.br-card div.card-content span {
     display: block;
     font-size: 20px;
     font-weight: 600;
     margin: 0;
-    text-transform: uppercase;
 }
 
-div #ouvidoria-acessoinformacao-cards a:not(:disabled):hover {
+.br-card a {
+    text-decoration: none;
+}
+
+.br-card a:not(:disabled):hover {
     background-image: none;
 }
 
@@ -226,12 +238,22 @@ div.com-content-article .cabecalho-linha .outstanding-title
 }
 
 div.com-content-article .cabecalho-linha .outstanding-title::before,
-div.com-content-article .cabecalho-linha .outstanding-title::after {
+div.com-content-article .cabecalho-linha .outstanding-title::after
+{
     background: #ccc;
     content: '';
     height: 1px;
     width: 100%;
-    margin: 0 12px;
+}
+
+div.com-content-article .cabecalho-linha .outstanding-title::before
+{
+    margin-right: 12px;
+}
+
+div.com-content-article .cabecalho-linha .outstanding-title::after
+{
+    margin-left: 12px;
 }
 
 /* Modo Alto Contraste */
