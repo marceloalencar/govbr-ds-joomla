@@ -155,6 +155,20 @@ div.com-content-category-blog div.tags {
     margin-bottom: 12px;
 }
 
+div.latestnews a {
+    text-decoration: none;
+    color: #0c326f;
+}
+
+div h2.latestnews-title {
+    font-weight: 600;
+    font-size: 20px;
+    color: #0c326f;
+    line-height: 28px;
+    margin: 0 0 8px 0;
+    padding: 0;
+}
+
 div #ouvidoria-acessoinformacao-header h1 {
     color: #0c326f;
     font-size: 36px;
