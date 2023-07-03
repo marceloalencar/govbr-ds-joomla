@@ -1,7 +1,8 @@
 /* Substituições de core.css */
 
 img[loading] {
-  z-index: auto; 
+    pointer-events: auto;
+    z-index: auto; 
 }
 
 form[role=search] {
@@ -155,11 +156,36 @@ div.com-content-category-blog div.tags {
     margin-bottom: 12px;
 }
 
-div.latestnews a {
-    text-decoration: none;
-    color: #0c326f;
+div.newsflash,
+div.latestnews {
+    margin-bottom: 24px;
 }
 
+div.newsflash-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-end;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.9) 100%);
+    position: relative;
+}
+
+div.newsflash-container a {
+    text-align: center;
+}
+
+div.newsflash-container img {
+    height: 375px;
+    object-fit: cover;
+    z-index: -2;
+    position: relative;
+}
+
+div.newsflash a:not(:disabled):hover {
+    background-image: none;
+}
+
+div h2.newsflash-title,
 div h2.latestnews-title {
     font-weight: 600;
     font-size: 20px;
@@ -167,6 +193,22 @@ div h2.latestnews-title {
     line-height: 28px;
     margin: 0 0 8px 0;
     padding: 0;
+}
+
+div h2.newsflash-title {
+    position: absolute;
+    padding: 0 16px 16px;
+}
+
+div h2.newsflash-title a {
+    text-decoration: none;
+    color: #fff;
+    padding: 0;
+}
+
+div.latestnews a {
+    text-decoration: none;
+    color: #0c326f;
 }
 
 div #ouvidoria-acessoinformacao-header h1 {
