@@ -156,6 +156,41 @@ div.com-content-category-blog div.tags {
     margin-bottom: 12px;
 }
 
+ul.com-finder__results-list {
+    padding-left: 0;
+    list-style-type: none;
+}
+
+ul.com-finder__results-list li.result__item {
+    list-style: none;
+    color: #333;
+    margin: 0 0 20px;
+    display: block;
+    padding-bottom: 12px;
+}
+
+ul.com-finder__results-list li.result__item span.result__title {
+    display: block;
+    font-size: 20px;
+    line-height: 30px;
+    font-weight: 600;
+    color: #1351b4;
+}
+
+ul.com-finder__results-list li.result__item span.result__title a {
+    text-decoration: none;
+}
+
+ul.com-finder__results-list li.result__item span.result__description {
+    color: #333;
+    font-size: 16px;
+}
+
+ul.com-finder__results-list li.result__item span.result__description span.date {
+    font-weight: 400;
+    color: #555;
+}
+
 div.newsflash,
 div.latestnews {
     margin-bottom: 24px;
