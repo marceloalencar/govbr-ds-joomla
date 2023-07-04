@@ -74,7 +74,7 @@ if (!empty($this->result->mime)) {
             <?php endif; ?>
         </figure>
     <?php endif; ?>
-    <p class="result__title">
+    <span class="result__title">
         <?php if ($this->result->route) : ?>
             <?php echo HTMLHelper::link(
                 Route::_($this->result->route),
@@ -86,14 +86,14 @@ if (!empty($this->result->mime)) {
         <?php else : ?>
             <?php echo $this->result->title; ?>
         <?php endif; ?>
-    </p>
-    <?php if ($show_description && $description !== '') : ?>
-        <p class="result__description">
-            <?php if ($this->result->start_date && $this->params->get('show_date', 1)) : ?>
-                <?php echo HTMLHelper::_('date', $this->result->start_date, Text::_('d/m/Y')); ?>
-            <?php endif; ?>
+    </span>
+    <span class="result__description">
+        <?php if ($this->result->start_date) : ?>
+            <span class="date"><?php echo HTMLHelper::_('date', $this->result->start_date, Text::_('d/m/Y')); ?></span>
             -
+        <?php endif; ?>
+        <?php if ($show_description && $description !== '') : ?>
             <?php echo $description; ?>
-        </p>
-    <?php endif; ?>
+        <?php endif; ?>
+    </span>
 </li>
