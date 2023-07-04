@@ -74,7 +74,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                         <div class="title">Funcionalidades do Sistema</div>
                                     </div>
                                     <div class="align-items-center br-item">
-                                        <button class="br-button circle small" type="button" aria-label="Alto contraste" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span>
+                                        <button class="br-button circle small" type="button" aria-label="Alto contraste" onclick="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"></i><span class="text">Alto contraste</span>
                                         </button>
                                     </div>
                                 </div>
