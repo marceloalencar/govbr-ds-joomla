@@ -40,9 +40,14 @@ $wa->addInlineStyle(".swiper-slide .carrossel-info { position: absolute; backgro
                      .swiper-slide .carrossel-info .title a { color: #fff !important; text-decoration: none; }
                      .swiper-slide .carrossel-info .title a:not(:disabled):hover { background-image: none; }
                      .swiper-slide .carrossel-info .description p { margin: 0 12px; font-size: 24px; text-align: left !important; font-weight: 400; color: #fff !important; }
-                     .swiper-slide img { width: 100%; }
+                     .swiper-slide .carrossel-info > a { position: absolute; top: 0; right: 0; bottom: 0; left: 0; margin: 0 48px; padding: 0; height: auto; max-height: none; }
+                     .swiper-slide .carrossel-info > a:not(:disabled):hover { background-image: none; }
                      .swiper-pagination-bullet { background: #ccc; width: 20px; height: 20px; opacity: 1; }
-                     .swiper-pagination-bullet-active { background: #ffcd07; }");
+                     .swiper-pagination-bullet-active { background: #ffcd07; }
+                     .swiper-button-next,
+                     .swiper-button-prev { position: absolute; top: 0; bottom: 0; height: auto; width: 48px; }
+                     .swiper-button-prev { left: 0 }
+                     .swiper-button-next { left: auto; right: 0 } ");
 
 ?>
 <!-- Swiper -->
@@ -135,12 +140,40 @@ $wa->addInlineStyle(".swiper-slide .carrossel-info { position: absolute; backgro
             <?php endif; ?>
             <div class="carrossel-info">
                 <div class="title">
-                    <a href="<?php echo $link; ?>"><?php echo $alt; ?></a>
+                    <?php if ($item->clickurl) : ?>
+                        <a href="<?php echo $link; ?>"><?php echo $alt; ?></a>
+                    <?php else : ?>
+                        <?php echo $alt; ?>
+                    <?php endif; ?>
                 </div>
                 <?php if (!empty($item->description)) : ?>
                 <div class="description">
                     <?php echo $item->description; ?>
                 </div>
+                <?php endif; ?>
+                <?php if ($item->clickurl) : ?>
+                    <?php $target = $params->get('target', 1); ?>
+                    <?php if ($target == 1) : ?>
+                        <?php // Open in a new window ?>
+                        <a
+                            href="<?php echo $link; ?>" target="_blank" rel="noopener noreferrer"
+                            title="<?php echo htmlspecialchars($item->name, ENT_QUOTES, 'UTF-8'); ?>">
+                        </a>
+                    <?php elseif ($target == 2) : ?>
+                        <?php // Open in a popup window ?>
+                        <a
+                            href="<?php echo $link; ?>" onclick="window.open(this.href, '',
+                                'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=550');
+                                return false"
+                            title="<?php echo htmlspecialchars($item->name, ENT_QUOTES, 'UTF-8'); ?>">
+                        </a>
+                    <?php else : ?>
+                        <?php // Open in parent window ?>
+                        <a
+                            href="<?php echo $link; ?>"
+                            title="<?php echo htmlspecialchars($item->name, ENT_QUOTES, 'UTF-8'); ?>">
+                        </a>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>
