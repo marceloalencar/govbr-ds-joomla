@@ -104,6 +104,36 @@
 					description="Código do órgão SIORG utilizado para direcionamento ao Fala.BR"
 					showon="componente_atendimentocidadao:1"
 					default="26" />
+				<field name="cookies_aviso" type="radio" layout="joomla.form.field.radio.switcher" default="1"
+					label="Aviso de cookies"
+					description="Habilita a barra de aviso sobre uso de cookies" >
+					<option value="0">Não</option>
+					<option value="1">Sim</option>
+				</field>
+				<field name="cookies_mensagem" type="textarea" label="Mensagem sobre cookies" rows="1" cols="5"
+					showon="cookies_aviso:1"
+					description="Mensagem apresentada na barra de aviso sobre uso de cookies."
+					default="N&amp;oacute;s utilizamos cookies para aprimorar a experi&amp;ecirc;ncia de navega&amp;ccedil;&amp;atilde;o em nosso site. Coletamos informa&amp;ccedil;&amp;otilde;es b&amp;aacute;sicas sobre a(s) visita(s) realizadas(s).&amp;lt;br&amp;gt;Se voc&amp;ecirc; concorda, clique em &amp;quot;Ciente&amp;quot;."
+					filter="raw" />
+				<field name="cookies_leiamais" type="radio" layout="joomla.form.field.radio.switcher" default="1"
+					showon="cookies_aviso:1"
+					label="Botão Leia Mais"
+					description="Habilita o botão com link para mais informações sobre uso de cookies" >
+					<option value="0">Não</option>
+					<option value="1">Sim</option>
+				</field>
+				<field name="cookies_leiamais_titulo" type="text" label="Título do botão Leia Mais"
+					showon="cookies_leiamais:1"
+					description="Texto do botão Leia Mais sobre uso de cookies."
+					default="Pol&amp;iacute;tica de cookies" />
+				<field name="cookies_leiamais_link" type="text" label="Link do botão Leia Mais"
+					showon="cookies_leiamais:1"
+					description="Link do botão Leia Mais sobre uso de cookies."
+					default="/cookie-banner-information.html" />
+				<field name="cookies_ciente_titulo" type="text" label="Título do botão Ciente"
+					showon="cookies_aviso:1"
+					description="Texto do botão declarando ciência sobre uso de cookies."
+					default="Ciente" />
 				<field name="imagem_footer_brasil" type="radio" layout="joomla.form.field.radio.switcher" default="1"
 					label="Exibir logo Brasil" description="Marca do Governo Federal, exibida no rodapé da página.">
 					<option value="0">Não</option>
