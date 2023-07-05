@@ -34,8 +34,14 @@ $wa->addInlineScript("var swiper = new Swiper('.swiper-container', {
                         loop: true
                       });");
 
-$wa->addInlineStyle(".swiper-container { width: 1176px; }
-                     .swiper-pagination-bullet { width: 20px; height: 20px; }
+$wa->addInlineStyle(".swiper-slide .carrossel-info { position: absolute; background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.9) 100%); top: auto; width: 100%;
+                        height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; padding-left: 32px; padding-right: 32px; }
+                     .swiper-slide .carrossel-info .title { text-align: left !important; margin: 0 12px 8px; font-size: 34px; font-weight: 600; color: #fff !important; }
+                     .swiper-slide .carrossel-info .title a { color: #fff !important; text-decoration: none; }
+                     .swiper-slide .carrossel-info .title a:not(:disabled):hover { background-image: none; }
+                     .swiper-slide .carrossel-info .description p { margin: 0 12px; font-size: 24px; text-align: left !important; font-weight: 400; color: #fff !important; }
+                     .swiper-slide img { width: 100%; }
+                     .swiper-pagination-bullet { background: #ccc; width: 20px; height: 20px; opacity: 1; }
                      .swiper-pagination-bullet-active { background: #ffcd07; }");
 
 ?>
@@ -127,6 +133,16 @@ $wa->addInlineStyle(".swiper-container { width: 1176px; }
                     <?php endif; ?>
                 <?php endif; ?>
             <?php endif; ?>
+            <div class="carrossel-info">
+                <div class="title">
+                    <a href="<?php echo $link; ?>"><?php echo $alt; ?></a>
+                </div>
+                <?php if (!empty($item->description)) : ?>
+                <div class="description">
+                    <?php echo $item->description; ?>
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
     <?php endforeach; ?>
     </div>
