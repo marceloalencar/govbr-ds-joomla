@@ -14,6 +14,17 @@ $wa->registerAndUseStyle('fontawesome-all', 'https://cdnjs.cloudflare.com/ajax/l
 $wa->registerAndUseStyle('dsgov-custom', 'media/templates/site/govbr-ds/css/custom.css');
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
 $wa->registerAndUseScript('dsgov-contrast-js', 'media/templates/site/govbr-ds/js/contrast.class.js');
+if ($this->params->get('cookies_aviso')):
+    $wa->registerAndUseScript('cookie-notice', 'media/templates/site/govbr-ds/js/cookie.notice.js');
+    $wa->addInlineScript("new cookieNoticeJS({
+                            'noticeText':'" . $this->params->get('cookies_mensagem') . "',
+                            'learnMoreLinkEnabled':" . ($this->params->get('cookies_leiamais') ? "true" : "false") . "," .
+                            (($this->params->get('cookies_leiamais')) ?
+                                "'learnMoreLinkHref':'" . $this->params->get('cookies_leiamais_link') . "',
+                                'learnMoreLinkText':'" . $this->params->get('cookies_leiamais_titulo') . "'," : '')
+                            . "'buttonText': '" . $this->params->get('cookies_ciente_titulo') . "'
+                          });");
+endif;
 
 $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/apple-touch-icon.png', '', [], false, 1), 'apple-touch-icon', 'rel', ['sizes' => '180x180']);
 $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/favicon-32x32.png', '', [], false, 1), 'icon', 'rel', ['type' => 'image/png', 'sizes' => '32x32']);
@@ -276,7 +287,6 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                 </div>
             </footer>
 
-            <div class="br-cookiebar default d-none" tabindex="-1"></div>
             <jdoc:include type="modules" name="debug" style="none" />
         </div>
     </body>
