@@ -16,11 +16,12 @@
 	<media destination="templates/site/govbr-ds" folder="media">
 		<folder>css</folder>
 		<folder>favicons</folder>
+		<folder>images</folder>
 		<folder>img</folder>
 		<folder>js</folder>
 	</media>
 	<positions>
-        <position>menuacesso</position>
+		<position>menuacesso</position>
 		<position>search</position>
 		<position>menu-body</position>
 		<position>menu-logos</position>
@@ -30,7 +31,7 @@
 		<position>content-top</position>
 		<position>content-bottom</position>
 		<position>main-bottom</position>
-        <position>menumapa</position>
+		<position>menumapa</position>
 		<position>debug</position>
 	</positions>
 	<config>
@@ -69,7 +70,7 @@
 					description="Identifica uma subcategoria ou descrição relacionada à marca."
 					default=""
 					filter="string" />
-				<field name="redes_sociais" type="radio" layout="joomla.form.field.radio.switcher" default="1"
+				<field name="redes_sociais" type="radio" layout="joomla.form.field.radio.switcher" default="0"
 					label="Exibir Redes Sociais" description="Bloco Redes Sociais, exibido no menu lateral e no rodapé da página.">
 					<option value="0">Não</option>
 					<option value="1">Sim</option>
@@ -115,7 +116,7 @@
 					description="Mensagem apresentada na barra de aviso sobre uso de cookies."
 					default="N&amp;oacute;s utilizamos cookies para aprimorar a experi&amp;ecirc;ncia de navega&amp;ccedil;&amp;atilde;o em nosso site. Coletamos informa&amp;ccedil;&amp;otilde;es b&amp;aacute;sicas sobre a(s) visita(s) realizadas(s).&amp;lt;br&amp;gt;Se voc&amp;ecirc; concorda, clique em &amp;quot;Ciente&amp;quot;."
 					filter="raw" />
-				<field name="cookies_leiamais" type="radio" layout="joomla.form.field.radio.switcher" default="1"
+				<field name="cookies_leiamais" type="radio" layout="joomla.form.field.radio.switcher" default="0"
 					showon="cookies_aviso:1"
 					label="Botão Leia Mais"
 					description="Habilita o botão com link para mais informações sobre uso de cookies" >
