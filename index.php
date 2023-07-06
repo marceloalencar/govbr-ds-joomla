@@ -25,6 +25,8 @@ if ($this->params->get('cookies_aviso')):
                             . "'buttonText': '" . $this->params->get('cookies_ciente_titulo') . "'
                           });");
 endif;
+$wa->registerAndUseScript('vlibras-plugin', 'https://vlibras.gov.br/app/vlibras-plugin.js');
+$wa->addInlineScript("new window.VLibras.Widget('https://vlibras.gov.br/app');");
 
 $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/apple-touch-icon.png', '', [], false, 1), 'apple-touch-icon', 'rel', ['sizes' => '180x180']);
 $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/favicon-32x32.png', '', [], false, 1), 'icon', 'rel', ['type' => 'image/png', 'sizes' => '32x32']);
@@ -288,6 +290,12 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
             </footer>
 
             <jdoc:include type="modules" name="debug" style="none" />
+        </div>
+        <div vw class="enabled">
+            <div vw-access-button class="active"></div>
+            <div vw-plugin-wrapper>
+                <div class="vw-plugin-top-wrapper"></div>
+            </div>
         </div>
     </body>
     <jdoc:include type="scripts" />
