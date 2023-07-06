@@ -425,13 +425,45 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 
 .contrast .br-cookiebar .br-button {
     border: 1px solid #fff !important;
+    background-color: black;
 }
+
+.contrast .header-info a * {
+    color: yellow !important;
+  }
 
 .contrast a.br-item,
 .contrast a.menu-item {
     background-color: transparent;
 }
 
+.contrast .br-menu .side-menu.active > .menu-item,
+.contrast .br-menu .menu-body .drop-menu.active > .menu-item:not(:hover) {
+    background-color: black !important;
+}
+
+.contrast .br-menu a.menu-item:not(:disabled):not(:disabled) * {
+    color: yellow !important;
+}
+
+.contrast .menu-links a *,
+.contrast div.social-network i {
+    color: yellow !important;
+}
+
+.contrast .br-footer .br-item * {
+    background: var(--hover-dark) !important;
+}
+
+.contrast .br-footer .br-list.horizontal .br-item * {
+    color: yellow !important;
+  }
+
 .contrast div.br-card {
     border: 1px solid #fff;
+}
+
+.contrast div.br-card i,
+.contrast div.br-card span {
+    color: yellow !important;
 }
