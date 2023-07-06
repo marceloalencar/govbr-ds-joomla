@@ -191,9 +191,12 @@ ul.com-finder__results-list li.result__item span.result__description span.date {
     color: #555;
 }
 
-div.newsflash,
-div.latestnews {
-    margin-bottom: 24px;
+div.latestnews-item {
+    padding-bottom: 20px;
+}
+
+div.newsflash-item {
+    padding-bottom: 24px;
 }
 
 div.newsflash-container {
@@ -210,7 +213,6 @@ div.newsflash-container a {
 }
 
 div.newsflash-container img {
-    height: 375px;
     object-fit: cover;
     z-index: -2;
     position: relative;

@@ -34,8 +34,9 @@ $wa->addInlineScript("var swiper = new Swiper('.swiper-container', {
                         loop: true
                       });");
 
-$wa->addInlineStyle(".swiper-slide .carrossel-info { position: absolute; background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.9) 100%); top: auto; width: 100%;
-                        height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; padding-left: 32px; padding-right: 32px; }
+$wa->addInlineStyle(".swiper-container { margin-bottom: 24px; }
+                     .swiper-slide .carrossel-info { position: absolute; background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.9) 100%); top: auto; width: 100%;
+                        height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 40px; padding-left: 32px; padding-right: 32px; }
                      .swiper-slide .carrossel-info .title { text-align: left !important; margin: 0 12px 8px; font-size: 34px; font-weight: 600; color: #fff !important; }
                      .swiper-slide .carrossel-info .title a { color: #fff !important; text-decoration: none; }
                      .swiper-slide .carrossel-info .title a:not(:disabled):hover { background-image: none; }
@@ -47,14 +48,19 @@ $wa->addInlineStyle(".swiper-slide .carrossel-info { position: absolute; backgro
                      .swiper-button-next,
                      .swiper-button-prev { position: absolute; top: 0; bottom: 0; height: auto; width: 48px; }
                      .swiper-button-prev { left: 0 }
-                     .swiper-button-next { left: auto; right: 0 } ");
+                     .swiper-button-next { left: auto; right: 0 }
+                     @media only screen and (max-width: 1023px) {
+                        .swiper-slide .carrossel-info { position: static; background: var(--background-dark); padding: 24px 24px 40px 24px; }
+                        .swiper-slide .carrossel-info .title { font-size: 24px; }
+                     } ");
 
 ?>
+<div class="container">
 <!-- Swiper -->
 <div class="swiper-container">
     <div class="swiper-wrapper d-flex align-items-center">
     <?php foreach ($list as $item) : ?>
-        <div class="swiper-slide d-flex text-center justify-content-center align-items-center">
+        <div class="swiper-slide d-flex flex-wrap text-center justify-content-center align-items-center">
             <?php $link = Route::_('index.php?option=com_banners&task=click&id=' . $item->id); ?>
             <?php if ($item->type == 1) : ?>
                 <?php // Text based banners ?>
@@ -184,4 +190,5 @@ $wa->addInlineStyle(".swiper-slide .carrossel-info { position: absolute; backgro
     <!-- Add Arrows -->
     <div class="swiper-button-prev swiper-button-white"></div>
     <div class="swiper-button-next swiper-button-white"></div>
+</div>
 </div>

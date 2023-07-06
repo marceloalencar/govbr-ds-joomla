@@ -16,11 +16,18 @@ if (!$list) {
     return;
 }
 
+$colunas = "col-md-4";
+if (count($list) < 4) :
+    if (count($list) % 2 == 0) :
+        $colunas = "col-md-6";
+    endif;
+endif;
+
 ?>
 <div class="container">
     <div class="latestnews row">
         <?php foreach ($list as $item) : ?>
-            <div class="col">
+            <div class="latestnews-item <?php echo $colunas; ?>">
                 <h2 class="latestnews-title">
                     <a href="<?php echo $item->link; ?>">
                         <?php echo $item->title; ?>

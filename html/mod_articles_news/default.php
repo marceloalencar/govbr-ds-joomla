@@ -16,12 +16,19 @@ if (!$list) {
     return;
 }
 
+$colunas = "col-md-4";
+if (count($list) < 5) :
+    if (count($list) % 2 == 0) :
+        $colunas = "col-md-6";
+    endif;
+endif;
+
 ?>
 <div class="container">
     <div class="newsflash row">
         <?php foreach ($list as $item) : ?>
             <?php if (!empty($item->imageSrc)) : ?>
-                <div class="col">
+                <div class="newsflash-item <?php echo $colunas; ?>">
                     <div class="newsflash-container">
                         <a href="<?php echo $item->link; ?>" title="<?php echo $item->title; ?>">
                             <?php echo LayoutHelper::render(
