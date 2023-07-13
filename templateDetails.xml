@@ -38,14 +38,14 @@
 		<fields name="params">
 			<fieldset name="advanced">
 				<field name="largura" type="radio" layout="joomla.form.field.radio.switcher" default="0"
-					label="Largura do conteúdo fluida">
-					<option value="0">Não</option>
-					<option value="1">Sim</option>
+					label="Largura do conteúdo">
+					<option value="0">Fixa</option>
+					<option value="1">Fluida</option>
 				</field>
-				<field name="tipomenu" type="radio" layout="joomla.form.field.radio.switcher" default="1"
-					label="Menu flutuante">
-					<option value="0">Não</option>
-					<option value="1">Sim</option>
+				<field name="tipomenu" type="radio" layout="joomla.form.field.radio.switcher" default="0"
+					label="Menu principal">
+					<option value="0">Flutuante</option>
+					<option value="1">Empurrando</option>
 				</field>
 				<field name="cor_footer" type="radio" layout="joomla.form.field.radio.switcher" default="0"
 					label="Cor do rodapé">
