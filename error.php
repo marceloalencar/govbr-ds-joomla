@@ -35,6 +35,7 @@ $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicon
 $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/safari-pinned-tab.svg', '', [], false, 1), 'mask-icon', 'rel', ['color' => '#00a300']);
 $this->setMetaData('msapplication-config', 'media/templates/site/govbr-ds/favicons/browserconfig.xml');
 $this->setMetaData('theme-color', '#00a300');
+$this->setMetaData('viewport', 'width=device-width, initial-scale=1');
 
 $error_code = $this->error->getCode();
 $this->setTitle("Erro " . $error_code . " - " . htmlspecialchars($this->error->getMessage(), ENT_QUOTES, 'UTF-8'));
@@ -141,11 +142,19 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <div class="menu-container">
                                 <div class="menu-panel">
                                     <div class="menu-header">
-                                        <div class="menu-title"><img src="<?php echo $this->params->get('imagem_logo', Uri::root() . 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="Imagem ilustrativa"/><span><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></span></div>
-                                        <div class="menu-close">
-                                            <button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i>
-                                            </button>
+                                        <?php if ($this->params->get('cabecalhomenu', '1')) : ?>
+                                        <div class="menu-title">
+                                            <?php if ($this->params->get('cabecalhomenu', '1') == 2 || $this->params->get('cabecalhomenu', '1') == 1) : ?>
+                                            <img src="<?php echo $this->params->get('imagem_logo', Uri::root() . 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="Imagem ilustrativa"/>
+                                            <?php endif; ?>
+                                            <?php if ($this->params->get('cabecalhomenu', '1') == 3 || $this->params->get('cabecalhomenu', '1') == 1) : ?>
+                                            <span><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></span>
+                                            <?php endif; ?>
                                         </div>
+                                        <div class="menu-close">
+                                            <button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                     <nav class="menu-body">
                                         <jdoc:include type="modules" name="menu-body" style="menuprincipal" />

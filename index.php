@@ -35,6 +35,7 @@ $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicon
 $this->addHeadLink(HTMLHelper::_('image', 'media/templates/site/govbr-ds/favicons/safari-pinned-tab.svg', '', [], false, 1), 'mask-icon', 'rel', ['color' => '#00a300']);
 $this->setMetaData('msapplication-config', 'media/templates/site/govbr-ds/favicons/browserconfig.xml');
 $this->setMetaData('theme-color', '#00a300');
+$this->setMetaData('viewport', 'width=device-width, initial-scale=1');
 
 $largura = $this->params->get('largura') ? 'container-fluid' : 'container-lg';
 $tipomenu = $this->params->get('tipomenu') ? 'br-menu push' : 'br-menu';
@@ -128,11 +129,19 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <div class="menu-container">
                                 <div class="menu-panel">
                                     <div class="menu-header">
-                                        <div class="menu-title"><img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="Imagem ilustrativa"/><span><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></span></div>
-                                        <div class="menu-close">
-                                            <button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i>
-                                            </button>
+                                        <?php if ($this->params->get('cabecalhomenu', '1')) : ?>
+                                        <div class="menu-title">
+                                            <?php if ($this->params->get('cabecalhomenu', '1') == 2 || $this->params->get('cabecalhomenu', '1') == 1) : ?>
+                                            <img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="Imagem ilustrativa"/>
+                                            <?php endif; ?>
+                                            <?php if ($this->params->get('cabecalhomenu', '1') == 3 || $this->params->get('cabecalhomenu', '1') == 1) : ?>
+                                            <span><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></span>
+                                            <?php endif; ?>
                                         </div>
+                                        <div class="menu-close">
+                                            <button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                     <nav class="menu-body">
                                         <jdoc:include type="modules" name="menu-body" style="menuprincipal" />
@@ -215,7 +224,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                     </div>
                                     <div class="col-md">
                                         <div class="br-card hover">
-                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=4&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
+                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=3&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
                                                 <div class="card-content d-flex flex-column justify-content-center align-items-center">
                                                     <i class="fas fa-thumbs-up" aria-hidden="true"></i><span>Elogio</span>
                                                 </div>
@@ -224,7 +233,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                     </div>
                                     <div class="col-md">
                                         <div class="br-card hover">
-                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=3&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
+                                            <a href="https://falabr.cgu.gov.br/publico/Manifestacao/RegistrarManifestacao.aspx?tipo=2&orgaoDestinatario=<?php echo $this->params->get('atendimentocidadao_siorg', ''); ?>">
                                                 <div class="card-content d-flex flex-column justify-content-center align-items-center">
                                                     <i class="fas fa-thumbs-down" aria-hidden="true"></i><span>Reclamação</span>
                                                 </div>
