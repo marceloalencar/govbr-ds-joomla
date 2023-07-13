@@ -72,7 +72,6 @@
 					filter="string" />
 				<field name="cabecalhomenu" type="list" label="Cabeçalho do menu principal"
 					description="Identifica o site ou sistema." default="1">
-					<option value="0">Sem cabeçalho</option>
 					<option value="1">Logo e título</option>
 					<option value="2">Apenas logo</option>
 					<option value="3">Apenas título</option>

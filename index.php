@@ -129,7 +129,6 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <div class="menu-container">
                                 <div class="menu-panel">
                                     <div class="menu-header">
-                                        <?php if ($this->params->get('cabecalhomenu', '1')) : ?>
                                         <div class="menu-title">
                                             <?php if ($this->params->get('cabecalhomenu', '1') == 2 || $this->params->get('cabecalhomenu', '1') == 1) : ?>
                                             <img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="Imagem ilustrativa"/>
@@ -141,7 +140,6 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                         <div class="menu-close">
                                             <button class="br-button circle" type="button" aria-label="Fechar o menu" data-dismiss="menu"><i class="fas fa-times" aria-hidden="true"></i></button>
                                         </div>
-                                        <?php endif; ?>
                                     </div>
                                     <nav class="menu-body">
                                         <jdoc:include type="modules" name="menu-body" style="menuprincipal" />
