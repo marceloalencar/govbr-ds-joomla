@@ -295,7 +295,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                     </div>
                 </div>
             </footer>
-
+	    <a id="gotop" class="backtotop" href="#"><span class="fa fa-chevron-up"></span></a>
             <jdoc:include type="modules" name="debug" style="none" />
         </div>
         <div vw class="enabled">
