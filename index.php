@@ -61,7 +61,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                 <div class="<?php echo $largura ?>">
                     <div class="header-top">
                         <div class="header-logo">
-                            <img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo"/>
+                	    <a href="<?php echo Uri::root(); ?>"><img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo" /></a>
                             <?php if (!empty($this->params->get('texto_assinatura', ''))) : ?>
                                 <span class="br-divider vertical mx-half mx-sm-1"></span>
                                 <div class="header-sign"><?php echo $this->params->get('texto_assinatura', ''); ?></div>
@@ -108,12 +108,14 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                 </button>
                             </div>
                             <div class="header-info">
-                                <a href="<?php echo Uri::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
-                                    <div class="header-title"><?php echo $this->params->get('texto_titulo', 'Template básico'); ?></div>
+                                <div class="header-title">
+                                 <a href="<?php echo Uri::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
+                                   <?php echo $this->params->get('texto_titulo', 'Template básico'); ?>
+				 </a>
+                                </div>
                                     <?php if (!empty($this->params->get('texto_subtitulo', ''))) : ?>
                                     <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
                                     <?php endif; ?>
-                                </a>
                             </div>
                         </div>
                         <jdoc:include type="modules" name="search" style="none" />
