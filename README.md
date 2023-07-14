@@ -25,14 +25,15 @@ Layouts:
 
 ## Parâmetros
 Parâmetros de estilo configurados na área "Avançado" do tema:
-* Largura fluida: expandir conteúdo para preencher todas as laterais da tela.
-* Menu flutuante: quando ativado exibe o menu com elevação em relação ao conteúdo da página. Quando desativado, o menu empurra o conteúdo da página na lateral esquerda. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
+* Largura: Fixa ou Fluída. Deixa o conteúdo fixo ou expande para preencher todas as laterais da tela. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
+* Menu Principal: Flutuante ou Emperruando. Quando flutuante, exibe o menu com elevação em relação ao conteúdo da página, já quando empurrando, o menu empurra o conteúdo da página na lateral esquerda. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
 * Cor do rodapé: escuro ou claro. [Referência](https://www.gov.br/ds/components/footer?tab=desenvolvedor)
 * Logo: marca exibida no cabeçalho. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
 * Logo (Rodapé): marca exibida no rodapé. [Referência](https://www.gov.br/ds/components/footer?tab=desenvolvedor)
 * Título: identifica o site, sistema ou aplicativo. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
 * Subtítulo: reforça a identificação de uma categoria associada ao título da página, ou descrição do mesmo. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
 * Assinatura: identifica uma subcategoria ou descrição relacionada à marca. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
+* Cabeçalho do menu principal: Opções para exibir logo e título, apenas logo ou apenas título. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
 * Exibir Redes Sociais: bloco "Redes Sociais", exibido no menu lateral e no rodapé da página. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
 * Informações legais (Rodapé do menu): texto exibido no rodapé do menu. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
 * Componente Atendimento ao Cidadão: habilita a exibição do bloco "Atendimento ao Cidadão", com referências ao Fala.BR. [Referência](https://www.gov.br/governodigital/pt-br/legislacao/gov-br/gov_br_manual_de_diretrizes.pdf)
