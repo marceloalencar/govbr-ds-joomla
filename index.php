@@ -14,6 +14,7 @@ $wa->registerAndUseStyle('fontawesome-all', 'https://cdnjs.cloudflare.com/ajax/l
 $wa->registerAndUseStyle('dsgov-custom', 'media/templates/site/govbr-ds/css/custom.css');
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
 $wa->registerAndUseScript('dsgov-contrast-js', 'media/templates/site/govbr-ds/js/contrast.class.js');
+$wa->registerAndUseScript('dsgov-backtotop-js', 'media/templates/site/govbr-ds/js/backtotop.js');
 if ($this->params->get('cookies_aviso')):
     $wa->registerAndUseScript('cookie-notice', 'media/templates/site/govbr-ds/js/cookie.notice.js');
     $wa->addInlineScript("new cookieNoticeJS({
