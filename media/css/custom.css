@@ -384,11 +384,14 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 .contrast em,
 .contrast cite,
 .contrast q,
-.contrast i,
 .contrast b,
 .contrast u,
 .contrast span {
     color: white !important;
+}
+
+.contrast i {
+    color: yellow !important;
 }
 
 .contrast a {
