@@ -269,6 +269,12 @@ div #ouvidoria-acessoinformacao-cards div.card-content span
     text-transform: uppercase;
 }
 
+@media only screen and (max-width: 575px) {
+  div #ouvidoria-acessoinformacao-header h1 {
+    font-size: 24px;
+  }
+}
+
 .br-card div.card-content {
     min-height: 230px;
     color: #0c326f;
@@ -389,6 +395,14 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
     color: yellow !important;
 }
 
+.contrast .header-links a {
+    color: yellow !important;
+}
+
+.contrast .header-links a.br-item:not(:disabled):hover {
+    color: yellow !important;
+}
+
 .contrast button,
 .contrast input[type=button],
 .contrast input[type=reset],
@@ -484,7 +498,7 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 
 .header-title a {
     color: currentcolor;
-    text-decoration: none!;
+    text-decoration: none;
 }
 
 .header-title a:hover {
@@ -566,7 +580,7 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 
 .header-links a.br-item {
     font-weight: 500;
-    color: var(--interactive)!important
+    color: var(--interactive);
 }
 
 .header-links a.br-item:not(:disabled):hover {
