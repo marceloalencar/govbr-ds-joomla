@@ -487,7 +487,7 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
     color: yellow !important;
 }
 
-/* Ajusta os backgrounds das, logos de acesso  à informação e Brasil do Footer */
+/* Ajusta os backgrounds das logos de Acesso à Informação e Brasil do Footer */
 
 .br-footer .assigns img:not(:disabled):hover {
     background-image: none;
@@ -523,7 +523,7 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 /*Ajusta font-weight, hover e link do copyright na info e no menu-info*/
 
 .info a {
-  	color: #fff;
+    color: #fff;
     text-decoration: none;
     font-weight: 700;
 }
@@ -534,16 +534,16 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 }
 
 .info .text-medium {
-  	font-weight: 400!important;
+    font-weight: 400!important;
 }
 
 .info .text-down-01 {
-  	font-size: 13px!important;
+    font-size: 13px!important;
     color: #ccc;
 }
 
 .menu-info a {
-  	color: var(--interactive);
+    color: var(--interactive);
     text-decoration: none;
     font-weight: 700;
 }
@@ -598,11 +598,8 @@ html {
   }
 
 .backtotop {
-    -webkit-animation-duration: 500ms;
     animation-duration: 500ms;
-    -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
-    -webkit-animation-timing-function: linear;
     animation-timing-function: linear;
     position: fixed;
     opacity: 0;
@@ -610,17 +607,11 @@ html {
     bottom: 57px;
     right: 8px;
     height: 40px;
-	width: 40px;
+    width: 40px;
     background: #1351b4;
     color: #fff;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center; 
     align-items: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
     justify-content: center;
     border-radius: 50%;
 }
@@ -633,9 +624,7 @@ html {
 .backtotop.active {
     opacity: 1;
     visibility: visible;
-    -webkit-animation-direction: normal;
     animation-direction: normal;
-    -webkit-animation-name: bounceIn;
     animation-name: bounceIn
   }
 
@@ -656,54 +645,24 @@ html {
     outline: none;
 }
 
-@-webkit-keyframes bounceIn {
-    0% {
-        opacity: 0;
-        -webkit-transform: scale(0.3) translate3d(0, 0, 0);
-        transform: scale(0.3) translate3d(0, 0, 0)
-    }
-
-    50% {
-        opacity: 0.9;
-        -webkit-transform: scale(1.1);
-        transform: scale(1.1)
-    }
-
-    80% {
-        opacity: 1;
-        -webkit-transform: scale(0.89);
-        transform: scale(0.89)
-    }
-
-    100% {
-        opacity: 1;
-        -webkit-transform: scale(1) translate3d(0, 0, 0);
-        transform: scale(1) translate3d(0, 0, 0)
-    }
-}
-
 @keyframes bounceIn {
     0% {
         opacity: 0;
-        -webkit-transform: scale(0.3) translate3d(0, 0, 0);
         transform: scale(0.3) translate3d(0, 0, 0)
     }
 
     50% {
         opacity: 0.9;
-        -webkit-transform: scale(1.1);
         transform: scale(1.1)
     }
 
     80% {
         opacity: 1;
-        -webkit-transform: scale(0.89);
         transform: scale(0.89)
     }
 
     100% {
         opacity: 1;
-        -webkit-transform: scale(1) translate3d(0, 0, 0);
         transform: scale(1) translate3d(0, 0, 0)
     }
 }
