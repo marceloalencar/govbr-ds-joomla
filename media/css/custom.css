@@ -269,6 +269,12 @@ div #ouvidoria-acessoinformacao-cards div.card-content span
     text-transform: uppercase;
 }
 
+@media only screen and (max-width: 575px) {
+  div #ouvidoria-acessoinformacao-header h1 {
+    font-size: 24px;
+  }
+}
+
 .br-card div.card-content {
     min-height: 230px;
     color: #0c326f;
@@ -378,14 +384,25 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 .contrast em,
 .contrast cite,
 .contrast q,
-.contrast i,
 .contrast b,
 .contrast u,
 .contrast span {
     color: white !important;
 }
 
+.contrast i {
+    color: yellow !important;
+}
+
 .contrast a {
+    color: yellow !important;
+}
+
+.contrast .header-links a {
+    color: yellow !important;
+}
+
+.contrast .header-links a.br-item:not(:disabled):hover {
     color: yellow !important;
 }
 
@@ -468,4 +485,184 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 .contrast div.br-card i,
 .contrast div.br-card span {
     color: yellow !important;
+}
+
+/* Ajusta os backgrounds das logos de Acesso à Informação e Brasil do Footer */
+
+.br-footer .assigns img:not(:disabled):hover {
+    background-image: none;
+}
+
+.br-footer .assigns img:not(:disabled):active {
+    background-image: none;
+}
+
+/* Cor e hover do Título no Header*/
+
+.header-title a {
+    color: currentcolor;
+    text-decoration: none;
+}
+
+.header-title a:hover {
+    color: var(--interactive);
+    text-decoration: none;
+}
+
+.header-title a:not(:disabled):hover {
+    background-image: none;
+}
+
+/* Ajuste de posição do dropdown das br-list para smarthphone no br-header*/
+
+.br-header .header-actions .header-functions .br-list, .br-header .header-actions .header-links .br-list {
+    left: auto;
+    right: 0;
+}
+
+/*Ajusta font-weight, hover e link do copyright na info e no menu-info*/
+
+.info a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.info a:not(:disabled):hover {
+    background-image: none;
+    color: #5992ed;
+}
+
+.info .text-medium {
+    font-weight: 400!important;
+}
+
+.info .text-down-01 {
+    font-size: 13px!important;
+    color: #ccc;
+}
+
+.menu-info a {
+    color: var(--interactive);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.menu-info a:not(:disabled):hover {
+    background-image: none;
+    color: #5992ed;
+}
+
+/* Ajusta o hover do header-logo, caso se queira link na logo */
+
+.header-logo a:not(:disabled):hover {
+    background-image: none;
+}
+
+/* Ajusta tamanho da fas fa-bars do menu */
+
+@media only screen and (min-width: 769px){
+  	.header-menu-trigger .fas {
+    	--icon-size: 24px;
+  }
+}
+
+@media only screen and (min-width:577px) and (max-width:768px){
+  	.header-menu-trigger .fas {
+    	--icon-size: 20px;
+  }
+}
+
+@media only screen and (max-width:576px) {
+  	.header-menu-trigger .fas {
+    	--icon-size: 16px;
+  }
+}
+
+/* Altera o weight e hover dos itens do header-links */
+
+.header-links a.br-item {
+    font-weight: 500;
+    color: var(--interactive);
+}
+
+.header-links a.br-item:not(:disabled):hover {
+    background-image: none;
+    color: #0c326f!important;
+}
+
+/* Back to top */
+
+html {
+    scroll-behavior: smooth;
+  }
+
+.backtotop {
+    animation-duration: 500ms;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+    position: fixed;
+    opacity: 0;
+    visibility: hidden;
+    bottom: 57px;
+    right: 8px;
+    height: 40px;
+    width: 40px;
+    background: #1351b4;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.backtotop span {
+    font-size: 16px;
+    width: auto;
+}
+
+.backtotop.active {
+    opacity: 1;
+    visibility: visible;
+    animation-direction: normal;
+    animation-name: bounceIn
+  }
+
+.backtotop:hover {
+    background: #dbe8fb;
+    text-decoration: none;
+    color: #1351b4;
+}
+
+.backtotop:focus {
+    outline-color: #c2850c;
+    outline-style: dashed;
+    outline-offset: 4px;
+    outline-width: 2px;
+}
+
+.backtotop:focus:not(.focus-visible) {
+    outline: none;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translate3d(0, 0, 0)
+    }
+
+    50% {
+        opacity: 0.9;
+        transform: scale(1.1)
+    }
+
+    80% {
+        opacity: 1;
+        transform: scale(0.89)
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translate3d(0, 0, 0)
+    }
 }
