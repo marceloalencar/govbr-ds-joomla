@@ -14,6 +14,7 @@ $wa->registerAndUseStyle('fontawesome-all', 'https://cdnjs.cloudflare.com/ajax/l
 $wa->registerAndUseStyle('dsgov-custom', 'media/templates/site/govbr-ds/css/custom.css');
 $wa->registerAndUseScript('dsgov-core-js', 'media/templates/site/govbr-ds/js/core-init.js');
 $wa->registerAndUseScript('dsgov-contrast-js', 'media/templates/site/govbr-ds/js/contrast.class.js');
+$wa->registerAndUseScript('dsgov-backtotop-js', 'media/templates/site/govbr-ds/js/backtotop.js');
 if ($this->params->get('cookies_aviso')):
     $wa->registerAndUseScript('cookie-notice', 'media/templates/site/govbr-ds/js/cookie.notice.js');
     $wa->addInlineScript("new cookieNoticeJS({
@@ -74,7 +75,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                 <div class="<?php echo $largura ?>">
                     <div class="header-top">
                         <div class="header-logo">
-                            <a href="<?php echo Uri::root(); ?>"><img src="<?php echo $this->params->get('imagem_logo', 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo" /></a>
+                            <a href="<?php echo Uri::root(); ?>"><img src="<?php echo $this->params->get('imagem_logo', Uri::root() . 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo" /></a>
                             <?php if (!empty($this->params->get('texto_assinatura', ''))) : ?>
                                 <span class="br-divider vertical mx-half mx-sm-1"></span>
                                 <div class="header-sign"><?php echo $this->params->get('texto_assinatura', ''); ?></div>
@@ -122,14 +123,13 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             </div>
                             <div class="header-info">
                                 <div class="header-title">
-                                 <a href="<?php echo Uri::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
-                                   <?php echo $this->params->get('texto_titulo', 'Template básico'); ?>
-				 </a>
+                                    <a href="<?php echo Uri::root(); ?>" title="<?php echo $this->params->get('texto_titulo', 'Template básico'); ?>">
+                                        <?php echo $this->params->get('texto_titulo', 'Template básico'); ?>
+                                    </a>
                                 </div>
-                                    <?php if (!empty($this->params->get('texto_subtitulo', ''))) : ?>
+                                <?php if (!empty($this->params->get('texto_subtitulo', ''))) : ?>
                                     <div class="header-subtitle"><?php echo $this->params->get('texto_subtitulo', 'Subtítulo do Header'); ?></div>
-                                    <?php endif; ?>
-                                </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <jdoc:include type="modules" name="search" style="none" />
