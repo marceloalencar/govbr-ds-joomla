@@ -75,7 +75,15 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                 <div class="<?php echo $largura ?>">
                     <div class="header-top">
                         <div class="header-logo">
+                            <?php if ($this->params->get('logo_comlink', '0') == 1) : ?>
+                            <a href="<?php echo Uri::root(); ?>">
+                            <?php elseif ($this->params->get('logo_comlink', '0') == 2) : ?>
+                            <a href="<?php echo $this->params->get('logo_link', ''); ?>">
+                            <?php endif; ?>
                             <img src="<?php echo $this->params->get('imagem_logo', Uri::root() . 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo" />
+                            <?php if ($this->params->get('logo_comlink', '0') != 0) : ?>
+                            </a>
+                            <?php endif; ?>
                             <?php if (!empty($this->params->get('texto_assinatura', ''))) : ?>
                                 <span class="br-divider vertical mx-half mx-sm-1"></span>
                                 <div class="header-sign"><?php echo $this->params->get('texto_assinatura', ''); ?></div>

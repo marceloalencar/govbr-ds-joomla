@@ -56,6 +56,16 @@
 				<field name="imagem_logo" type="media" label="Logo"
 					description="É recomendada que a largura tenha, no máximo, 4x a dimensão da altura (ênfase) escolhida."
 					default="" />
+				<field name="logo_comlink" type="list" default="0"
+					label="Logo com link?" description="Habilita link na logo do cabeçalho.">
+					<option value="0">Não</option>
+					<option value="1">Página inicial</option>
+					<option value="2">Endereço personalizado</option>
+				</field>
+				<field name="logo_link" type="text" label="Link"
+					description="Endereço da página para o link na logo do cabeçalho."
+					showon="logo_comlink:2"
+					default="" />
 				<field name="imagem_logo_footer" type="media" label="Logo (Rodapé)"
 					description="É recomendada que a largura tenha, no máximo, 4x a dimensão da altura (ênfase) escolhida."
 					default="" />

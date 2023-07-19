@@ -29,6 +29,7 @@ Parâmetros de estilo configurados na área "Avançado" do tema:
 * Menu Principal: Flutuante ou Empurrando. Quando flutuante, exibe o menu com elevação em relação ao conteúdo da página. No outro caso, o menu empurra o conteúdo da página na lateral esquerda. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
 * Cor do rodapé: escuro ou claro. [Referência](https://www.gov.br/ds/components/footer?tab=desenvolvedor)
 * Logo: marca exibida no cabeçalho. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
+* Logo com link?: habilita link na logo do cabeçalho, podendo direcionar para a página inicial ou para endereço personalizado.
 * Logo (Rodapé): marca exibida no rodapé. [Referência](https://www.gov.br/ds/components/footer?tab=desenvolvedor)
 * Título: identifica o site, sistema ou aplicativo. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
 * Subtítulo: reforça a identificação de uma categoria associada ao título da página, ou descrição do mesmo. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)

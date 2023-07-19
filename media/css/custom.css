@@ -36,6 +36,12 @@ form[role="search"] {
     background-image: none;
 }
 
+/* Ajusta o hover do header-logo, caso se queira link na logo */
+
+.br-header .header-logo a:not(:disabled):hover {
+    background-image: none;
+}
+
 .br-breadcrumb .crumb-list .crumb.home a:not(:disabled):active {
     background-image: none;
 }
