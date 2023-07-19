@@ -61,6 +61,7 @@ Parâmetros de estilo configurados na área "Avançado" do tema:
 * content-bottom: Área para exibição de módulos abaixo do conteúdo.
 * main-bottom: Área para exibição de módulos ao final da página, antes do rodapé.
 * menumapa: Mapa do Site. É obrigatório o uso do layout "mapadosite" nos módulos.
+* error-search: Área para exibição do módulo Busca Inteligente (finder) na página de erro. É obrigatório o uso do layout "busca-erro" no módulo.
 * debug: Área para exibição de módulos quando a depuração está habilitada no Joomla.
 
 ## Demonstração

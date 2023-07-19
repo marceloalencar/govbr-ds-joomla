@@ -227,43 +227,35 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                         </div>
                                     </div>
                                     <?php if ($this->debug) : ?>
-                                            <div class="row">
-                                            <p>
-                                				<?php echo $this->error->getCode(); ?> - <?php echo htmlspecialchars($this->error->getMessage(), ENT_QUOTES, 'UTF-8'); ?>
-					                            <br><?php echo htmlspecialchars($this->error->getFile(), ENT_QUOTES, 'UTF-8');?>:<?php echo $this->error->getLine(); ?>
-                                			</p>
-                                            </div>
-                                            <div class="row">
-                                                <?php echo $this->renderBacktrace(); ?>
-                                                <?php // Check if there are more Exceptions and render their data as well ?>
-                                                <?php if ($this->error->getPrevious()) : ?>
-                                                    <?php $loop = true; ?>
-                                                    <?php // Reference $this->_error here and in the loop as setError() assigns errors to this property and we need this for the backtrace to work correctly ?>
-                                                    <?php // Make the first assignment to setError() outside the loop so the loop does not skip Exceptions ?>
-                                                    <?php $this->setError($this->_error->getPrevious()); ?>
-                                                    <?php while ($loop === true) : ?>
-                                                        <p><strong><?php echo Text::_('JERROR_LAYOUT_PREVIOUS_ERROR'); ?></strong></p>
-                                                        <p>
-                                                            <?php echo htmlspecialchars($this->_error->getMessage(), ENT_QUOTES, 'UTF-8'); ?>
-                                                            <br><?php echo htmlspecialchars($this->_error->getFile(), ENT_QUOTES, 'UTF-8');?>:<?php echo $this->_error->getLine(); ?>
-                                                        </p>
-                                                        <?php echo $this->renderBacktrace(); ?>
-                                                        <?php $loop = $this->setError($this->_error->getPrevious()); ?>
-                                                    <?php endwhile; ?>
-                                                    <?php // Reset the main error object to the base error ?>
-                                                    <?php $this->setError($this->error); ?>
-                                                <?php endif; ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    <div class="my-3">
-                                        <p>Aproveite para fazer uma nova busca</p>
-                                        <div class="br-input input-button mt-n1 input-highlight">
-                                            <label class="sr-only" for="error-search">Texto da pesquisa</label>
-                                            <input id="error-search" type="search" placeholder="O que você procura?"/>
-                                            <button class="br-button crumb" type="button" aria-label="Buscar"><i class="fas fa-search" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
+                                    <div class="row">
+                                        <p>
+                                            <?php echo $this->error->getCode(); ?> - <?php echo htmlspecialchars($this->error->getMessage(), ENT_QUOTES, 'UTF-8'); ?>
+                                            <br><?php echo htmlspecialchars($this->error->getFile(), ENT_QUOTES, 'UTF-8');?>:<?php echo $this->error->getLine(); ?>
+                                        </p>
                                     </div>
+                                    <div class="row">
+                                        <?php echo $this->renderBacktrace(); ?>
+                                        <?php // Check if there are more Exceptions and render their data as well ?>
+                                        <?php if ($this->error->getPrevious()) : ?>
+                                            <?php $loop = true; ?>
+                                            <?php // Reference $this->_error here and in the loop as setError() assigns errors to this property and we need this for the backtrace to work correctly ?>
+                                            <?php // Make the first assignment to setError() outside the loop so the loop does not skip Exceptions ?>
+                                            <?php $this->setError($this->_error->getPrevious()); ?>
+                                            <?php while ($loop === true) : ?>
+                                                <p><strong><?php echo Text::_('JERROR_LAYOUT_PREVIOUS_ERROR'); ?></strong></p>
+                                                <p>
+                                                    <?php echo htmlspecialchars($this->_error->getMessage(), ENT_QUOTES, 'UTF-8'); ?>
+                                                    <br><?php echo htmlspecialchars($this->_error->getFile(), ENT_QUOTES, 'UTF-8');?>:<?php echo $this->_error->getLine(); ?>
+                                                </p>
+                                                <?php echo $this->renderBacktrace(); ?>
+                                                <?php $loop = $this->setError($this->_error->getPrevious()); ?>
+                                            <?php endwhile; ?>
+                                            <?php // Reset the main error object to the base error ?>
+                                            <?php $this->setError($this->error); ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php endif; ?>
+                                    <jdoc:include type="modules" name="error-search" style="none" />
                                     <div class="row my-5 text-center justify-content-lg-center">
                                         <div class="col-lg-auto">
                                             <button class="br-button crumb" type="button" onclick="history.back()"><i class="fas fa-chevron-left" aria-hidden="true"></i><span>Ir para Página Anterior</span>
