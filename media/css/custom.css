@@ -1,40 +1,56 @@
 /* Substituições de core.css */
 
+html {
+    scroll-behavior: smooth;
+}
+
 img[loading] {
     pointer-events: auto;
-    z-index: auto; 
+    z-index: auto;
 }
 
-form[role=search] {
-  display: flex;
-  flex: 100%;
+form[role="search"] {
+    display: flex;
+    flex: 100%;
 }
 
-.br-breadcrumb .crumb-list .crumb:not(:last-child) span {
-    font-size: var(--font-size-scale-down-01);
-    font-weight: var(--font-weight-medium);
-    padding: 0 0 0 var(--spacing-scale-base);
-    padding: 0 6px;
+/* Ajuste de posição do dropdown das br-list para smarthphone no br-header */
+
+.br-header .header-actions .header-functions .br-list,
+.br-header .header-actions .header-links .br-list {
+    left: auto;
+    right: 0;
+}
+
+/* Cor e hover do Título no Header */
+
+.br-header .header-title a {
+    color: currentcolor;
+}
+
+.br-header .header-title a:hover {
+    color: var(--interactive);
+}
+
+.br-header .header-title a:not(:disabled):hover {
+    background-image: none;
 }
 
 .br-breadcrumb .crumb-list .crumb.home a:not(:disabled):active {
-  background-image: none;
+    background-image: none;
 }
 
-.br-footer .assigns a:not(:disabled):hover {
-  background-image: none;
+.br-breadcrumb .crumb-list .crumb:not(:last-child) > span {
+    padding: 0 6px;
 }
 
-.br-footer .assigns a:not(:disabled):active {
-  background-image: none;
-}
+/* Ajusta os backgrounds das logos de Acesso à Informação e Brasil do Footer */
 
-.br-footer .assigns img:not(:disabled):hover {
-  background-image: linear-gradient(rgba(var(--interactive-rgb), var(--hover)), rgba(var(--interactive-rgb), var(--hover)));
-}
-
+.br-footer .assigns a:not(:disabled):hover,
+.br-footer .assigns a:not(:disabled):active,
+.br-footer .assigns img:not(:disabled):hover,
 .br-footer .assigns img:not(:disabled):active {
-  background-image: linear-gradient(rgba(var(--interactive-rgb), var(--pressed)), rgba(var(--interactive-rgb), var(--pressed)));
+    background-image: none;
 }
 
 .br-pagination a {
@@ -52,8 +68,8 @@ div.com-content-article .page-header {
     text-align: left;
 }
 
-div.com-tags-tag h2[itemprop='name'],
-div.com-content-category-blog h2[itemprop='name'] {
+div.com-tags-tag h2[itemprop="name"],
+div.com-content-category-blog h2[itemprop="name"] {
     font-size: 24px;
     line-height: 26px;
     font-weight: 600;
@@ -62,37 +78,37 @@ div.com-content-category-blog h2[itemprop='name'] {
     padding: 0;
 }
 
-div.com-tags-tag h2[itemprop='name'] a,
-div.com-content-category-blog h2[itemprop='name'] a {
-    color: #0c326f;
+div.com-tags-tag h2[itemprop="name"] a,
+div.com-content-category-blog h2[itemprop="name"] a {
+    color: var(--blue-warm-vivid-80);
     text-decoration: none;
     margin-bottom: 12px;
 }
 
-div.com-content-category-blog [itemprop='headline'],
-div.com-content-article [itemprop='headline'] {
+div.com-content-category-blog [itemprop="headline"],
+div.com-content-article [itemprop="headline"] {
     font-size: 36px;
     line-height: 40px;
     font-weight: 600;
-    color: #0c326f;
+    color: var(--blue-warm-vivid-80);
     padding-bottom: 10px;
-    margin: 0
+    margin: 0;
 }
 
-div.com-content-category-blog [itemprop='description'],
-div.com-content-article [itemprop='description'] {
+div.com-content-category-blog [itemprop="description"],
+div.com-content-article [itemprop="description"] {
     font-weight: 400;
     font-size: 18px;
     color: #555;
     line-height: normal;
     margin-bottom: 16px;
     margin: 0;
-    padding-bottom: 8px
+    padding-bottom: 8px;
 }
 
 @media only screen and (max-width: 575px) {
-    div.com-content-article [itemprop='headline'] {
-        font-size: 24px
+    div.com-content-article [itemprop="headline"] {
+        font-size: 24px;
     }
 }
 
@@ -102,7 +118,7 @@ div.menu-logos img {
     object-fit: contain;
 }
 
-div.com-content-article div[itemprop='articleBody'] {
+div.com-content-article div[itemprop="articleBody"] {
     padding-top: 32px;
 }
 
@@ -117,12 +133,12 @@ div.com-content-article figure figcaption {
     font-size: 0.88rem;
     font-weight: normal;
     max-width: 960px;
-    margin: 5px auto
+    margin: 5px auto;
 }
 
 div.com-content-article figure img {
     height: auto;
-    max-width: 100%
+    max-width: 100%;
 }
 
 div.com-tags__items,
@@ -204,7 +220,11 @@ div.newsflash-container {
     flex-direction: column;
     height: 100%;
     justify-content: flex-end;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.9) 100%);
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 50%,
+        rgba(0, 0, 0, 0.9) 100%
+    );
     position: relative;
 }
 
@@ -226,7 +246,7 @@ div h2.newsflash-title,
 div h2.latestnews-title {
     font-weight: 600;
     font-size: 20px;
-    color: #0c326f;
+    color: var(--blue-warm-vivid-80);
     line-height: 28px;
     margin: 0 0 8px 0;
     padding: 0;
@@ -245,11 +265,11 @@ div h2.newsflash-title a {
 
 div.latestnews a {
     text-decoration: none;
-    color: #0c326f;
+    color: var(--blue-warm-vivid-80);
 }
 
 div #ouvidoria-acessoinformacao-header h1 {
-    color: #0c326f;
+    color: var(--blue-warm-vivid-80);
     font-size: 36px;
     font-weight: 600;
     margin: 0 0 24px;
@@ -264,20 +284,19 @@ div #ouvidoria-acessoinformacao-header h2 {
     padding-bottom: 0px;
 }
 
-div #ouvidoria-acessoinformacao-cards div.card-content span
-{
+div #ouvidoria-acessoinformacao-cards div.card-content span {
     text-transform: uppercase;
 }
 
 @media only screen and (max-width: 575px) {
-  div #ouvidoria-acessoinformacao-header h1 {
-    font-size: 24px;
-  }
+    div #ouvidoria-acessoinformacao-header h1 {
+        font-size: 24px;
+    }
 }
 
 .br-card div.card-content {
     min-height: 230px;
-    color: #0c326f;
+    color: var(--blue-warm-vivid-80);
 }
 
 .br-card div.card-content i {
@@ -321,8 +340,7 @@ div.tags span a.tags-link {
     margin: 0 0 25px;
 }
 
-div.com-content-article .cabecalho-linha .outstanding-title
-{
+div.com-content-article .cabecalho-linha .outstanding-title {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -337,22 +355,38 @@ div.com-content-article .cabecalho-linha .outstanding-title
 }
 
 div.com-content-article .cabecalho-linha .outstanding-title::before,
-div.com-content-article .cabecalho-linha .outstanding-title::after
-{
+div.com-content-article .cabecalho-linha .outstanding-title::after {
     background: #ccc;
-    content: '';
+    content: "";
     height: 1px;
     width: 100%;
 }
 
-div.com-content-article .cabecalho-linha .outstanding-title::before
-{
+div.com-content-article .cabecalho-linha .outstanding-title::before {
     margin-right: 12px;
 }
 
-div.com-content-article .cabecalho-linha .outstanding-title::after
-{
+div.com-content-article .cabecalho-linha .outstanding-title::after {
     margin-left: 12px;
+}
+
+/* Back to top */
+
+.backtotop {
+    position: fixed;
+    opacity: 0;
+    visibility: hidden;
+    bottom: 5px;
+    right: 5px;
+}
+
+.backtotop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.backtotop:focus:not(.focus-visible) {
+    outline: none;
 }
 
 /* Modo Alto Contraste */
@@ -390,26 +424,15 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
     color: white !important;
 }
 
-.contrast i {
-    color: yellow !important;
-}
-
+.contrast i,
 .contrast a {
     color: yellow !important;
 }
 
-.contrast .header-links a {
-    color: yellow !important;
-}
-
-.contrast .header-links a.br-item:not(:disabled):hover {
-    color: yellow !important;
-}
-
 .contrast button,
-.contrast input[type=button],
-.contrast input[type=reset],
-.contrast input[type=submit] {
+.contrast input[type="button"],
+.contrast input[type="reset"],
+.contrast input[type="submit"] {
     background: black !important;
     color: yellow !important;
     border: none !important;
@@ -423,36 +446,32 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
     filter: brightness(0) invert(1);
 }
 
-.contrast input[type=text],
-.contrast input[type=text]::placeholder,
-.contrast input[type=password],
-.contrast input[type=url],
-.contrast input[type=search],
-.contrast input[type=email],
-.contrast input[type=tel],
-.contrast input[type=date],
-.contrast input[type=month],
-.contrast input[type=week],
-.contrast input[type=datetime],
-.contrast input[type=datetime-local],
+.contrast input[type="text"],
+.contrast input[type="text"]::placeholder,
+.contrast input[type="password"],
+.contrast input[type="url"],
+.contrast input[type="search"],
+.contrast input[type="email"],
+.contrast input[type="tel"],
+.contrast input[type="date"],
+.contrast input[type="month"],
+.contrast input[type="week"],
+.contrast input[type="datetime"],
+.contrast input[type="datetime-local"],
 .contrast textarea,
-.contrast input[type=number] {
+.contrast input[type="number"] {
     background: black !important;
     border: 1px solid white !important;
     color: white !important;
 }
 
-.contrast .br-cookiebar .br-button {
+.contrast .br-cookiebar .br-button,
+.contrast #gotop {
     border: 1px solid #fff !important;
     background-color: black;
 }
 
-.contrast .header-info a * {
-    color: yellow !important;
-  }
-
-.contrast a.br-item,
-.contrast a.menu-item {
+.contrast a.br-item {
     background-color: transparent;
 }
 
@@ -476,7 +495,7 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 
 .contrast .br-footer .br-list.horizontal .br-item * {
     color: yellow !important;
-  }
+}
 
 .contrast div.br-card {
     border: 1px solid #fff;
@@ -485,184 +504,4 @@ div.com-content-article .cabecalho-linha .outstanding-title::after
 .contrast div.br-card i,
 .contrast div.br-card span {
     color: yellow !important;
-}
-
-/* Ajusta os backgrounds das logos de Acesso à Informação e Brasil do Footer */
-
-.br-footer .assigns img:not(:disabled):hover {
-    background-image: none;
-}
-
-.br-footer .assigns img:not(:disabled):active {
-    background-image: none;
-}
-
-/* Cor e hover do Título no Header*/
-
-.header-title a {
-    color: currentcolor;
-    text-decoration: none;
-}
-
-.header-title a:hover {
-    color: var(--interactive);
-    text-decoration: none;
-}
-
-.header-title a:not(:disabled):hover {
-    background-image: none;
-}
-
-/* Ajuste de posição do dropdown das br-list para smarthphone no br-header*/
-
-.br-header .header-actions .header-functions .br-list, .br-header .header-actions .header-links .br-list {
-    left: auto;
-    right: 0;
-}
-
-/*Ajusta font-weight, hover e link do copyright na info e no menu-info*/
-
-.info a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.info a:not(:disabled):hover {
-    background-image: none;
-    color: #5992ed;
-}
-
-.info .text-medium {
-    font-weight: 400!important;
-}
-
-.info .text-down-01 {
-    font-size: 13px!important;
-    color: #ccc;
-}
-
-.menu-info a {
-    color: var(--interactive);
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.menu-info a:not(:disabled):hover {
-    background-image: none;
-    color: #5992ed;
-}
-
-/* Ajusta o hover do header-logo, caso se queira link na logo */
-
-.header-logo a:not(:disabled):hover {
-    background-image: none;
-}
-
-/* Ajusta tamanho da fas fa-bars do menu */
-
-@media only screen and (min-width: 769px){
-  	.header-menu-trigger .fas {
-    	--icon-size: 24px;
-  }
-}
-
-@media only screen and (min-width:577px) and (max-width:768px){
-  	.header-menu-trigger .fas {
-    	--icon-size: 20px;
-  }
-}
-
-@media only screen and (max-width:576px) {
-  	.header-menu-trigger .fas {
-    	--icon-size: 16px;
-  }
-}
-
-/* Altera o weight e hover dos itens do header-links */
-
-.header-links a.br-item {
-    font-weight: 500;
-    color: var(--interactive);
-}
-
-.header-links a.br-item:not(:disabled):hover {
-    background-image: none;
-    color: #0c326f!important;
-}
-
-/* Back to top */
-
-html {
-    scroll-behavior: smooth;
-  }
-
-.backtotop {
-    animation-duration: 500ms;
-    animation-fill-mode: forwards;
-    animation-timing-function: linear;
-    position: fixed;
-    opacity: 0;
-    visibility: hidden;
-    bottom: 57px;
-    right: 8px;
-    height: 40px;
-    width: 40px;
-    background: #1351b4;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.backtotop span {
-    font-size: 16px;
-    width: auto;
-}
-
-.backtotop.active {
-    opacity: 1;
-    visibility: visible;
-    animation-direction: normal;
-    animation-name: bounceIn
-  }
-
-.backtotop:hover {
-    background: #dbe8fb;
-    text-decoration: none;
-    color: #1351b4;
-}
-
-.backtotop:focus {
-    outline-color: #c2850c;
-    outline-style: dashed;
-    outline-offset: 4px;
-    outline-width: 2px;
-}
-
-.backtotop:focus:not(.focus-visible) {
-    outline: none;
-}
-
-@keyframes bounceIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.3) translate3d(0, 0, 0)
-    }
-
-    50% {
-        opacity: 0.9;
-        transform: scale(1.1)
-    }
-
-    80% {
-        opacity: 1;
-        transform: scale(0.89)
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1) translate3d(0, 0, 0)
-    }
 }

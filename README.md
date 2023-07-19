@@ -26,7 +26,7 @@ Layouts:
 ## Parâmetros
 Parâmetros de estilo configurados na área "Avançado" do tema:
 * Largura: Fixa ou Fluída. Deixa o conteúdo fixo ou expande para preencher todas as laterais da tela. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
-* Menu Principal: Flutuante ou Emperruando. Quando flutuante, exibe o menu com elevação em relação ao conteúdo da página. No outro caso, o menu empurra o conteúdo da página na lateral esquerda. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
+* Menu Principal: Flutuante ou Empurrando. Quando flutuante, exibe o menu com elevação em relação ao conteúdo da página. No outro caso, o menu empurra o conteúdo da página na lateral esquerda. [Referência](https://www.gov.br/ds/components/menu?tab=desenvolvedor)
 * Cor do rodapé: escuro ou claro. [Referência](https://www.gov.br/ds/components/footer?tab=desenvolvedor)
 * Logo: marca exibida no cabeçalho. [Referência](https://www.gov.br/ds/components/header?tab=desenvolvedor)
 * Logo (Rodapé): marca exibida no rodapé. [Referência](https://www.gov.br/ds/components/footer?tab=desenvolvedor)

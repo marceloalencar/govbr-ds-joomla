@@ -75,7 +75,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                 <div class="<?php echo $largura ?>">
                     <div class="header-top">
                         <div class="header-logo">
-                            <a href="<?php echo Uri::root(); ?>"><img src="<?php echo $this->params->get('imagem_logo', Uri::root() . 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo" /></a>
+                            <img src="<?php echo $this->params->get('imagem_logo', Uri::root() . 'media/templates/site/govbr-ds/img/logo.svg'); ?>" alt="logo" />
                             <?php if (!empty($this->params->get('texto_assinatura', ''))) : ?>
                                 <span class="br-divider vertical mx-half mx-sm-1"></span>
                                 <div class="header-sign"><?php echo $this->params->get('texto_assinatura', ''); ?></div>
@@ -286,7 +286,6 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                     <jdoc:include type="modules" name="main-bottom" />
                 </div>
             </main>
-	    <a id="gotop" class="backtotop" href="#"><span class="fa fa-chevron-up"></span></a>
             <footer class="<?php echo $cor_footer ?>" id="footer">
 				<div class="<?php echo $largura ?>">
 					<div class="logo"><img src="<?php echo $this->params->get('imagem_logo_footer', Uri::root() . $logo_footer); ?>" alt="Imagem"/></div>
@@ -316,10 +315,10 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                             <?php endif; ?>
 							<div class="col assigns text-right">
 								<?php if ($this->params->get('imagem_footer_acesso', '1')) : ?>
-									<a href="https://www.gov.br/acessoainformacao"><img class="ml-4" src="<?php echo $this->params->get('cor_footer') ? Uri::root() . 'media/templates/site/govbr-ds/img/acesso_footer_claro.svg' : Uri::root() . 'media/templates/site/govbr-ds/img/acesso_footer.svg'; ?>" alt="Acesso a Informação"/></a>
+									<a class="d-inline-block ml-4" href="https://www.gov.br/acessoainformacao"><img src="<?php echo $this->params->get('cor_footer') ? Uri::root() . 'media/templates/site/govbr-ds/img/acesso_footer_claro.svg' : Uri::root() . 'media/templates/site/govbr-ds/img/acesso_footer.svg'; ?>" alt="Acesso a Informação"/></a>
 								<?php endif; ?>
 								<?php if ($this->params->get('imagem_footer_brasil', '1')) : ?>
-									<a href="https://www.gov.br/"><img class="ml-4" src="<?php echo $this->params->get('imagem_footer_brasil_src', Uri::root() . 'media/templates/site/govbr-ds/img/brasil_footer.svg')?>" alt="Imagem"/></a>
+									<a class="d-inline-block ml-4" href="https://www.gov.br/"><img src="<?php echo $this->params->get('imagem_footer_brasil_src', Uri::root() . 'media/templates/site/govbr-ds/img/brasil_footer.svg')?>" alt="Imagem"/></a>
 								<?php endif; ?>
 							</div>
 						</div>
@@ -334,7 +333,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                     </div>
                 </div>
             </footer>
-
+            <button id="gotop" class="br-button primary circle backtotop" aria-label="Ir para o topo" onclick="goTop()"><i class="fa fa-chevron-up"></i></button>
             <jdoc:include type="modules" name="debug" style="none" />
         </div>
         <div vw class="enabled">
