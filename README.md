@@ -53,7 +53,7 @@ Parâmetros de estilo configurados na área "Avançado" do tema:
 ## Posições
 * menuacesso: Menu de Acesso, exibido no cabeçalho. É obrigatório o uso do layout "acessorapido" no módulo.
 * search: Área para exibição do módulo Busca Inteligente (finder).
-* menu-body: Menu Principal (Conteúdo). É obrigatório o uso do layout "menuprincipal" nos módulos. Opcionalmente pode-se adicionar um ícone da biblioteca FontAwesome 5 Free para o menu, preenchendo o campo "Classe do Menu".
+* menu-body: Menu Principal (Conteúdo). É obrigatório o uso do layout "menuprincipal" nos módulos para itens multiníveis. Utilizar o layout "menuprincipal-nivel1" para exibição de itens de nível 1. Opcionalmente pode-se adicionar um ícone da biblioteca FontAwesome 5 Free para o menu, preenchendo o campo "Classe do Menu".
 * menu-logos: Menu Principal (Logos). É obrigatório o uso do layout "logosmenu" no módulo. É obrigatório o preenchimento do campo "Imagem do Link" nos itens de menu.
 * menu-links: Menu Principal (Links). É obrigatório o uso do layout "linksmenu" no módulo. Opcionalmente pode-se adicionar um ícone da biblioteca FontAwesome 5 Free para os itens de menu, preenchendo o campo "Classe de ícones de link".
 * main-top: Área para exibição de módulos no início da página, após o cabeçalho.

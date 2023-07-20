@@ -41,7 +41,7 @@ $linktype = '<span class="content">' . $item->title . '</span>';
 
 if ($item->menu_icon) {
     // The link has an icon
-    $linktype = '<span class="icon"><i class="' . $item->menu_icon . '" aria-hidden="true"></i></span>' . $linktype;
+    $linktype = '<span class="icon"><i class="fas ' . $item->menu_icon . '" aria-hidden="true"></i></span>' . $linktype;
 }
 
 if ($item->browserNav == 1) {

@@ -166,7 +166,7 @@ $logo_footer = $this->params->get('cor_footer') ? 'media/templates/site/govbr-ds
                                         </div>
                                     </div>
                                     <nav class="menu-body">
-                                        <jdoc:include type="modules" name="menu-body" style="menuprincipal" />
+                                        <jdoc:include type="modules" name="menu-body" style="none" />
                                     </nav>
                                     <div class="menu-footer">
                                         <?php if ($this->countModules('menu-logos')) : ?>
