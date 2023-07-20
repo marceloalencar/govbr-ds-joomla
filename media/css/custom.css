@@ -399,7 +399,7 @@ div.com-content-article .cabecalho-linha .outstanding-title::after {
 
 .contrast,
 .contrast nav,
-.contrast div,
+.contrast div:not(div[class^='swiper'], .carrossel-info),
 .contrast li,
 .contrast ol,
 .contrast header,
@@ -431,7 +431,8 @@ div.com-content-article .cabecalho-linha .outstanding-title::after {
 }
 
 .contrast i,
-.contrast a {
+.contrast a,
+.contrast a > span {
     color: yellow !important;
 }
 
@@ -472,6 +473,7 @@ div.com-content-article .cabecalho-linha .outstanding-title::after {
 }
 
 .contrast .br-cookiebar .br-button,
+.contrast .br-button.secondary,
 .contrast #gotop {
     border: 1px solid #fff !important;
     background-color: black;
@@ -510,4 +512,21 @@ div.com-content-article .cabecalho-linha .outstanding-title::after {
 .contrast div.br-card i,
 .contrast div.br-card span {
     color: yellow !important;
+}
+
+.contrast .swiper-slide .carrossel-info
+{
+    background: transparent !important;
+}
+
+.contrast .swiper-slide .carrossel-info .title a {
+    color: yellow !important;
+}
+
+.contrast div h2.newsflash-title {
+    background: black !important;
+}
+
+.contrast .newsflash-container img {
+    z-index: 0;
 }
